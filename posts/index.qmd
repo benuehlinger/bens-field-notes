@@ -1,0 +1,18 @@
+---
+title: "Notes"
+subtitle: "Notebooks, signals, and the occasional explainer."
+listing:
+  id: all-posts
+  contents: "."
+  sort: "date desc"
+  type: default
+  fields: [date, title, description, categories]
+  filter-ui: [title, description, categories]
+  sort-ui: false
+  categories: true
+page-layout: full
+toc: false
+---
+
+::: {#all-posts}
+:::

@@ -1,0 +1,197 @@
+---
+title: "Auto Loan Credit"
+subtitle: "ABS-EE Loan-Level Panel — SEC EDGAR"
+description: "Delinquency trends from SEC EDGAR ABS-EE filings. Loan-level auto credit data, parsed from servicer reports so you don't have to."
+toc: true
+freeze: false
+---
+
+```{=html}
+<div class="data-note">
+  <strong>Data source:</strong> SEC EDGAR ABS-EE autoloan panel —
+  loan-level data from asset-backed securities filings.
+  Parsed from raw XML filings via the bens-data-lake pipeline.
+  Coverage varies by issuer. See <a href="../data-sources.qmd">Data Sources</a> for full methodology.
+</div>
+```
+
+This is structured finance data — the kind of thing you'd normally pay a Bloomberg terminal
+to look at, except it's sitting in SEC EDGAR and nobody told you.
+ABS-EE filings contain loan-level performance data for auto loan ABS trusts:
+origination date, balance, days past due, payment status. The good stuff.
+
+---
+
+## Delinquency Trends
+
+90+ day delinquency rate across all loans in the panel, by filing month.
+A number going up here means consumers are falling behind on car payments.
+Make of that what you will.
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// Initialize DuckDB-WASM
+import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
+db = DuckDBClient.of({})
+
+// R2 base URL — injected via Quarto site params or environment
+r2Base = params["r2-base-url"]
+```
+
+```{ojs}
+//| echo: false
+
+// Query: 90+ day delinquency rate by filing month
+delinqData = {
+  if (!r2Base || r2Base === "") {
+    return null
+  }
+  try {
+    const result = await db.query(`
+      SELECT
+        filing_date,
+        COUNT(*) FILTER (WHERE days_past_due >= 90) * 100.0 / COUNT(*) AS delinq_rate_90plus,
+        COUNT(*) AS total_loans,
+        COUNT(*) FILTER (WHERE days_past_due >= 30) * 100.0 / COUNT(*) AS delinq_rate_30plus
+      FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/*.parquet')
+      WHERE filing_date IS NOT NULL
+      GROUP BY filing_date
+      ORDER BY filing_date
+    `)
+    return result
+  } catch(e) {
+    return { error: e.message }
+  }
+}
+```
+
+```{ojs}
+//| echo: false
+
+// Chart: 90+ day delinquency rate
+{
+  if (!r2Base || r2Base === "") {
+    const el = document.createElement("div")
+    el.className = "chart-error"
+    el.innerHTML = `<span>⚠</span><span>R2 data source not configured. Set <code>r2-base-url</code> in site params.</span>`
+    return el
+  }
+
+  if (!delinqData || delinqData.error) {
+    const el = document.createElement("div")
+    el.className = "chart-error"
+    el.innerHTML = `<span>⚠</span><span>Data unavailable — ${delinqData?.error ?? "unknown error"}. Check R2 connection.</span>`
+    return el
+  }
+
+  const maxDate = d3.max(delinqData, d => new Date(d.filing_date))
+  const asOfStr = maxDate
+    ? maxDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "unknown"
+
+  return Plot.plot({
+    title: "90+ Day Delinquency Rate",
+    subtitle: "% of loans 90+ days past due, by filing month",
+    width: 800,
+    height: 340,
+    marginLeft: 55,
+    marginBottom: 45,
+    x: {
+      type: "time",
+      label: null,
+      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+    },
+    y: {
+      label: "Delinquency Rate (%)",
+      tickFormat: d => `${d.toFixed(1)}%`,
+      grid: true,
+      gridColor: "var(--border-color, #D8D3C8)"
+    },
+    marks: [
+      Plot.ruleY([0], { stroke: "var(--border-color, #D8D3C8)" }),
+      Plot.line(delinqData, {
+        x: d => new Date(d.filing_date),
+        y: "delinq_rate_90plus",
+        stroke: "#4A6FA5",
+        strokeWidth: 2
+      }),
+      Plot.dot(delinqData, Plot.selectLast({
+        x: d => new Date(d.filing_date),
+        y: "delinq_rate_90plus",
+        fill: "#4A6FA5",
+        r: 4
+      }))
+    ],
+    caption: `Source: SEC EDGAR ABS-EE | Units: % of loans | No smoothing applied | As of ${asOfStr}`
+  })
+}
+```
+
+---
+
+## Loan Volume
+
+Total loans in the panel over time. This gives a sense of coverage — more loans
+means more issuers filing, means the delinquency rate above is a better sample.
+
+```{ojs}
+//| echo: false
+
+{
+  if (!delinqData || delinqData.error || !r2Base) return html`<div class="chart-loading"><span>◌</span><span>Waiting for data...</span></div>`
+
+  return Plot.plot({
+    title: "Total Loans in Panel",
+    subtitle: "Count of loans reported in ABS-EE filings, by month",
+    width: 800,
+    height: 260,
+    marginLeft: 65,
+    marginBottom: 45,
+    x: {
+      type: "time",
+      label: null,
+      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+    },
+    y: {
+      label: "Loan Count",
+      tickFormat: d => d >= 1e6 ? `${(d/1e6).toFixed(1)}M` : d >= 1e3 ? `${(d/1e3).toFixed(0)}K` : d,
+      grid: true,
+      gridColor: "var(--border-color, #D8D3C8)"
+    },
+    marks: [
+      Plot.areaY(delinqData, {
+        x: d => new Date(d.filing_date),
+        y: "total_loans",
+        fill: "#4A6FA5",
+        fillOpacity: 0.15
+      }),
+      Plot.line(delinqData, {
+        x: d => new Date(d.filing_date),
+        y: "total_loans",
+        stroke: "#4A6FA5",
+        strokeWidth: 1.5
+      })
+    ],
+    caption: "Source: SEC EDGAR ABS-EE | Units: loan count | As of latest filing month"
+  })
+}
+```
+
+---
+
+## Methodology
+
+**What counts as delinquent**: A loan is classified as 90+ days past due (`days_past_due >= 90`)
+at the servicer-reported filing date. The bucket used here is the most severe — it excludes
+30–59 day and 60–89 day buckets.
+
+**What's included**: All loans in Hive-partitioned Parquet files under
+`abs_ee/curated/asset_class=autoloan/` on R2. Coverage is limited to issuers that
+file ABS-EE with the SEC — not all auto ABS trusts are required to do so.
+
+**Known limitations**: Servicer definitions of "days past due" can vary slightly by issuer.
+This is the data as filed. No harmonization has been applied across issuers.
+
+For full source documentation, see [Data Sources →](../data-sources.qmd)

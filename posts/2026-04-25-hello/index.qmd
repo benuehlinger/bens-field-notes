@@ -1,0 +1,47 @@
+---
+title: "Field Notes, Volume Zero"
+date: 2026-04-25
+description: "What this site is, what it isn't, and why there's a Cloudflare Worker involved."
+categories: [methodology]
+type: notebook
+---
+
+This is a public data journal. The idea is simple enough: I spend time downloading,
+parsing, and analyzing financial datasets, and instead of letting those notebooks
+sit in a folder on my laptop, I put them here.
+
+## What you'll find here
+
+Mostly credit markets. The kind of data that shows up in analyst reports as a
+single chart with a footnote that says "Source: Federal Reserve." I'm interested
+in where those numbers come from and what the raw data actually shows when you
+look at it directly.
+
+The main datasets right now:
+
+- **ABS-EE** — loan-level auto credit data from SEC EDGAR securitization filings
+- **SLOOS** — the Federal Reserve's survey of bank lending standards  
+- **FRED** — macroeconomic series (NFCI, credit spreads, delinquency rates)
+
+More as the pipelines get built.
+
+## What this isn't
+
+Not financial advice. Not a trading signal service. Not trying to have takes.
+The analysis here is descriptive — here's what the data shows, here's the methodology,
+here's where it's incomplete. Conclusions are, per the tagline, questionable.
+
+## How the charts work
+
+The dashboards on this site query live Parquet data from a private Cloudflare R2 bucket.
+The queries run in your browser via DuckDB-WASM — a WebAssembly build of DuckDB that
+runs client-side with no backend server. The data travels from R2 to your browser and
+nowhere else.
+
+The data lake pipeline that ingests this data lives separately at
+[bens-data-lake](https://github.com/benuehlinger/bens-data-lake).
+This repo is just the visualization layer.
+
+---
+
+That's it. More notes when there's something worth writing.

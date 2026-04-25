@@ -1,0 +1,272 @@
+/*-- scss:defaults --*/
+
+/*------------------------------------------------------------------------*/
+/* Light mode palette                                                       */
+/*------------------------------------------------------------------------*/
+$body-bg:           #F5F0E8;   /* warm off-white parchment */
+$body-color:        #2C2C2C;   /* near-black charcoal */
+$link-color:        #4A6FA5;   /* muted slate blue */
+$link-hover-color:  #2E4B78;
+$code-bg:           #EDEAE2;
+$code-color:        #3D3D3D;
+
+$primary:           #4A6FA5;
+$secondary:         #8A8A8A;
+$border-color:      #D8D3C8;
+
+/*------------------------------------------------------------------------*/
+/* Typography                                                               */
+/*------------------------------------------------------------------------*/
+$font-family-sans-serif: 'DM Sans', system-ui, sans-serif;
+$font-family-monospace:  'DM Mono', 'Fira Mono', monospace;
+$headings-font-family:   'DM Serif Display', Georgia, serif;
+
+$font-size-base:    1.0625rem;  /* ~17px — comfortable reading size */
+$line-height-base:  1.75;
+$headings-line-height: 1.2;
+$headings-font-weight: 400;     /* Serif display at 400 is already bold enough */
+$paragraph-margin-bottom: 1.4rem;
+
+/*------------------------------------------------------------------------*/
+/* Spacing & layout                                                         */
+/*------------------------------------------------------------------------*/
+$spacer: 1rem;
+$border-radius: 4px;
+$border-radius-sm: 2px;
+
+/*------------------------------------------------------------------------*/
+/* Quarto-specific overrides                                               */
+/*------------------------------------------------------------------------*/
+$navbar-bg:         #F5F0E8;
+$navbar-fg:         #2C2C2C;
+$navbar-hl:         #4A6FA5;
+$footer-bg:         #EDE8E0;
+$footer-fg:         #8A8A8A;
+$sidebar-bg:        #F0EBE3;
+
+/*-- scss:rules --*/
+
+/*-- Google Fonts --*/
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=DM+Mono:wght@300;400&display=swap');
+
+/*------------------------------------------------------------------------*/
+/* Component overrides                                                      */
+/*------------------------------------------------------------------------*/
+
+/* Body */
+body {
+  letter-spacing: -0.01em;
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #1C1C1E;
+}
+
+h4, h5, h6 {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  color: #5A5A5A;
+}
+
+/* Navbar */
+.navbar {
+  border-bottom: 1px solid #D8D3C8;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+
+  .navbar-brand {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: #1C1C1E !important;
+  }
+
+  .nav-link {
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: #5A5A5A !important;
+    &:hover { color: #2C2C2C !important; }
+  }
+}
+
+/* Main content — generous whitespace */
+main.content {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+  max-width: 900px;
+}
+
+/* Lead paragraph on landing */
+.lead {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #4A4A4A;
+  font-weight: 300;
+}
+
+/* Source/as-of caption pattern under charts */
+.chart-caption {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: #8A8A8A;
+  letter-spacing: 0.02em;
+  margin-top: 0.5rem;
+  border-top: 1px solid #D8D3C8;
+  padding-top: 0.4rem;
+}
+
+/* Inline data annotations */
+.data-note {
+  background: #EDEAE2;
+  border-left: 3px solid #4A6FA5;
+  padding: 0.75rem 1rem;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  color: #4A4A4A;
+}
+
+/* Tags / categories */
+.quarto-category {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #EDEAE2;
+  border: 1px solid #D8D3C8;
+  color: #5A5A5A;
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+
+  &:hover {
+    background: #4A6FA5;
+    color: #F5F0E8;
+    border-color: #4A6FA5;
+  }
+}
+
+/* Code blocks */
+pre.sourceCode {
+  background: #EDEAE2;
+  border: 1px solid #D8D3C8;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Horizontal rule — used as section divider */
+hr {
+  border: none;
+  border-top: 1px solid #D8D3C8;
+  margin: 2.5rem 0;
+}
+
+/* Footer */
+.nav-footer {
+  border-top: 1px solid #D8D3C8;
+  font-size: 0.8rem;
+  color: #8A8A8A;
+  padding: 1.5rem 0;
+}
+
+/* Listing cards (blog posts) */
+.quarto-listing {
+  .listing-title a {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-weight: 400;
+    color: #2C2C2C;
+    text-decoration: none;
+    &:hover { color: #4A6FA5; }
+  }
+
+  .listing-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: #8A8A8A;
+    letter-spacing: 0.04em;
+  }
+
+  .listing-description {
+    color: #5A5A5A;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}
+
+/*------------------------------------------------------------------------*/
+/* Dark mode                                                                */
+/*------------------------------------------------------------------------*/
+
+/*-- Dark mode is the primary aesthetic. Rain outside. Deep focus. --*/
+
+.quarto-dark {
+  --body-bg:       #1C1C1E;
+  --body-color:    #E8E3D8;
+  --link-color:    #7BA3C8;
+  --border-color:  #3A3A3C;
+
+  body {
+    background-color: #1C1C1E;
+    color: #E8E3D8;
+  }
+
+  h1, h2, h3 { color: #F0EBE0; }
+  h4, h5, h6 { color: #9A9A9A; }
+
+  .navbar {
+    background: #1C1C1E !important;
+    border-bottom-color: #3A3A3C;
+
+    .navbar-brand { color: #F0EBE0 !important; }
+    .nav-link { color: #9A9A9A !important; &:hover { color: #E8E3D8 !important; } }
+  }
+
+  .chart-caption {
+    color: #6A6A6A;
+    border-top-color: #3A3A3C;
+  }
+
+  .data-note {
+    background: #2A2A2C;
+    border-left-color: #7BA3C8;
+    color: #C8C3B8;
+  }
+
+  .quarto-category {
+    background: #2A2A2C;
+    border-color: #3A3A3C;
+    color: #9A9A9A;
+    &:hover {
+      background: #7BA3C8;
+      color: #1C1C1E;
+      border-color: #7BA3C8;
+    }
+  }
+
+  pre.sourceCode {
+    background: #2A2A2C;
+    border-color: #3A3A3C;
+  }
+
+  hr { border-top-color: #3A3A3C; }
+
+  .nav-footer {
+    border-top-color: #3A3A3C;
+    color: #6A6A6A;
+  }
+
+  .quarto-listing {
+    .listing-title a { color: #E8E3D8; &:hover { color: #7BA3C8; } }
+    .listing-date { color: #6A6A6A; }
+    .listing-description { color: #9A9A9A; }
+  }
+
+  code { color: #C8A882; }
+}

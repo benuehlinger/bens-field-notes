@@ -1,0 +1,141 @@
+---
+title: "Data Sources"
+subtitle: "What it is, where it comes from, and what's wrong with it."
+toc: true
+---
+
+Every chart on this site is derived from one of the datasets below.
+This page documents what each dataset is, who publishes it, how it gets
+from the source to this site, and what known limitations you should keep in mind
+before drawing any strong conclusions from it.
+
+Transparency about methodology is not optional here. See the
+[constitution](https://github.com/benuehlinger/bens-field-notes/blob/main/.specify/memory/constitution.md)
+if you want the full doctrine.
+
+---
+
+## ABS-EE Autoloan Panel
+
+**Publisher**: SEC / Office of Structured Finance  
+**Source**: [SEC EDGAR ABS-EE filings](https://www.sec.gov/cgi-bin/browse-edgar)  
+**Update cadence**: Monthly (new filings processed as they appear on EDGAR)  
+**R2 prefix**: `abs_ee/curated/asset_class=autoloan/`  
+**Pipeline**: `bens-data-lake/pipelines/scripts/ingest_autoloan_panel_incremental.py`
+
+### What it is
+
+Under SEC Regulation AB II, issuers of certain auto loan asset-backed securities
+are required to file loan-level performance data (Form ABS-EE) monthly.
+The filing contains data on every loan in the pool: current balance, days past due,
+payment status, origination date, and other servicer-reported fields.
+
+The data lake pipeline downloads these filings from EDGAR's master index,
+parses the XML schema, and writes structured Parquet files partitioned by filing month.
+
+### Key variables
+
+| Variable | Description |
+|---|---|
+| `filing_date` | Month-end date of the servicer report |
+| `days_past_due` | Days since last payment, as reported by servicer |
+| `delinquency_status` | Bucketed: `current`, `30-59`, `60-89`, `90+`, `default` |
+| `current_balance` | Outstanding principal balance at filing date (USD) |
+| `origination_date` | Date the loan was originated |
+| `loan_type` | Vehicle type (new, used, lease) where available |
+
+### Known limitations
+
+- **Coverage**: Only loans in filed ABS trusts. Bank-held auto loans and captive
+  finance loans not securitized are excluded.
+- **Servicer definitions**: "Days past due" is servicer-reported. Definitions
+  vary slightly across issuers.
+- **Filing gaps**: Some issuers file late or amend prior filings.
+  The pipeline processes filings as they appear; amendments may not be retroactively applied.
+- **Universe size**: Varies by month depending on which issuers are active.
+  Check the loan count chart on the dashboard to assess coverage.
+
+---
+
+## SLOOS — Senior Loan Officer Opinion Survey
+
+**Publisher**: Federal Reserve Board  
+**Source**: [Federal Reserve SLOOS release](https://www.federalreserve.gov/releases/sloos/)  
+**Update cadence**: Quarterly (typically released ~2 weeks after survey close)  
+**R2 prefix**: `sloos/curated/source=fed_sloos_table_1/`  
+**Pipeline**: `bens-data-lake/pipelines/scripts/ingest_sloos_tables_to_r2.py`
+
+### What it is
+
+The Federal Reserve surveys senior loan officers at approximately 80 large domestic
+banks and 24 US branches of foreign banks quarterly. The survey asks whether
+lending standards have tightened, eased, or remained unchanged over the past three
+months, and whether loan demand has increased or decreased.
+
+Results are reported as a **net percentage**: (% tightening) − (% easing).
+Positive values mean more banks are tightening than easing. Negative values mean
+more banks are easing.
+
+The pipeline scrapes the HTML tables from the Federal Reserve's release page
+and writes Parquet to R2.
+
+### Key variables
+
+| Variable | Description |
+|---|---|
+| `survey_date` | Quarter-end date of the survey |
+| `net_pct_tightening` | Net % reporting tighter standards (positive = more tightening) |
+| `loan_type` | C&I (large/small firm), CRE, consumer (auto, CC, other) |
+| `question_label` | Federal Reserve question text as published |
+
+### Known limitations
+
+- **Survey-based**: Measures opinion and intent, not actual loan volumes or prices.
+  A bank saying it's tightening standards is not the same as measuring tighter standards.
+- **Aggregation**: Net percentage masks the distribution.
+  A 20% net tightening reading could be 30% tightening / 10% easing
+  or 60% tightening / 40% easing. Different situations.
+- **Definition changes**: The Fed has revised question wording over the years.
+  Long historical comparisons should account for definitional shifts.
+- **Response rate**: Not all surveyed banks respond in every quarter.
+
+---
+
+## FRED Macro Bundle
+
+**Publisher**: Federal Reserve Bank of St. Louis (FRED)  
+**Source**: [FRED API](https://fred.stlouisfed.org/)  
+**Update cadence**: Daily (FRED series updated as new data releases)  
+**R2 prefix**: `macro/curated/source=fred_api/`  
+**Pipeline**: `bens-data-lake/pipelines/scripts/ingest_fred_series_bundle_to_r2.py`
+
+### What it is
+
+A curated bundle of macroeconomic time series fetched from the FRED API.
+Includes financial stress indicators, credit spreads, and delinquency rates.
+The pipeline fetches only series that have updated since the last run (`--skip-if-unchanged`).
+
+**Included series (non-exhaustive)**:
+
+| Series ID | Description |
+|---|---|
+| `NFCI` | Chicago Fed National Financial Conditions Index |
+| `DRTSCIS` | Net % banks tightening C&I loan standards (from SLOOS, on FRED) |
+| Various | Credit spreads, consumer delinquency aggregates |
+
+### Status
+
+The FRED macro dataset is present in the data lake but **not yet surfaced on this site**.
+It will appear in v2 of the dashboard. The R2 data is there if you want to query it
+directly: `macro/curated/source=fred_api/*.parquet`.
+
+### Known limitations
+
+- FRED series definitions, vintage dates, and revisions vary by source agency.
+- Some series are seasonally adjusted (SA); others are not (NSA).
+  Check the `units` field in the Parquet schema.
+
+---
+
+*Last updated: 2026-04-25. For data pipeline documentation, see
+[bens-data-lake](https://github.com/benuehlinger/bens-data-lake).*

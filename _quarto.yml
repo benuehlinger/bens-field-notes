@@ -1,0 +1,69 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "posts/**/*.qmd"
+    - "dashboards/**/*.qmd"
+  resources:
+    - "styles/**"
+
+website:
+  title: "Ben's Field Notes"
+  description: "Rigorous Analysis. Questionable Conclusions. Overengineered Charts."
+  favicon: "styles/assets/favicon.ico"
+
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Dashboards"
+        menu:
+          - text: "Auto Loan Credit"
+            href: dashboards/abs-ee.qmd
+          - text: "Bank Lending Standards"
+            href: dashboards/sloos.qmd
+      - text: "Notes"
+        href: posts/index.qmd
+      - text: "Data Sources"
+        href: data-sources.qmd
+    right:
+      - icon: github
+        href: https://github.com/benuehlinger/bens-field-notes
+        aria-label: GitHub
+
+  page-footer:
+    left: |
+      Ben's Field Notes — Rigorous Analysis. Questionable Conclusions.
+    right: |
+      Built with [Quarto](https://quarto.org). Data from SEC EDGAR, Federal Reserve, FRED.
+
+  search: true
+
+  open-graph:
+    title: "Ben's Field Notes"
+    description: "Rigorous Analysis. Questionable Conclusions. Overengineered Charts."
+
+format:
+  html:
+    theme:
+      light: [flatly, styles/theme.scss]
+      dark: [darkly, styles/theme.scss]
+    css: styles/custom.css
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    highlight-style: github-dark
+    fig-responsive: true
+    grid:
+      sidebar-width: 0px
+      body-width: 900px
+      margin-width: 200px
+
+execute:
+  freeze: auto
+  cache: false
+
+params:
+  r2-base-url: ""

@@ -1,0 +1,90 @@
+/* Ben's Field Notes — custom CSS (post-SCSS, light touches) */
+
+/* Smooth transitions for dark/light mode toggle */
+body, .navbar, pre, code, .data-note, .quarto-category {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* OJS chart containers */
+.observablehq {
+  margin: 1.5rem 0;
+}
+
+/* Chart error state */
+.chart-error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: #FFF5F0;
+  border: 1px solid #E8C8BB;
+  border-left: 4px solid #C8604A;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: #7A3020;
+  margin: 1.5rem 0;
+}
+
+/* Chart loading state */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: #F5F0E8;
+  border: 1px dashed #D8D3C8;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: #8A8A8A;
+  margin: 1.5rem 0;
+}
+
+/* Dashboard stat callout boxes */
+.stat-box {
+  text-align: center;
+  padding: 1.5rem;
+  background: #F5F0E8;
+  border: 1px solid #D8D3C8;
+  border-radius: 4px;
+}
+
+.stat-box .stat-value {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2.2rem;
+  color: #2C2C2C;
+  line-height: 1;
+}
+
+.stat-box .stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  margin-top: 0.5rem;
+}
+
+/* Dark mode overrides for custom CSS */
+.quarto-dark .chart-error {
+  background: #2A1A18;
+  border-color: #5A3028;
+  border-left-color: #C8604A;
+  color: #E8A898;
+}
+
+.quarto-dark .chart-loading {
+  background: #2A2A2C;
+  border-color: #3A3A3C;
+  color: #6A6A6A;
+}
+
+.quarto-dark .stat-box {
+  background: #2A2A2C;
+  border-color: #3A3A3C;
+}
+
+.quarto-dark .stat-box .stat-value {
+  color: #E8E3D8;
+}

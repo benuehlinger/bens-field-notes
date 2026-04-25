@@ -71,6 +71,12 @@ Written copy MUST follow the "Rigorous Analysis. Questionable Conclusions." voic
   as a defensive shield.
 - Charts and labels MUST remain clinically factual — no humor in axis labels or
   legends that could obscure meaning.
+- The underlying register is: lowkey, analytical, quietly confident. Not
+  performative. Not trying to impress anyone. The work speaks. The voice is
+  the kind of person who notices things, thinks carefully, and says what they
+  mean without fanfare.
+- Think: late-night focus session, rain outside, one dataset open, no deadline.
+  The writing should feel like it was done in that headspace.
 
 Banned phrases: "unlock the potential of", "deep dive", "robust", "leverage",
 "actionable insights", "game-changing", and any sentence that opens with
@@ -89,18 +95,25 @@ chart MUST be documented inline on the same page. This includes:
 If a transformation is complex enough to require more than two sentences to
 explain, it deserves a callout box, not a footnote.
 
-### VI. Visual Design — Muted, Editorial, Data-Forward
+### VI. Visual Design — Muted, Contemplative, Data-Forward
 
 The visual system MUST follow these constraints:
-- Background: off-white / light cream (day mode), deep charcoal (dark mode)
-- Text: charcoal / near-black (day), off-white (dark)
-- Accent palette: muted, no neon. Warm earth tones or cool slate. Single
-  primary accent color; one secondary at most.
-- Typography: one display/heading font (distinctive, not Inter), one body font
-  (readable at 16–18px).
-- Chart ink: restrained. Data-ink ratio MUST be high. No 3D charts. No pie charts
-  unless there are exactly two slices and we're making a point about how bad
-  pie charts are.
+- Background: off-white / light cream (day mode), deep charcoal (dark mode).
+  Dark mode is considered the primary aesthetic — the site should look at home
+  on a screen at night.
+- Text: charcoal / near-black (day), soft off-white (dark — not pure white)
+- Accent palette: muted, no neon. Cool slate, rain-grey, or warm amber.
+  Single primary accent; one secondary at most. The palette should feel
+  like a quiet room, not a conference slide.
+- Typography: one display/heading font (distinctive, not Inter, not Roboto),
+  one body font optimized for sustained reading at 16–18px. Comfortable
+  line-height. Generous paragraph spacing. This is a reading site.
+- Whitespace: generous. Pages breathe. Nothing cramped.
+- Mood reference: the kind of site you'd read on a rainy afternoon. Calm.
+  Focused. Unhurried.
+- Chart ink: restrained. Data-ink ratio MUST be high. No 3D charts. No pie
+  charts unless there are exactly two slices and we're making a point about
+  how bad pie charts are.
 - Every page MUST work in both light and dark mode. No hardcoded hex colors in
   `{ojs}` cells — use CSS custom properties.
 

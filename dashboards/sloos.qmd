@@ -1,0 +1,155 @@
+---
+title: "Bank Lending Standards"
+subtitle: "Senior Loan Officer Opinion Survey — Federal Reserve"
+description: "The Fed asks banks if they're tightening credit. Banks answer. We chart it. Riveting."
+toc: true
+freeze: false
+---
+
+```{=html}
+<div class="data-note">
+  <strong>Data source:</strong> Federal Reserve Senior Loan Officer Opinion Survey (SLOOS) —
+  Table 1 (C&amp;I loans) and Table 2 (Consumer loans).
+  Quarterly survey. Net percentage = % tightening minus % easing.
+  See <a href="../data-sources.qmd">Data Sources</a> for methodology.
+</div>
+```
+
+Four times a year, the Federal Reserve asks senior loan officers at major banks
+whether they've been tightening or loosening lending standards. The result is reported
+as a "net percentage" — banks tightening minus banks easing. Positive means more banks
+are tightening than easing. Historically, sustained readings above +20% have preceded
+things worth paying attention to.
+
+This is survey data. It measures intent and perception, not actual loan volumes.
+Keep that in mind before drawing any strong conclusions. Or don't — your call.
+
+---
+
+## Net Tightening by Loan Type
+
+Net percentage of banks reporting tighter lending standards.
+A value above zero means more banks are tightening than easing.
+The horizontal line at zero is there so you know where zero is.
+
+```{ojs}
+//| echo: false
+//| output: false
+
+import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
+db_sloos = DuckDBClient.of({})
+r2Base = params["r2-base-url"]
+```
+
+```{ojs}
+//| echo: false
+
+sloosData = {
+  if (!r2Base || r2Base === "") return null
+  try {
+    const result = await db_sloos.query(`
+      SELECT
+        survey_date,
+        question_label,
+        loan_type,
+        net_pct_tightening
+      FROM read_parquet('${r2Base}/sloos/curated/source=fed_sloos_table_1/*.parquet')
+      WHERE loan_type IN ('C&I - Large', 'C&I - Small', 'Consumer - Auto', 'Consumer - Credit Card')
+        AND survey_date IS NOT NULL
+      ORDER BY survey_date, loan_type
+    `)
+    return result
+  } catch(e) {
+    return { error: e.message }
+  }
+}
+```
+
+```{ojs}
+//| echo: false
+
+{
+  if (!r2Base || r2Base === "") {
+    const el = document.createElement("div")
+    el.className = "chart-error"
+    el.innerHTML = `<span>⚠</span><span>R2 data source not configured.</span>`
+    return el
+  }
+
+  if (!sloosData || sloosData.error) {
+    const el = document.createElement("div")
+    el.className = "chart-error"
+    el.innerHTML = `<span>⚠</span><span>Data unavailable — ${sloosData?.error ?? "unknown error"}.</span>`
+    return el
+  }
+
+  const maxDate = d3.max(sloosData, d => new Date(d.survey_date))
+  const asOfStr = maxDate
+    ? maxDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "unknown"
+
+  // Color palette — 4 muted series colors
+  const loanColors = {
+    "C&I - Large":            "#4A6FA5",
+    "C&I - Small":            "#7BA3C8",
+    "Consumer - Auto":        "#C8A058",
+    "Consumer - Credit Card": "#8A7A5A"
+  }
+
+  const loanTypes = [...new Set(sloosData.map(d => d.loan_type))]
+
+  return Plot.plot({
+    title: "Net % of Banks Tightening Lending Standards",
+    subtitle: "Positive = more banks tightening than easing",
+    width: 800,
+    height: 380,
+    marginLeft: 55,
+    marginBottom: 50,
+    color: {
+      domain: loanTypes,
+      range: loanTypes.map(t => loanColors[t] ?? "#8A8A8A"),
+      legend: true
+    },
+    x: {
+      type: "time",
+      label: null,
+      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+    },
+    y: {
+      label: "Net % Tightening",
+      tickFormat: d => `${d > 0 ? "+" : ""}${d}%`,
+      grid: true,
+      gridColor: "var(--border-color, #D8D3C8)"
+    },
+    marks: [
+      Plot.ruleY([0], { stroke: "#8A8A8A", strokeWidth: 1.5, strokeDasharray: "4,3" }),
+      Plot.line(sloosData, {
+        x: d => new Date(d.survey_date),
+        y: "net_pct_tightening",
+        stroke: "loan_type",
+        strokeWidth: 2,
+        curve: "monotone-x"
+      })
+    ],
+    caption: `Source: Federal Reserve SLOOS Table 1 | Units: net % | Survey-based | As of ${asOfStr}`
+  })
+}
+```
+
+---
+
+## What Tightening Means in Practice
+
+Net tightening is reported as: **(% tightening standards) − (% easing standards)**.
+
+- **+40% or above**: Significant tightening — happened during the GFC (2008–2009)
+  and the early COVID period (2020).
+- **+20% to +40%**: Elevated tightening — historically associated with late-cycle
+  credit slowdowns.
+- **Near zero**: Roughly neutral — banks aren't materially changing standards.
+- **Negative**: Net easing — more banks loosening than tightening. Less common.
+
+This is a diffusion index, not a volume measure. It doesn't tell you how much
+standards tightened — only how many banks said they did.
+
+For full source documentation, see [Data Sources →](../data-sources.qmd)
