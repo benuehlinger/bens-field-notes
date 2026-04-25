@@ -1,0 +1,13 @@
+name = "bens-field-notes-r2"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# R2 bucket binding — name must match usage in index.js
+[[r2_buckets]]
+binding = "DATA_LAKE"
+bucket_name = "YOUR_BUCKET_NAME"   # replace with your actual R2 bucket name
+
+[vars]
+# Allowed origin for CORS — your Cloudflare Pages domain
+# Update this once you have your Pages URL (e.g. https://bens-field-notes.pages.dev)
+ALLOWED_ORIGIN = "http://localhost:4321"
