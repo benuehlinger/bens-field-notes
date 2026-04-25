@@ -19,11 +19,15 @@ jobs:
           version: "1.9.37"
 
       - name: Render site
-        run: quarto render
+        run: |
+          if [ -n "${R2_BASE_URL:-}" ]; then
+            quarto render -P "r2-base-url:${R2_BASE_URL}"
+          else
+            quarto render
+          fi
         env:
-          # Injected by Cloudflare Pages environment variables
-          # Set R2_BASE_URL in Cloudflare Pages dashboard → Settings → Environment Variables
-          QUARTO_PROFILE: production
+          # Optional — add as a GitHub Actions secret if you use this workflow
+          R2_BASE_URL: ${{ secrets.R2_BASE_URL }}
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1

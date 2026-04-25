@@ -17,6 +17,9 @@ _site/
 _freeze/
 .quarto/
 
+# Wrangler local state
+worker/.wrangler/
+
 # Cursor agent (may contain auth tokens)
 .cursor/
 

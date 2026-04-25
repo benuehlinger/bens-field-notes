@@ -11,7 +11,6 @@ project:
 website:
   title: "Ben's Field Notes"
   description: "Rigorous Analysis. Questionable Conclusions. Overengineered Charts."
-  favicon: "styles/assets/favicon.ico"
 
   navbar:
     left:

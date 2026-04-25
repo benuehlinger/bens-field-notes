@@ -5,7 +5,7 @@ compatibility_date = "2024-09-23"
 # R2 bucket binding — name must match usage in index.js
 [[r2_buckets]]
 binding = "DATA_LAKE"
-bucket_name = "YOUR_BUCKET_NAME"   # replace with your actual R2 bucket name
+bucket_name = "lending-data-lake"   # replace with your actual R2 bucket name
 
 [vars]
 # Allowed origin for CORS — your Cloudflare Pages domain
