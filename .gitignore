@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Next.js (legacy, not used)
+.next/
+*.tsbuildinfo
+
+# Environment — never commit secrets
+.env
+.env.local
+
+# macOS
+.DS_Store
+
+# Quarto build output
+_site/
+_freeze/
+.quarto/
+
+# Cursor agent (may contain auth tokens)
+.cursor/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
