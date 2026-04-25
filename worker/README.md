@@ -31,10 +31,17 @@ ALLOWED_ORIGIN = "https://bens-field-notes.pages.dev"
 Then redeploy: `npx wrangler deploy`
 
 ### 5. Set R2_BASE_URL on Cloudflare Pages
-In Cloudflare Pages → your project → Settings → Environment Variables:
+In Cloudflare Pages → your project → **Settings → Environment variables**:
 ```
 R2_BASE_URL = https://bens-field-notes-r2.YOUR-SUBDOMAIN.workers.dev
 ```
+
+**Build command** (the repo installs Quarto during the build):
+```
+bash scripts/cloudflare-pages-build.sh
+```
+
+**Build output directory:** `_site` (no leading slash)
 
 ### 6. Update .env.local for local dev
 ```
