@@ -2,10 +2,12 @@
 title: "Auto Loan Credit — May 2018"
 subtitle: "ABS-EE Loan-Level Panel · SEC EDGAR Securitization Filings"
 description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 performance. Pre-computed from raw SEC EDGAR ABS-EE filings via DuckDB."
-toc: false
+toc: true
+toc-depth: 2
 page-layout: full
 format:
   html:
+    toc-location: body
     grid:
       body-width: 1120px
       margin-width: 0px
