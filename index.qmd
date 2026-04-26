@@ -14,48 +14,50 @@ listing:
   sort-ui: false
 ---
 
-```{=html}
-<div class="hero-section" style="padding: 3rem 0 2rem 0; max-width: 680px;">
-  <p class="lead">
-    A public data journal. Mostly credit markets, occasionally macro, always overengineered.
-    I spend an unreasonable amount of time downloading and parsing financial datasets
-    so you don't have to — though you probably also don't want to.
-  </p>
-  <p style="color: #8A8A8A; font-size: 0.9rem; margin-top: 1rem;">
-    Data from SEC EDGAR, the Federal Reserve, and FRED.
-    Analysis my own. Conclusions questionable by design.
-  </p>
-</div>
-```
+::: {.hero-section}
+<p class="lead">
+  A public data journal. Mostly credit markets, occasionally macro, always overengineered.
+  I spend an unreasonable amount of time downloading and parsing financial datasets
+  so you don't have to — though you probably also don't want to.
+</p>
+<p class="hero-meta">
+  Data from SEC EDGAR, the Federal Reserve, and FRED.
+  Analysis my own. Conclusions questionable by design.
+</p>
+:::
 
 ---
 
-## Dashboards
+## Dashboards {.home-section-title}
 
 Live charts querying the data lake directly. Updated when the pipelines run, which is to say,
 whenever I remember to run them.
 
-::: {.grid}
+::: {.grid .dashboard-tiles}
 ::: {.g-col-12 .g-col-md-6}
-**[Auto Loan Credit — ABS-EE Panel](dashboards/abs-ee.qmd)**
+::: {.dashboard-tile}
+[**Auto Loan Credit — ABS-EE Panel**](dashboards/abs-ee.qmd)
 
 Loan-level delinquency data from SEC EDGAR ABS-EE filings. Consumer auto credit,
 aggregated from servicer reports. Not exactly a beach read.
 :::
+:::
 
 ::: {.g-col-12 .g-col-md-6}
-**[Bank Lending Standards — SLOOS](dashboards/sloos.qmd)**
+::: {.dashboard-tile}
+[**Bank Lending Standards — SLOOS**](dashboards/sloos.qmd)
 
 The Fed's Senior Loan Officer Opinion Survey. Banks self-reporting whether they're
 tightening credit. Spoiler: when they tighten a lot, things tend to get interesting.
 :::
 :::
+:::
 
 ---
 
-## Recent Notes
+## Recent Notes {.home-section-title}
 
 ::: {#recent-posts}
 :::
 
-[All notes →](posts/index.qmd)
+[All notes →](posts/index.qmd){.home-all-notes-link}
