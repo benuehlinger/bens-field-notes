@@ -4,6 +4,11 @@ subtitle: "ABS-EE Loan-Level Panel · SEC EDGAR Securitization Filings"
 description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 performance. Pre-computed from raw SEC EDGAR ABS-EE filings via DuckDB."
 toc: false
 page-layout: full
+format:
+  html:
+    grid:
+      body-width: 1120px
+      margin-width: 0px
 ---
 
 ```{=html}
@@ -76,12 +81,74 @@ DELINQ = [
 
 ```{ojs}
 //| echo: false
+//| output: false
+
+viewModeInput = Inputs.radio(["Count", "Share %"], {
+  label: "Metric view",
+  value: "Count"
+})
+topNTrustsInput = Inputs.range([6, 12], { label: "Trust bars", value: 10, step: 1 })
+topNStatesInput = Inputs.range([5, 10], { label: "State bars", value: 10, step: 1 })
+focusBandInput = Inputs.select(
+  ["All", "Prime (740+)", "Near-prime (700-739)", "Mid (650-699)", "Subprime (<650)"],
+  { label: "Trust focus", value: "All" }
+)
+
+viewMode = Generators.input(viewModeInput)
+topNTrusts = Generators.input(topNTrustsInput)
+topNStates = Generators.input(topNStatesInput)
+focusBand = Generators.input(focusBandInput)
+
+bandForFico = (score) => score >= 740
+  ? "Prime (740+)"
+  : score >= 700
+    ? "Near-prime (700-739)"
+    : score >= 650
+      ? "Mid (650-699)"
+      : "Subprime (<650)"
+
+TRUSTS_VIEW = TRUSTS
+  .map((d) => ({ ...d, share: (d.loans * 100) / 706856, fico_band: bandForFico(d.avg_fico) }))
+  .filter((d) => focusBand === "All" ? true : d.fico_band === focusBand)
+  .sort((a, b) => b.loans - a.loans)
+  .slice(0, topNTrusts)
+
+STATES_VIEW = STATES
+  .map((d) => ({ ...d, share: (d.n * 100) / 529820 }))
+  .sort((a, b) => b.n - a.n)
+  .slice(0, topNStates)
+
+FICO_VIEW = FICO.map((d) => ({ ...d, share: (d.n * 100) / 695650 }))
+RATES_VIEW = RATES.map((d) => ({ ...d, share: (d.n * 100) / 612742 }))
+VINTAGE_VIEW = VINTAGE.map((d) => ({ ...d, share: (d.n * 100) / 706856 }))
+DELINQ_VIEW = DELINQ.map((d) => ({ ...d, share: (d.n * 100) / 529820 }))
+```
+
+```{ojs}
+//| echo: false
+
+sessionClock = {
+  const el = html`<span class="live-timestamp"></span>`
+  const tick = () => {
+    el.textContent = `session refresh ${new Date().toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"})}`
+  }
+  tick()
+  const timer = setInterval(tick, 1000)
+  invalidation.then(() => clearInterval(timer))
+  return el
+}
+```
+
+```{ojs}
+//| echo: false
 
 // KPI strip
 html`
 <div class="showcase-meta">
   <span class="showcase-period">April 2018 reporting period</span>
-  <span class="static-badge">pre-computed snapshot</span>
+  <span class="static-badge">snapshot model</span>
+  <span class="live-badge">live interactions</span>
+  ${sessionClock}
 </div>
 <div class="kpi-strip">
   <div class="kpi-card">
@@ -108,6 +175,12 @@ html`
     <div class="kpi-value">63.5%</div>
     <div class="kpi-label">New Vehicles</div>
   </div>
+</div>
+<div class="showcase-controls">
+  <div class="showcase-control"><label>Metric</label>${viewModeInput}</div>
+  <div class="showcase-control"><label>Trust Bars</label>${topNTrustsInput}</div>
+  <div class="showcase-control"><label>State Bars</label>${topNStatesInput}</div>
+  <div class="showcase-control"><label>Trust Focus</label>${focusBandInput}</div>
 </div>`
 ```
 
@@ -124,17 +197,20 @@ html`
 //| echo: false
 
 {
-  const totalLoans = TRUSTS.reduce((s, d) => s + d.loans, 0)
+  const xField = viewMode === "Count" ? "loans" : "share"
+  const xMax = viewMode === "Count"
+    ? Math.max(...TRUSTS_VIEW.map((d) => d.loans)) * 1.3
+    : Math.max(...TRUSTS_VIEW.map((d) => d.share)) * 1.35
   return Plot.plot({
     marginLeft: 190,
-    marginRight: 80,
-    height: 340,
-    x: { axis: null, domain: [0, 135000] },
+    marginRight: 120,
+    height: 360,
+    x: { axis: null, domain: [0, xMax] },
     y: { label: null, tickSize: 0 },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barX(TRUSTS, {
-        x: "loans",
+      Plot.barX(TRUSTS_VIEW, {
+        x: xField,
         y: "name",
         fill: d => d.avg_fico >= 740 ? "#4A6FA5"
                  : d.avg_fico >= 700 ? "#7BA3C8"
@@ -143,15 +219,22 @@ html`
         sort: { y: "-x" },
         rx: 2
       }),
-      Plot.text(TRUSTS, {
-        x: "loans",
+      Plot.text(TRUSTS_VIEW, {
+        x: xField,
         y: "name",
-        text: d => `${(d.loans/1000).toFixed(0)}K  ·  FICO ${d.avg_fico}`,
+        text: d => viewMode === "Count"
+          ? `${(d.loans / 1000).toFixed(0)}K`
+          : `${d.share.toFixed(1)}%`,
         dx: 8,
         textAnchor: "start",
-        fill: "#9A9A9A",
-        fontSize: 10
-      })
+        fill: "#6E6E6E",
+        fontSize: 11
+      }),
+      Plot.tip(TRUSTS_VIEW, Plot.pointer({
+        x: xField,
+        y: "name",
+        title: d => `${d.name}\nLoans: ${d.loans.toLocaleString()}\nShare: ${d.share.toFixed(2)}%\nAvg FICO: ${d.avg_fico}`
+      }))
     ]
   })
 }
@@ -168,31 +251,41 @@ html`
 //| echo: false
 
 {
-  const total = STATES.reduce((s, d) => s + d.n, 0)
+  const xField = viewMode === "Count" ? "n" : "share"
+  const xMax = viewMode === "Count"
+    ? Math.max(...STATES_VIEW.map((d) => d.n)) * 1.28
+    : Math.max(...STATES_VIEW.map((d) => d.share)) * 1.35
   return Plot.plot({
     marginLeft: 36,
-    marginRight: 90,
-    height: 340,
-    x: { axis: null },
+    marginRight: 120,
+    height: 360,
+    x: { axis: null, domain: [0, xMax] },
     y: { label: null, tickSize: 0 },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barX(STATES, {
-        x: "n",
+      Plot.barX(STATES_VIEW, {
+        x: xField,
         y: "state",
         fill: "#C8A058",
         sort: { y: "-x" },
         rx: 2
       }),
-      Plot.text(STATES, {
-        x: "n",
+      Plot.text(STATES_VIEW, {
+        x: xField,
         y: "state",
-        text: d => `${(d.n/1000).toFixed(0)}K  ${(d.n*100/total).toFixed(1)}%`,
+        text: d => viewMode === "Count"
+          ? `${(d.n/1000).toFixed(0)}K  ${d.share.toFixed(1)}%`
+          : `${d.share.toFixed(1)}%`,
         dx: 8,
         textAnchor: "start",
-        fill: "#9A9A9A",
-        fontSize: 10
-      })
+        fill: "#6E6E6E",
+        fontSize: 11
+      }),
+      Plot.tip(STATES_VIEW, Plot.pointer({
+        x: xField,
+        y: "state",
+        title: d => `${d.state}\nLoans: ${d.n.toLocaleString()}\nShare: ${d.share.toFixed(2)}%`
+      }))
     ]
   })
 }
@@ -216,29 +309,37 @@ html`
 
 {
   const ficoColors = ["#C86A50","#C8964A","#C8B86A","#7EA870","#5A8A8A","#4A6FA5"]
-  const total = FICO.reduce((s, d) => s + d.n, 0)
+  const yField = viewMode === "Count" ? "n" : "share"
+  const total = FICO_VIEW.reduce((s, d) => s + d.n, 0)
   return Plot.plot({
-    height: 230,
-    marginTop: 30,
+    height: 280,
+    marginTop: 20,
     x: { label: null, tickSize: 0 },
     y: { axis: null },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barY(FICO, {
+      Plot.barY(FICO_VIEW, {
         x: "bucket",
-        y: "n",
+        y: yField,
         fill: (d, i) => ficoColors[i],
         rx: 2
       }),
-      Plot.text(FICO, {
+      Plot.text(FICO_VIEW, {
         x: "bucket",
-        y: "n",
-        text: d => (d.n * 100 / total).toFixed(0) + "%",
-        dy: -8,
-        fontSize: 10,
-        fill: "#8A8A8A"
+        y: yField,
+        text: d => viewMode === "Count"
+          ? (d.n * 100 / total).toFixed(1) + "%"
+          : d.share.toFixed(1) + "%",
+        dy: -10,
+        fontSize: 11,
+        fill: "#6E6E6E"
       }),
-      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 }),
+      Plot.tip(FICO_VIEW, Plot.pointer({
+        x: "bucket",
+        y: yField,
+        title: d => `${d.bucket}\nLoans: ${d.n.toLocaleString()}\nShare: ${d.share.toFixed(2)}%`
+      }))
     ]
   })
 }
@@ -255,31 +356,34 @@ html`
 //| echo: false
 
 {
-  const total = VINTAGE.reduce((s, d) => s + d.n, 0)
+  const yField = viewMode === "Count" ? "n" : "share"
   return Plot.plot({
-    height: 230,
-    marginTop: 30,
+    height: 280,
+    marginTop: 20,
     x: { label: null, tickSize: 0 },
     y: { axis: null },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barY(VINTAGE, {
+      Plot.barY(VINTAGE_VIEW, {
         x: "year",
-        y: "n",
+        y: yField,
         fill: d => d.year === "2016" ? "#4A6FA5" : "#D4CFC4",
         rx: 2
       }),
-      Plot.text(VINTAGE.filter(d => d.n > 20000), {
+      Plot.text(VINTAGE_VIEW.filter(d => d.year === "2016"), {
         x: "year",
-        y: "n",
-        text: d => d.year === "2016"
-          ? (d.n/1000).toFixed(0) + "K"
-          : (d.n/1000).toFixed(0) + "K",
-        dy: -8,
-        fontSize: 10,
-        fill: "#8A8A8A"
+        y: yField,
+        text: d => viewMode === "Count" ? (d.n/1000).toFixed(0) + "K" : d.share.toFixed(1) + "%",
+        dy: -10,
+        fontSize: 11,
+        fill: "#6E6E6E"
       }),
-      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 }),
+      Plot.tip(VINTAGE_VIEW, Plot.pointer({
+        x: "year",
+        y: yField,
+        title: d => `${d.year}\nLoans: ${d.n.toLocaleString()}\nShare: ${d.share.toFixed(2)}%`
+      }))
     ]
   })
 }
@@ -296,29 +400,37 @@ html`
 //| echo: false
 
 {
-  const total = RATES.reduce((s, d) => s + d.n, 0)
+  const yField = viewMode === "Count" ? "n" : "share"
+  const total = RATES_VIEW.reduce((s, d) => s + d.n, 0)
   return Plot.plot({
-    height: 230,
-    marginTop: 30,
+    height: 280,
+    marginTop: 20,
     x: { label: null, tickSize: 0 },
     y: { axis: null },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barY(RATES, {
+      Plot.barY(RATES_VIEW, {
         x: "bucket",
-        y: "n",
+        y: yField,
         fill: d => d.ord <= 2 ? "#7BA3C8" : d.ord <= 4 ? "#8A7A6A" : "#C86A50",
         rx: 2
       }),
-      Plot.text(RATES, {
+      Plot.text(RATES_VIEW, {
         x: "bucket",
-        y: "n",
-        text: d => (d.n * 100 / total).toFixed(0) + "%",
-        dy: -8,
-        fontSize: 10,
-        fill: "#8A8A8A"
+        y: yField,
+        text: d => viewMode === "Count"
+          ? (d.n * 100 / total).toFixed(1) + "%"
+          : d.share.toFixed(1) + "%",
+        dy: -10,
+        fontSize: 11,
+        fill: "#6E6E6E"
       }),
-      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 }),
+      Plot.tip(RATES_VIEW, Plot.pointer({
+        x: "bucket",
+        y: yField,
+        title: d => `${d.bucket}\nLoans: ${d.n.toLocaleString()}\nShare: ${(d.n * 100 / total).toFixed(2)}%`
+      }))
     ]
   })
 }
@@ -338,7 +450,11 @@ html`
 //| echo: false
 
 {
-  const reported = DELINQ.reduce((s, d) => s + d.n, 0)
+  const reported = DELINQ_VIEW.reduce((s, d) => s + d.n, 0)
+  const xField = viewMode === "Count" ? "n" : "share"
+  const xMax = viewMode === "Count"
+    ? Math.max(...DELINQ_VIEW.map((d) => d.n)) * 1.3
+    : Math.max(...DELINQ_VIEW.map((d) => d.share)) * 1.35
   const delinqColors = {
     "Current":    "#4A6FA5",
     "1 period":   "#D8C090",
@@ -348,28 +464,35 @@ html`
   }
   return Plot.plot({
     marginLeft: 110,
-    marginRight: 130,
-    height: 200,
-    x: { axis: null },
+    marginRight: 120,
+    height: 260,
+    x: { axis: null, domain: [0, xMax] },
     y: { label: null, tickSize: 0 },
     style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barX(DELINQ, {
-        x: "n",
+      Plot.barX(DELINQ_VIEW, {
+        x: xField,
         y: "bucket",
         fill: d => delinqColors[d.bucket] || "#D8D3C8",
         sort: { y: "-x" },
         rx: 2
       }),
-      Plot.text(DELINQ, {
-        x: "n",
+      Plot.text(DELINQ_VIEW, {
+        x: xField,
         y: "bucket",
-        text: d => `${(d.n/1000).toFixed(0)}K  ·  ${(d.n*100/reported).toFixed(1)}%`,
+        text: d => viewMode === "Count"
+          ? `${(d.n/1000).toFixed(0)}K  ${(d.n*100/reported).toFixed(1)}%`
+          : `${d.share.toFixed(1)}%`,
         dx: 8,
         textAnchor: "start",
-        fill: "#9A9A9A",
+        fill: "#6E6E6E",
         fontSize: 11
-      })
+      }),
+      Plot.tip(DELINQ_VIEW, Plot.pointer({
+        x: xField,
+        y: "bucket",
+        title: d => `${d.bucket}\nLoans: ${d.n.toLocaleString()}\nShare: ${(d.n*100/reported).toFixed(2)}%`
+      }))
     ]
   })
 }

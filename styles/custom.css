@@ -144,6 +144,37 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   margin-top: 0.35rem;
 }
 
+.live-timestamp {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: #8A8A8A;
+}
+
+.showcase-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.8rem;
+  margin: 0.35rem 0 2.1rem;
+}
+
+.showcase-control {
+  background: #F7F6F2;
+  border: 1px solid #D8D3C8;
+  border-radius: 4px;
+  padding: 0.7rem 0.75rem 0.55rem;
+}
+
+.showcase-control label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+}
+
 /* Dark mode overrides for custom CSS */
 .quarto-dark .chart-error {
   background: #2A1A18;
@@ -194,4 +225,17 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   background: #2A2A2C;
   border-color: #3A3A3C;
   color: #6A6A6A;
+}
+
+.quarto-dark .live-timestamp {
+  color: #7A7A7A;
+}
+
+.quarto-dark .showcase-control {
+  background: #242426;
+  border-color: #3A3A3C;
+}
+
+.quarto-dark .showcase-control label {
+  color: #7A7A7A;
 }
