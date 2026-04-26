@@ -82,18 +82,12 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 }
 
 /* Left rail TOC for showcase dashboards */
-.page-layout-full #quarto-document-content.column-page {
-  display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  column-gap: 2.2rem;
-  align-items: start;
-}
-
 .page-layout-full #quarto-document-content.column-page > #TOC {
-  grid-column: 1;
-  position: sticky;
-  top: 6.4rem;
-  align-self: start;
+  position: fixed;
+  left: max(1rem, calc((100vw - min(1240px, 94vw)) / 2 - 200px));
+  top: 14.25rem;
+  width: 170px;
+  z-index: 10;
   margin: 0;
   padding: 0.2rem 0 0;
   border: 0;
@@ -141,18 +135,11 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   border-left-color: #4A6FA5;
 }
 
-.page-layout-full #quarto-document-content.column-page > :not(#TOC) {
-  grid-column: 2;
-  min-width: 0;
-}
-
 @media (max-width: 1100px) {
-  .page-layout-full #quarto-document-content.column-page {
-    display: block;
-  }
-
   .page-layout-full #quarto-document-content.column-page > #TOC {
     position: static;
+    width: auto;
+    z-index: auto;
     margin: 0 0 1.1rem;
     padding: 0.7rem 0.85rem;
     border: 1px solid #DDD8CD;
