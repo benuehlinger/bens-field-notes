@@ -5,6 +5,8 @@ description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 perf
 toc: false
 page-layout: full
 freeze: false
+params:
+  r2-base-url: ""
 ---
 
 ```{=html}
@@ -22,7 +24,14 @@ freeze: false
 
 import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
 db = DuckDBClient.of({})
-r2Base = params["r2-base-url"]
+r2Base = {
+  try {
+    const v = (typeof params !== "undefined" ? params : {})["r2-base-url"]
+    return v || ""
+  } catch(e) {
+    return ""
+  }
+}
 
 MAY_2018_FILES = [
   `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1679731/accession=000167973118000027/loans_part0000.parquet`,
