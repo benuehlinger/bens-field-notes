@@ -55,7 +55,7 @@ delinqData = {
         COUNT(*) FILTER (WHERE days_past_due >= 90) * 100.0 / COUNT(*) AS delinq_rate_90plus,
         COUNT(*) AS total_loans,
         COUNT(*) FILTER (WHERE days_past_due >= 30) * 100.0 / COUNT(*) AS delinq_rate_30plus
-      FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/*.parquet')
+      FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/**/*.parquet', union_by_name=true)
       WHERE filing_date IS NOT NULL
       GROUP BY filing_date
       ORDER BY filing_date
@@ -198,7 +198,7 @@ means more issuers filing, means the delinquency rate above is a better sample.
         strokeWidth: 1.5
       })
     ],
-    caption: "Source: SEC EDGAR ABS-EE | Units: loan count | As of latest filing month"
+    caption: "Source: SEC EDGAR ABS-EE | Units: loan count | As of latest reporting period"
   })
 }
 ```

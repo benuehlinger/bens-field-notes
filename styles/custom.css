@@ -71,6 +71,79 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   margin-top: 0.5rem;
 }
 
+/* ─── Showcase dashboard — KPI strip & meta ─────────────────────────────── */
+
+.showcase-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.showcase-period {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+}
+
+.live-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: #4A7A5A;
+  background: #E8F2EC;
+  border: 1px solid #A8D0B8;
+  padding: 0.1rem 0.5rem;
+  border-radius: 2px;
+}
+
+.static-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: #8A8A8A;
+  background: #EDEAE2;
+  border: 1px solid #D8D3C8;
+  padding: 0.1rem 0.5rem;
+  border-radius: 2px;
+}
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1px;
+  background: #D8D3C8;
+  border: 1px solid #D8D3C8;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 0 2rem;
+}
+
+.kpi-card {
+  background: #F7F6F2;
+  padding: 1.1rem 1.25rem;
+  text-align: left;
+}
+
+.kpi-value {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: #1C1C1E;
+  letter-spacing: -0.03em;
+}
+
+.kpi-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9A9A9A;
+  margin-top: 0.35rem;
+}
+
 /* Dark mode overrides for custom CSS */
 .quarto-dark .chart-error {
   background: #2A1A18;
@@ -92,4 +165,33 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 
 .quarto-dark .stat-box .stat-value {
   color: #E8E3D8;
+}
+
+.quarto-dark .kpi-strip {
+  background: #3A3A3C;
+  border-color: #3A3A3C;
+}
+
+.quarto-dark .kpi-card {
+  background: #242426;
+}
+
+.quarto-dark .kpi-value {
+  color: #F0EBE0;
+}
+
+.quarto-dark .kpi-label {
+  color: #6A6A6A;
+}
+
+.quarto-dark .live-badge {
+  background: #1A2E22;
+  border-color: #3A7A5A;
+  color: #7AB090;
+}
+
+.quarto-dark .static-badge {
+  background: #2A2A2C;
+  border-color: #3A3A3C;
+  color: #6A6A6A;
 }
