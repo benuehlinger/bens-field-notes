@@ -153,26 +153,60 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 
 .showcase-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 0.8rem;
-  margin: 0.35rem 0 2.1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin: 0.55rem 0 2.1rem;
 }
 
 .showcase-control {
-  background: #F7F6F2;
-  border: 1px solid #D8D3C8;
-  border-radius: 4px;
-  padding: 0.7rem 0.75rem 0.55rem;
+  background: #FAF9F5;
+  border: 1px solid #D9D5CB;
+  border-radius: 6px;
+  padding: 0.7rem 0.75rem 0.7rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
 }
 
 .showcase-control label {
   display: block;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.45rem;
   font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8A8A8A;
+  color: #7D7D7D;
+}
+
+.showcase-control .observablehq {
+  margin: 0;
+}
+
+.showcase-control select {
+  width: 100%;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.76rem;
+  color: #2C2C2C;
+  background: #FFFFFF;
+  border: 1px solid #CFC9BC;
+  border-radius: 4px;
+  padding: 0.42rem 0.55rem;
+}
+
+.showcase-control select:focus {
+  outline: none;
+  border-color: #4A6FA5;
+  box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.15);
+}
+
+@media (max-width: 1024px) {
+  .showcase-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .showcase-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Dark mode overrides for custom CSS */
@@ -238,4 +272,10 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 
 .quarto-dark .showcase-control label {
   color: #7A7A7A;
+}
+
+.quarto-dark .showcase-control select {
+  color: #E4DFD5;
+  background: #1F1F21;
+  border-color: #48484B;
 }

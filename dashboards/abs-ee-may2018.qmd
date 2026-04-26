@@ -83,15 +83,21 @@ DELINQ = [
 //| echo: false
 //| output: false
 
-viewModeInput = Inputs.radio(["Count", "Share %"], {
-  label: "Metric view",
+viewModeInput = Inputs.select(["Count", "Share %"], {
+  label: null,
   value: "Count"
 })
-topNTrustsInput = Inputs.range([6, 12], { label: "Trust bars", value: 10, step: 1 })
-topNStatesInput = Inputs.range([5, 10], { label: "State bars", value: 10, step: 1 })
+topNTrustsInput = Inputs.select([6, 7, 8, 9, 10, 11, 12], {
+  label: null,
+  value: 10
+})
+topNStatesInput = Inputs.select([5, 6, 7, 8, 9, 10], {
+  label: null,
+  value: 10
+})
 focusBandInput = Inputs.select(
   ["All", "Prime (740+)", "Near-prime (700-739)", "Mid (650-699)", "Subprime (<650)"],
-  { label: "Trust focus", value: "All" }
+  { label: null, value: "All" }
 )
 
 viewMode = Generators.input(viewModeInput)
