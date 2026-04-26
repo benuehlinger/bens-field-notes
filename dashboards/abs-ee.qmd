@@ -70,12 +70,36 @@ delinqData = {
 ```{ojs}
 //| echo: false
 
+// Stat callouts — reactive; show — until data lands
+{
+  const latest = (delinqData && !delinqData.error && delinqData.length > 0)
+    ? delinqData[delinqData.length - 1] : null
+
+  const rate = latest
+    ? `${Number(latest.delinq_rate_90plus).toFixed(2)}%`
+    : "—"
+  const loans = latest
+    ? (latest.total_loans >= 1e6
+        ? `${(latest.total_loans / 1e6).toFixed(1)}M`
+        : `${(latest.total_loans / 1e3).toFixed(0)}K`)
+    : "—"
+
+  return html`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:0 0 2rem;">
+    <div class="stat-box"><div class="stat-value">${rate}</div><div class="stat-label">90+ Day Delinquency</div></div>
+    <div class="stat-box"><div class="stat-value">${loans}</div><div class="stat-label">Loans in Latest Month</div></div>
+  </div>`
+}
+```
+
+```{ojs}
+//| echo: false
+
 // Chart: 90+ day delinquency rate
 {
   if (!r2Base || r2Base === "") {
     const el = document.createElement("div")
-    el.className = "chart-error"
-    el.innerHTML = `<span>⚠</span><span>R2 data source not configured. Set <code>r2-base-url</code> in site params.</span>`
+    el.className = "chart-loading"
+    el.innerHTML = `<span>◌</span><span>Live data — pipeline syncing. Chart loads automatically when the data lake is ready.</span>`
     return el
   }
 

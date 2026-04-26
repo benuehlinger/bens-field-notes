@@ -96,6 +96,14 @@ h4, h5, h6 {
     color: #5A5A5A !important;
     &:hover { color: #2C2C2C !important; }
   }
+
+  .nav-item .nav-link.active,
+  .nav-item.active .nav-link {
+    color: #1C1C1E !important;
+    font-weight: 500;
+    border-bottom: 2px solid #4A6FA5;
+    padding-bottom: calc(0.5rem - 2px);
+  }
 }
 
 /* Main content — generous whitespace */
@@ -205,6 +213,52 @@ a.home-all-notes-link {
 a.home-all-notes-link:hover {
   color: #2E4B78;
   border-bottom-color: currentColor;
+}
+
+/* Data tables (data-sources page and inline) */
+.table {
+  font-size: 0.875rem;
+  border-color: #D8D3C8;
+
+  thead th {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    color: #5A5A5A;
+    border-bottom: 2px solid #D8D3C8;
+    background: transparent;
+    padding-bottom: 0.65rem;
+  }
+
+  td {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    color: #4A4A4A;
+    border-color: #E8E3D8;
+    vertical-align: top;
+    padding: 0.55rem 0.75rem;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+/* Post title block — date, categories */
+.quarto-title-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: #8A8A8A;
+  margin-top: 0.65rem;
+  text-transform: uppercase;
+}
+
+.quarto-title-meta-heading {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: #AAAAAA;
+  margin-bottom: 0.2rem;
 }
 
 /* Source/as-of caption pattern under charts */
@@ -360,6 +414,20 @@ hr {
   a.home-all-notes-link:hover {
     color: #A8C4E0;
   }
+
+  .nav-item .nav-link.active,
+  .nav-item.active .nav-link {
+    color: #F0EBE0 !important;
+    border-bottom-color: #7BA3C8;
+  }
+
+  .table {
+    thead th { color: #9A9A9A; border-bottom-color: #3A3A3C; }
+    td { color: #B8B3A8; border-color: #2E2E30; }
+  }
+
+  .quarto-title-meta { color: #6A6A6A; }
+  .quarto-title-meta-heading { color: #5A5A5A; }
 
   .navbar {
     background: #1C1C1E !important;
