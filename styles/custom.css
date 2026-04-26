@@ -81,46 +81,96 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   margin-right: auto;
 }
 
-/* In-body TOC treatment for full-width dashboard pages */
-.page-layout-full #TOC {
-  margin: 1.1rem 0 1.75rem;
-  padding: 1rem 1.15rem;
-  background: #FAF9F5;
-  border: 1px solid #DDD8CD;
-  border-left: 3px solid #4A6FA5;
-  border-radius: 6px;
-  max-width: 430px;
+/* Left rail TOC for showcase dashboards */
+.page-layout-full #quarto-document-content.column-page {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  column-gap: 2.2rem;
+  align-items: start;
 }
 
-.page-layout-full #TOC .toc-title,
-.page-layout-full #TOC h2 {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 1.05rem;
-  color: #1C1C1E;
-  letter-spacing: -0.01em;
-  margin: 0 0 0.45rem;
-}
-
-.page-layout-full #TOC ul {
+.page-layout-full #quarto-document-content.column-page > #TOC {
+  grid-column: 1;
+  position: sticky;
+  top: 6.4rem;
+  align-self: start;
   margin: 0;
-  padding-left: 1.05rem;
+  padding: 0.2rem 0 0;
+  border: 0;
+  border-left: 1px solid #D7D2C7;
+  border-radius: 0;
+  background: transparent;
 }
 
-.page-layout-full #TOC li {
-  margin: 0.18rem 0;
-}
-
-.page-layout-full #TOC a {
+.page-layout-full #quarto-document-content.column-page > #TOC .toc-title,
+.page-layout-full #quarto-document-content.column-page > #TOC h2 {
   font-family: 'DM Mono', monospace;
-  font-size: 0.76rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8B8B8B;
+  margin: 0 0 0.55rem;
+  padding-left: 0.9rem;
+}
+
+.page-layout-full #quarto-document-content.column-page > #TOC ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page-layout-full #quarto-document-content.column-page > #TOC li {
+  margin: 0.08rem 0;
+}
+
+.page-layout-full #quarto-document-content.column-page > #TOC a {
+  display: block;
+  margin-left: -1px;
+  padding: 0.33rem 0 0.33rem 0.9rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.02em;
-  color: #3A3A3A;
+  color: #5A5A5A;
+  border-left: 1px solid transparent;
   text-decoration: none;
 }
 
-.page-layout-full #TOC a:hover,
-.page-layout-full #TOC a.active {
+.page-layout-full #quarto-document-content.column-page > #TOC a:hover,
+.page-layout-full #quarto-document-content.column-page > #TOC a.active {
   color: #4A6FA5;
+  border-left-color: #4A6FA5;
+}
+
+.page-layout-full #quarto-document-content.column-page > :not(#TOC) {
+  grid-column: 2;
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .page-layout-full #quarto-document-content.column-page {
+    display: block;
+  }
+
+  .page-layout-full #quarto-document-content.column-page > #TOC {
+    position: static;
+    margin: 0 0 1.1rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #DDD8CD;
+    border-left: 3px solid #4A6FA5;
+    background: #FAF9F5;
+  }
+
+  .page-layout-full #quarto-document-content.column-page > #TOC .toc-title,
+  .page-layout-full #quarto-document-content.column-page > #TOC h2 {
+    padding-left: 0;
+    margin-bottom: 0.35rem;
+  }
+
+  .page-layout-full #quarto-document-content.column-page > #TOC a {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
 }
 
 .showcase-meta {
@@ -282,22 +332,29 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   border-top-color: #3A3A3C;
 }
 
-.quarto-dark .page-layout-full #TOC {
-  background: #242426;
-  border-color: #3A3A3C;
-  border-left-color: #7BA3C8;
+.quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC {
+  border-left-color: #3A3A3C;
 }
 
-.quarto-dark .page-layout-full #TOC .toc-title,
-.quarto-dark .page-layout-full #TOC h2 {
+.quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC .toc-title,
+.quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC h2 {
   color: #EDE7DB;
 }
 
-.quarto-dark .page-layout-full #TOC a {
+.quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC a {
   color: #C6C6C8;
 }
 
-.quarto-dark .page-layout-full #TOC a:hover,
-.quarto-dark .page-layout-full #TOC a.active {
+.quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC a:hover,
+.quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC a.active {
   color: #9BC0E6;
+  border-left-color: #7BA3C8;
+}
+
+@media (max-width: 1100px) {
+  .quarto-dark .page-layout-full #quarto-document-content.column-page > #TOC {
+    background: #242426;
+    border-color: #3A3A3C;
+    border-left-color: #7BA3C8;
+  }
 }
