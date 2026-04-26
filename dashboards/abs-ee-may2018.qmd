@@ -1,19 +1,15 @@
 ---
 title: "Auto Loan Credit — May 2018"
 subtitle: "ABS-EE Loan-Level Panel · SEC EDGAR Securitization Filings"
-description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 performance. Computed live from raw SEC EDGAR ABS-EE filings via DuckDB-WASM."
+description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 performance. Pre-computed from raw SEC EDGAR ABS-EE filings via DuckDB."
 toc: false
 page-layout: full
-freeze: false
-params:
-  r2-base-url: ""
 ---
 
 ```{=html}
 <div class="data-note">
   <strong>Reporting period:</strong> April 30, 2018 —
-  20 ABS-EE parquet files · 12 trusts · 706,856 loans · Computed from SEC EDGAR Form ABS-EE.
-  Aggregations run live in your browser via DuckDB-WASM from Cloudflare R2.
+  20 ABS-EE parquet files · 12 trusts · 706,856 loans · Aggregated from SEC EDGAR Form ABS-EE.
   See <a href="../data-sources.qmd">Data Sources</a> for full methodology.
 </div>
 ```
@@ -22,265 +18,97 @@ params:
 //| echo: false
 //| output: false
 
-import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
-db = DuckDBClient.of({})
-r2Base = {
-  try {
-    const v = (typeof params !== "undefined" ? params : {})["r2-base-url"]
-    return v || ""
-  } catch(e) {
-    return ""
-  }
-}
-
-MAY_2018_FILES = [
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1679731/accession=000167973118000027/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1679731/accession=000167973118000027/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1692310/accession=000169231018000025/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1692310/accession=000169231018000025/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1693819/accession=000169381918000021/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1693819/accession=000169381918000021/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1694010/accession=000169401018000018/loans.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1694276/accession=000095013118000770/loans.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1694423/accession=000095013118000823/loans.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1694919/accession=000095013118000847/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1694919/accession=000095013118000847/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1696935/accession=000095013118000756/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1696935/accession=000095013118000756/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1697574/accession=000095013118000800/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1697574/accession=000095013118000800/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1699234/accession=000114420418031297/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1699234/accession=000114420418031297/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1700667/accession=000170066718000025/loans_part0000.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1700667/accession=000170066718000025/loans_part0001.parquet`,
-  `${r2Base}/abs_ee/curated/asset_class=autoloan/reporting_period=2018-05/cik=1702011/accession=000114420418030887/loans_part0000.parquet`
-]
-```
-
-```{ojs}
-//| echo: false
-//| output: false
-
-// Load all data — single pass query for all charts
-allData = {
-  if (!r2Base || r2Base === "") return { status: "no-r2" }
-  const flist = MAY_2018_FILES.map(f => `'${f}'`).join(", ")
-  try {
-    const [trusts, fico, states, rates, origYears, delinq] = await Promise.all([
-      db.query(`
-        SELECT REGEXP_REPLACE(trust_name, ' (Owner Trust|Receivables Trust|Auto Owner Trust|Automobile Receivables)', '') as name,
-               trust_cik, COUNT(*) as loans,
-               ROUND(AVG(originalLoanAmount),0) as avg_bal,
-               ROUND(AVG(TRY_CAST(obligorCreditScore AS DOUBLE)),0) as avg_fico
-        FROM read_parquet([${flist}], union_by_name=true)
-        GROUP BY trust_name, trust_cik ORDER BY loans DESC
-      `),
-      db.query(`
-        SELECT CASE
-            WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 600 THEN 'Sub-600'
-            WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 650 THEN '600-649'
-            WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 700 THEN '650-699'
-            WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 750 THEN '700-749'
-            WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 800 THEN '750-799'
-            ELSE '800+' END as bucket,
-          COUNT(*) as n,
-          CASE WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 600 THEN 1
-               WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 650 THEN 2
-               WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 700 THEN 3
-               WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 750 THEN 4
-               WHEN TRY_CAST(obligorCreditScore AS DOUBLE) < 800 THEN 5
-               ELSE 6 END as ord
-        FROM read_parquet([${flist}], union_by_name=true)
-        WHERE TRY_CAST(obligorCreditScore AS DOUBLE) IS NOT NULL
-        GROUP BY 1, 3 ORDER BY 3
-      `),
-      db.query(`
-        SELECT obligorGeographicLocation as state, COUNT(*) as n
-        FROM read_parquet([${flist}], union_by_name=true)
-        WHERE obligorGeographicLocation IS NOT NULL AND length(obligorGeographicLocation) = 2
-        GROUP BY 1 ORDER BY 2 DESC LIMIT 10
-      `),
-      db.query(`
-        SELECT CASE
-            WHEN originalInterestRatePercentage * 100 < 2   THEN '< 2%'
-            WHEN originalInterestRatePercentage * 100 < 4   THEN '2-4%'
-            WHEN originalInterestRatePercentage * 100 < 6   THEN '4-6%'
-            WHEN originalInterestRatePercentage * 100 < 8   THEN '6-8%'
-            WHEN originalInterestRatePercentage * 100 < 10  THEN '8-10%'
-            ELSE '10%+' END as bucket,
-          COUNT(*) as n,
-          CASE WHEN originalInterestRatePercentage * 100 < 2  THEN 1
-               WHEN originalInterestRatePercentage * 100 < 4  THEN 2
-               WHEN originalInterestRatePercentage * 100 < 6  THEN 3
-               WHEN originalInterestRatePercentage * 100 < 8  THEN 4
-               WHEN originalInterestRatePercentage * 100 < 10 THEN 5
-               ELSE 6 END as ord
-        FROM read_parquet([${flist}], union_by_name=true)
-        WHERE originalInterestRatePercentage IS NOT NULL AND originalInterestRatePercentage > 0
-        GROUP BY 1, 3 ORDER BY 3
-      `),
-      db.query(`
-        SELECT SUBSTR(originationDate, 4, 4) as year, COUNT(*) as n
-        FROM read_parquet([${flist}], union_by_name=true)
-        WHERE originationDate IS NOT NULL AND LENGTH(originationDate) = 7
-          AND SUBSTR(originationDate, 4, 4) BETWEEN '2010' AND '2018'
-        GROUP BY 1 ORDER BY 1
-      `),
-      db.query(`
-        SELECT CASE
-            WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 0 THEN 'Current'
-            WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 1 THEN '1 period'
-            WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 2 THEN '2 periods'
-            WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 3 THEN '3 periods'
-            WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) >= 4 THEN '4+ periods'
-            END as bucket,
-          COUNT(*) as n,
-          CASE WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 0 THEN 1
-               WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 1 THEN 2
-               WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 2 THEN 3
-               WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) = 3 THEN 4
-               WHEN TRY_CAST(currentDelinquencyStatus AS INTEGER) >= 4 THEN 5 END as ord
-        FROM read_parquet([${flist}], union_by_name=true)
-        WHERE currentDelinquencyStatus IS NOT NULL
-        GROUP BY 1, 3 ORDER BY 3
-      `)
-    ])
-    return { status: "live", trusts, fico, states, rates, origYears, delinq }
-  } catch(e) {
-    return { status: "error", error: e.message }
-  }
-}
-```
-
-```{ojs}
-//| echo: false
-//| output: false
-
-// Pre-computed static snapshots — from 20 ABS-EE parquet files, 2026-04-26
-S_TRUSTS = [
-  {name:"Ally Auto 2017-1",              loans:118931, avg_bal:22061, avg_fico:729},
-  {name:"Hyundai Auto 2017-A",           loans: 71274, avg_bal:21192, avg_fico:739},
-  {name:"Toyota Auto Receivables 2017-A",loans: 69923, avg_bal:26015, avg_fico:760},
-  {name:"Ally Auto 2017-2",              loans: 67717, avg_bal:21490, avg_fico:726},
-  {name:"Honda Auto Receivables 2017-1", loans: 63515, avg_bal:23783, avg_fico:763},
-  {name:"CarMax 2017-1",                 loans: 61139, avg_bal:19003, avg_fico:703},
-  {name:"Santander Drive Auto 2017-1",   loans: 52577, avg_bal:20177, avg_fico:602},
-  {name:"Ford Credit 2017-A",            loans: 50945, avg_bal:32292, avg_fico:645},
-  {name:"World Omni Auto 2017-A",        loans: 50000, avg_bal:27059, avg_fico:720},
-  {name:"Nissan Auto Receivables 2017-A",loans: 41719, avg_bal:27849, avg_fico:776},
-  {name:"AmeriCredit Automobile 2017-1", loans: 38379, avg_bal:23173, avg_fico:574},
-  {name:"California Republic Auto 2017-1",loans:20737, avg_bal:20708, avg_fico:700}
-]
-```
-
-```{ojs}
-//| echo: false
-//| output: false
-
-S_FICO = [
-  {bucket:"Sub-600", n:81610},
-  {bucket:"600-649", n:61018},
-  {bucket:"650-699", n:128212},
-  {bucket:"700-749", n:145972},
-  {bucket:"750-799", n:124419},
-  {bucket:"800+",    n:154419}
+TRUSTS = [
+  {name:"Ally Auto 2017-1",               loans:118931, avg_bal:22061, avg_fico:729},
+  {name:"Hyundai Auto 2017-A",            loans: 71274, avg_bal:21192, avg_fico:739},
+  {name:"Toyota Auto Recv. 2017-A",       loans: 69923, avg_bal:26015, avg_fico:760},
+  {name:"Ally Auto 2017-2",               loans: 67717, avg_bal:21490, avg_fico:726},
+  {name:"Honda Auto Recv. 2017-1",        loans: 63515, avg_bal:23783, avg_fico:763},
+  {name:"CarMax Auto 2017-1",             loans: 61139, avg_bal:19003, avg_fico:703},
+  {name:"Santander Drive 2017-1",         loans: 52577, avg_bal:20177, avg_fico:602},
+  {name:"Ford Credit Auto 2017-A",        loans: 50945, avg_bal:32292, avg_fico:645},
+  {name:"World Omni Auto 2017-A",         loans: 50000, avg_bal:27059, avg_fico:720},
+  {name:"Nissan Auto Recv. 2017-A",       loans: 41719, avg_bal:27849, avg_fico:776},
+  {name:"AmeriCredit Auto 2017-1",        loans: 38379, avg_bal:23173, avg_fico:574},
+  {name:"California Republic 2017-1",     loans: 20737, avg_bal:20708, avg_fico:700}
 ]
 
-S_STATES = [
-  {state:"CA",n:93719},{state:"TX",n:80416},{state:"FL",n:74315},
-  {state:"IL",n:33066},{state:"GA",n:31012},{state:"NC",n:29076},
-  {state:"PA",n:26076},{state:"NY",n:22126},{state:"OH",n:18968},
-  {state:"NJ",n:18900}
-]
-```
-
-```{ojs}
-//| echo: false
-//| output: false
-
-S_RATES = [
-  {bucket:"< 2%",  n:106656},
-  {bucket:"2-4%",  n:156536},
-  {bucket:"4-6%",  n:117585},
-  {bucket:"6-8%",  n: 74020},
-  {bucket:"8-10%", n: 43441},
-  {bucket:"10%+",  n:114504}
+FICO = [
+  {bucket:"Sub-600", n:81610,  ord:1},
+  {bucket:"600–649", n:61018,  ord:2},
+  {bucket:"650–699", n:128212, ord:3},
+  {bucket:"700–749", n:145972, ord:4},
+  {bucket:"750–799", n:124419, ord:5},
+  {bucket:"800+",    n:154419, ord:6}
 ]
 
-S_YEARS = [
-  {year:"2010",n:25},{year:"2011",n:3692},{year:"2012",n:35285},
-  {year:"2013",n:29860},{year:"2014",n:50597},{year:"2015",n:134061},
-  {year:"2016",n:421175},{year:"2017",n:32103},{year:"2018",n:1}
+STATES = [
+  {state:"CA", n:93719}, {state:"TX", n:80416}, {state:"FL", n:74315},
+  {state:"IL", n:33066}, {state:"GA", n:31012}, {state:"NC", n:29076},
+  {state:"PA", n:26076}, {state:"NY", n:22126}, {state:"OH", n:18968},
+  {state:"NJ", n:18900}
 ]
 
-S_DELINQ = [
-  {bucket:"Current",    n:470136},
-  {bucket:"1 period",   n:2285},
-  {bucket:"2 periods",  n:2825},
-  {bucket:"3 periods",  n:2810},
-  {bucket:"4+ periods", n:51764}
+RATES = [
+  {bucket:"< 2%",  n:106656, ord:1},
+  {bucket:"2–4%",  n:156536, ord:2},
+  {bucket:"4–6%",  n:117585, ord:3},
+  {bucket:"6–8%",  n: 74020, ord:4},
+  {bucket:"8–10%", n: 43441, ord:5},
+  {bucket:"10%+",  n:114504, ord:6}
 ]
-```
 
-```{ojs}
-//| echo: false
-//| output: false
+VINTAGE = [
+  {year:"2011", n:3692},  {year:"2012", n:35285},
+  {year:"2013", n:29860}, {year:"2014", n:50597},
+  {year:"2015", n:134061},{year:"2016", n:421175},
+  {year:"2017", n:32103}
+]
 
-// Route to live data if loaded, else static snapshot
-trusts     = (allData.status === "live") ? allData.trusts    : S_TRUSTS
-ficoData   = (allData.status === "live") ? allData.fico      : S_FICO
-stateData  = (allData.status === "live") ? allData.states    : S_STATES
-rateData   = (allData.status === "live") ? allData.rates     : S_RATES
-origData   = (allData.status === "live") ? allData.origYears : S_YEARS
-delinqData = (allData.status === "live") ? allData.delinq    : S_DELINQ
-isLive     = allData.status === "live"
+DELINQ = [
+  {bucket:"Current",    n:470136, ord:1},
+  {bucket:"1 period",   n:2285,   ord:2},
+  {bucket:"2 periods",  n:2825,   ord:3},
+  {bucket:"3 periods",  n:2810,   ord:4},
+  {bucket:"4+ periods", n:51764,  ord:5}
+]
 ```
 
 ```{ojs}
 //| echo: false
 
 // KPI strip
-{
-  const fmt = n => n >= 1e6
-    ? (n/1e6).toFixed(2) + "M"
-    : n >= 1e3 ? (n/1e3).toFixed(0) + "K" : n.toString()
-
-  const badge = isLive
-    ? `<span class="live-badge">● live</span>`
-    : `<span class="static-badge">snapshot</span>`
-
-  return html`
-  <div class="showcase-meta">
-    <span class="showcase-period">April 2018 reporting period</span>
-    ${badge}
+html`
+<div class="showcase-meta">
+  <span class="showcase-period">April 2018 reporting period</span>
+  <span class="static-badge">pre-computed snapshot</span>
+</div>
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-value">706,856</div>
+    <div class="kpi-label">Total Loans</div>
   </div>
-  <div class="kpi-strip">
-    <div class="kpi-card">
-      <div class="kpi-value">706,856</div>
-      <div class="kpi-label">Total Loans</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value">12</div>
-      <div class="kpi-label">ABS Trusts</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value">712</div>
-      <div class="kpi-label">Avg FICO</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value">$21,945</div>
-      <div class="kpi-label">Median Balance</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value">5.52%</div>
-      <div class="kpi-label">Avg Rate</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value">63.5%</div>
-      <div class="kpi-label">New Vehicles</div>
-    </div>
-  </div>`
-}
+  <div class="kpi-card">
+    <div class="kpi-value">12</div>
+    <div class="kpi-label">ABS Trusts</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">712</div>
+    <div class="kpi-label">Avg FICO</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">$21,945</div>
+    <div class="kpi-label">Median Balance</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">5.52%</div>
+    <div class="kpi-label">Avg Rate</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">63.5%</div>
+    <div class="kpi-label">New Vehicles</div>
+  </div>
+</div>`
 ```
 
 ---
@@ -295,40 +123,41 @@ isLive     = allData.status === "live"
 ```{ojs}
 //| echo: false
 
-Plot.plot({
-  marginLeft: 200,
-  marginRight: 60,
-  height: 300,
-  x: { axis: null, domain: [0, 130000] },
-  y: { label: null, tickSize: 0 },
-  style: { fontFamily: "'DM Mono', monospace", fontSize: "11px" },
-  marks: [
-    Plot.barX(trusts, {
-      x: "loans",
-      y: "name",
-      fill: d => d.avg_fico >= 740 ? "#4A6FA5" : d.avg_fico >= 680 ? "#7BA3C8" : "#B0C8DC",
-      sort: { y: "-x" },
-      rx: 2
-    }),
-    Plot.text(trusts, {
-      x: "loans",
-      y: "name",
-      text: d => (d.loans / 1000).toFixed(0) + "K",
-      dx: 6,
-      textAnchor: "start",
-      fill: "#8A8A8A",
-      fontSize: 10
-    }),
-    Plot.tip(trusts, Plot.pointer({
-      x: "loans",
-      y: "name",
-      title: d => `${d.name}\n${d.loans.toLocaleString()} loans\nAvg balance: $${d.avg_bal.toLocaleString()}\nAvg FICO: ${d.avg_fico}`
-    }))
-  ]
-})
+{
+  const totalLoans = TRUSTS.reduce((s, d) => s + d.loans, 0)
+  return Plot.plot({
+    marginLeft: 190,
+    marginRight: 80,
+    height: 340,
+    x: { axis: null, domain: [0, 135000] },
+    y: { label: null, tickSize: 0 },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
+    marks: [
+      Plot.barX(TRUSTS, {
+        x: "loans",
+        y: "name",
+        fill: d => d.avg_fico >= 740 ? "#4A6FA5"
+                 : d.avg_fico >= 700 ? "#7BA3C8"
+                 : d.avg_fico >= 650 ? "#B8C8DC"
+                 : "#C86A50",
+        sort: { y: "-x" },
+        rx: 2
+      }),
+      Plot.text(TRUSTS, {
+        x: "loans",
+        y: "name",
+        text: d => `${(d.loans/1000).toFixed(0)}K  ·  FICO ${d.avg_fico}`,
+        dx: 8,
+        textAnchor: "start",
+        fill: "#9A9A9A",
+        fontSize: 10
+      })
+    ]
+  })
+}
 ```
 
-<p class="chart-caption">Color = avg FICO band: dark = 740+, mid = 680–739, light = &lt;680</p>
+<p class="chart-caption">Color = avg FICO band: blue ≥ 740 · mid-blue ≥ 700 · light ≥ 650 · red < 650</p>
 :::
 
 ::: {.g-col-12 .g-col-md-5}
@@ -339,29 +168,29 @@ Plot.plot({
 //| echo: false
 
 {
-  const total = stateData.reduce((s, d) => s + d.n, 0)
+  const total = STATES.reduce((s, d) => s + d.n, 0)
   return Plot.plot({
-    marginLeft: 40,
-    marginRight: 70,
-    height: 300,
+    marginLeft: 36,
+    marginRight: 90,
+    height: 340,
     x: { axis: null },
     y: { label: null, tickSize: 0 },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
     marks: [
-      Plot.barX(stateData, {
+      Plot.barX(STATES, {
         x: "n",
         y: "state",
         fill: "#C8A058",
         sort: { y: "-x" },
         rx: 2
       }),
-      Plot.text(stateData, {
+      Plot.text(STATES, {
         x: "n",
         y: "state",
-        text: d => (d.n / 1000).toFixed(0) + "K  " + (d.n * 100 / total).toFixed(1) + "%",
-        dx: 6,
+        text: d => `${(d.n/1000).toFixed(0)}K  ${(d.n*100/total).toFixed(1)}%`,
+        dx: 8,
         textAnchor: "start",
-        fill: "#8A8A8A",
+        fill: "#9A9A9A",
         fontSize: 10
       })
     ]
@@ -369,7 +198,7 @@ Plot.plot({
 }
 ```
 
-<p class="chart-caption">Source: obligorGeographicLocation field · 529K loans with state reported</p>
+<p class="chart-caption">obligorGeographicLocation field · 529K loans with state reported</p>
 :::
 :::
 
@@ -380,118 +209,122 @@ Plot.plot({
 ::: {.grid}
 ::: {.g-col-12 .g-col-md-4}
 
-**FICO distribution** — avg 712, median pool is prime/near-prime.
+**FICO distribution** — avg 712, skewed prime.
 
 ```{ojs}
 //| echo: false
 
 {
-  const ficoColors = ["#C86A50","#C8964A","#B8A84A","#7EA870","#5A8A8A","#4A6FA5"]
-  const total = ficoData.reduce((s, d) => s + d.n, 0)
+  const ficoColors = ["#C86A50","#C8964A","#C8B86A","#7EA870","#5A8A8A","#4A6FA5"]
+  const total = FICO.reduce((s, d) => s + d.n, 0)
   return Plot.plot({
-    height: 220,
+    height: 230,
+    marginTop: 30,
     x: { label: null, tickSize: 0 },
     y: { axis: null },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px" },
-    color: { range: ficoColors },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
     marks: [
-      Plot.barY(ficoData, {
+      Plot.barY(FICO, {
         x: "bucket",
         y: "n",
         fill: (d, i) => ficoColors[i],
         rx: 2
       }),
-      Plot.text(ficoData, {
+      Plot.text(FICO, {
         x: "bucket",
         y: "n",
         text: d => (d.n * 100 / total).toFixed(0) + "%",
-        dy: -6,
+        dy: -8,
         fontSize: 10,
         fill: "#8A8A8A"
       }),
-      Plot.ruleY([0], { stroke: "#D8D3C8" })
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
     ]
   })
 }
 ```
 
-<p class="chart-caption">695K scored loans · Sub-600 = 11.5% · 800+ = 21.8%</p>
+<p class="chart-caption">695K scored · Sub-600 = 11.5% · 800+ = 21.8%</p>
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 
-**Origination vintage** — pool is overwhelmingly 2016 origination (59%).
+**Origination vintage** — 59% of pool is 2016 origination.
 
 ```{ojs}
 //| echo: false
 
 {
-  const total = origData.reduce((s, d) => s + d.n, 0)
+  const total = VINTAGE.reduce((s, d) => s + d.n, 0)
   return Plot.plot({
-    height: 220,
+    height: 230,
+    marginTop: 30,
     x: { label: null, tickSize: 0 },
     y: { axis: null },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
     marks: [
-      Plot.barY(origData, {
+      Plot.barY(VINTAGE, {
         x: "year",
         y: "n",
-        fill: d => d.year === "2016" ? "#4A6FA5" : "#D8D3C8",
+        fill: d => d.year === "2016" ? "#4A6FA5" : "#D4CFC4",
         rx: 2
       }),
-      Plot.text(origData.filter(d => d.n > 10000), {
+      Plot.text(VINTAGE.filter(d => d.n > 20000), {
         x: "year",
         y: "n",
-        text: d => (d.n / 1000).toFixed(0) + "K",
-        dy: -6,
+        text: d => d.year === "2016"
+          ? (d.n/1000).toFixed(0) + "K"
+          : (d.n/1000).toFixed(0) + "K",
+        dy: -8,
         fontSize: 10,
         fill: "#8A8A8A"
       }),
-      Plot.ruleY([0], { stroke: "#D8D3C8" })
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
     ]
   })
 }
 ```
 
-<p class="chart-caption">Year of loan origination (MM/YYYY format) · 2016 vintage = 421K loans</p>
+<p class="chart-caption">Year of loan origination · 2016 vintage = 421K loans (59%)</p>
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 
-**Interest rate distribution** — avg 5.52%, bimodal shape (captive vs. bank lenders).
+**Rate distribution** — avg 5.52%, bimodal (captive vs. bank).
 
 ```{ojs}
 //| echo: false
 
 {
-  const total = rateData.reduce((s, d) => s + d.n, 0)
+  const total = RATES.reduce((s, d) => s + d.n, 0)
   return Plot.plot({
-    height: 220,
+    height: 230,
+    marginTop: 30,
     x: { label: null, tickSize: 0 },
     y: { axis: null },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "11px", background: "transparent" },
     marks: [
-      Plot.barY(rateData, {
+      Plot.barY(RATES, {
         x: "bucket",
         y: "n",
-        fill: "#8A7A6A",
+        fill: d => d.ord <= 2 ? "#7BA3C8" : d.ord <= 4 ? "#8A7A6A" : "#C86A50",
         rx: 2
       }),
-      Plot.text(rateData, {
+      Plot.text(RATES, {
         x: "bucket",
         y: "n",
         text: d => (d.n * 100 / total).toFixed(0) + "%",
-        dy: -6,
+        dy: -8,
         fontSize: 10,
         fill: "#8A8A8A"
       }),
-      Plot.ruleY([0], { stroke: "#D8D3C8" })
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
     ]
   })
 }
 ```
 
-<p class="chart-caption">612K non-zero rate loans · Bimodal shape: low-rate captive + higher-rate bank paper</p>
+<p class="chart-caption">612K non-zero rate loans · bimodal: low-rate captive + bank paper</p>
 :::
 :::
 
@@ -499,37 +332,42 @@ Plot.plot({
 
 ## Payment Performance
 
-30+ day delinquency of 3.1% (of reported). ~177K loans have no status field in this filing period.
+30+ day delinquency of 3.1% among loans with status reported. ~177K loans have no status field in this filing.
 
 ```{ojs}
 //| echo: false
 
 {
-  const reported = delinqData.reduce((s, d) => s + d.n, 0)
-  const delinqColors = { "Current":"#4A6FA5","1 period":"#D8C090","2 periods":"#C8A058","3 periods":"#C87840","4+ periods":"#C85030" }
-  
+  const reported = DELINQ.reduce((s, d) => s + d.n, 0)
+  const delinqColors = {
+    "Current":    "#4A6FA5",
+    "1 period":   "#D8C090",
+    "2 periods":  "#C8A058",
+    "3 periods":  "#C87840",
+    "4+ periods": "#C85030"
+  }
   return Plot.plot({
     marginLeft: 110,
-    marginRight: 100,
-    height: 180,
+    marginRight: 130,
+    height: 200,
     x: { axis: null },
     y: { label: null, tickSize: 0 },
-    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px" },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
     marks: [
-      Plot.barX(delinqData, {
+      Plot.barX(DELINQ, {
         x: "n",
         y: "bucket",
         fill: d => delinqColors[d.bucket] || "#D8D3C8",
         sort: { y: "-x" },
         rx: 2
       }),
-      Plot.text(delinqData, {
+      Plot.text(DELINQ, {
         x: "n",
         y: "bucket",
-        text: d => (d.n / 1000).toFixed(0) + "K  " + (d.n * 100 / reported).toFixed(1) + "%",
-        dx: 6,
+        text: d => `${(d.n/1000).toFixed(0)}K  ·  ${(d.n*100/reported).toFixed(1)}%`,
+        dx: 8,
         textAnchor: "start",
-        fill: "#8A8A8A",
+        fill: "#9A9A9A",
         fontSize: 11
       })
     ]
@@ -538,18 +376,18 @@ Plot.plot({
 ```
 
 <p class="chart-caption">
-Delinquency status codes: 0 = current, 1–3 = 1/2/3 payment periods behind, 4+ = 4 or more periods behind.
-Of 529,820 loans with status reported: 88.7% current, 11.3% behind on at least one payment.
+529,820 loans with status: 88.7% current · 11.3% one or more payments behind.
+Status codes: 0 = current, 1–3 = payment periods behind, 4+ = severely delinquent.
 </p>
 
 ---
 
 ## Methodology
 
-**What this page shows**: Loan-level performance data from 20 ABS-EE parquet files, covering 12 auto loan securitization trusts that reported April 2018 data in their May 2018 SEC EDGAR filings. All charts compute aggregations directly from the raw loan records.
+**What this page shows** — loan-level performance data from 20 ABS-EE parquet files, covering 12 auto loan securitization trusts that reported April 2018 data in their May 2018 SEC EDGAR filings. Aggregations were pre-computed from the raw loan records using DuckDB.
 
-**Data path**: SEC EDGAR ABS-EE (Form 10-D) → data lake pipeline → Hive-partitioned Parquet → Cloudflare R2 → DuckDB-WASM in browser. When `r2-base-url` is configured, charts run live. Otherwise they render from a pre-computed snapshot.
+**Data path** — SEC EDGAR ABS-EE (Form 10-D) → data lake pipeline → Hive-partitioned Parquet in Cloudflare R2 → DuckDB aggregation → embedded in this page as a static snapshot.
 
-**Trust coverage**: These are the trusts that filed for the May 2018 reporting period. Not all active auto ABS trusts are required to file ABS-EE — coverage skews toward bank-sponsored trusts (Ally, Toyota, Honda) and away from captive-heavy structures.
+**Trust coverage** — these are the trusts that filed for the May 2018 reporting period. Coverage skews toward bank-sponsored trusts (Ally, Toyota, Honda) and away from captive-heavy structures.
 
 For full dataset documentation, see [Data Sources →](../data-sources.qmd)
