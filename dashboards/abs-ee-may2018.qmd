@@ -2,13 +2,8 @@
 title: "Auto Loan Credit — May 2018"
 subtitle: "ABS-EE Loan-Level Panel · SEC EDGAR Securitization Filings"
 description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 performance. Pre-computed from raw SEC EDGAR ABS-EE filings via DuckDB."
-toc: false
-page-layout: full
-format:
-  html:
-    grid:
-      body-width: 1120px
-      margin-width: 0px
+toc: true
+toc-depth: 2
 ---
 
 ```{=html}
@@ -17,15 +12,6 @@ format:
   20 ABS-EE parquet files · 12 trusts · 706,856 loans · Aggregated from SEC EDGAR Form ABS-EE.
   See <a href="../data-sources.qmd">Data Sources</a> for full methodology.
 </div>
-```
-
-```{=html}
-<nav class="showcase-chapters" aria-label="Dashboard sections">
-  <a href="#portfolio-composition">Portfolio Composition</a>
-  <a href="#loan-characteristics">Loan Characteristics</a>
-  <a href="#payment-performance">Payment Performance</a>
-  <a href="#methodology">Methodology</a>
-</nav>
 ```
 
 ```{ojs}
