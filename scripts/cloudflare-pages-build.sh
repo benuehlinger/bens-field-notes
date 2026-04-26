@@ -25,14 +25,28 @@ rm -rf /tmp/quarto-extract
 mkdir -p /tmp/quarto-extract
 tar -xzf /tmp/quarto.tgz -C /tmp/quarto-extract
 
-QUARTO_HOME="$(find /tmp/quarto-extract -maxdepth 1 -type d -name 'quarto-*' | head -1)"
-if [[ ! -d "${QUARTO_HOME}/bin" ]]; then
-  echo "[build] ERROR: could not locate quarto bin inside tarball" >&2
+# Portable: locate `quarto` anywhere under the extract dir.
+# Avoid `find -maxdepth` — not reliable on all CI images / BusyBox.
+QUARTO_BIN=""
+while IFS= read -r line; do
+  [[ -z "$line" ]] && continue
+  if [[ -x "$line" ]]; then
+    QUARTO_BIN="$line"
+    break
+  fi
+done < <(find /tmp/quarto-extract -type f \( -path '*/bin/quarto' -o -path '*/quarto' \) 2>/dev/null | sort)
+
+if [[ -z "$QUARTO_BIN" ]]; then
+  echo "[build] ERROR: could not locate quarto executable inside tarball" >&2
+  echo "[build] Top-level extract dir:" >&2
   ls -la /tmp/quarto-extract >&2
+  echo "[build] First 40 paths in tarball listing:" >&2
+  tar -tzf /tmp/quarto.tgz 2>/dev/null | head -40 >&2 || true
   exit 1
 fi
 
-export PATH="${QUARTO_HOME}/bin:${PATH}"
+export PATH="$(dirname "$QUARTO_BIN"):${PATH}"
+echo "[build] Using Quarto binary: ${QUARTO_BIN}"
 quarto --version
 
 RENDER_ARGS=()
