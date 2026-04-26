@@ -3,7 +3,7 @@
 /*------------------------------------------------------------------------*/
 /* Light mode palette                                                       */
 /*------------------------------------------------------------------------*/
-$body-bg:           #F5F0E8;   /* warm off-white parchment */
+$body-bg:           #F8F5EF;   /* slightly whiter parchment at top */
 $body-color:        #2C2C2C;   /* near-black charcoal */
 $link-color:        #4A6FA5;   /* muted slate blue */
 $link-hover-color:  #2E4B78;
@@ -56,6 +56,16 @@ $sidebar-bg:        #F0EBE3;
 /* Body */
 body {
   letter-spacing: -0.01em;
+  background-color: #F8F5EF;
+  background-image: linear-gradient(
+    180deg,
+    #FCFAF6 0%,
+    #F8F5EF 28%,
+    #F3EBDD 68%,
+    #EEE2CF 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 /* Headings */
