@@ -28,6 +28,11 @@ __pycache__/
 *.py[cod]
 .venv/
 
+# Local notebook drafts — ignore everything except the committed skeleton + README
+drafts/*
+!drafts/README.md
+!drafts/skeleton-post.ipynb
+
 
 /.quarto/
 **/*.quarto_ipynb
