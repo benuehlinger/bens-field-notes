@@ -18,6 +18,9 @@ jobs:
         with:
           version: "1.9.37"
 
+      - name: Install notebook Python dependencies
+        run: python3 -m pip install --quiet -r requirements-notebooks.txt
+
       - name: Render site
         run: |
           if [ -n "${R2_BASE_URL:-}" ]; then

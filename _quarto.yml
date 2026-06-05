@@ -5,7 +5,6 @@ project:
     - "*.qmd"
     - "posts/**/*.qmd"
     - "posts/**/*.ipynb"
-    - "drafts/**/*.ipynb"
     - "dashboards/**/*.qmd"
   resources:
     - "styles/**"

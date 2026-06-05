@@ -49,6 +49,11 @@ export PATH="$(dirname "$QUARTO_BIN"):${PATH}"
 echo "[build] Using Quarto binary: ${QUARTO_BIN}"
 quarto --version
 
+if command -v python3 >/dev/null 2>&1; then
+  echo "[build] Installing notebook Python dependencies..."
+  python3 -m pip install --quiet -r requirements-notebooks.txt
+fi
+
 RENDER_ARGS=()
 if [[ -n "${R2_BASE_URL:-}" ]]; then
   echo "[build] R2_BASE_URL is set — passing to Quarto as r2-base-url"
