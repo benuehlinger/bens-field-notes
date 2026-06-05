@@ -1,6 +1,8 @@
-name: Deploy to Cloudflare Pages (manual)
+name: Deploy to Cloudflare Pages
 
 on:
+  push:
+    branches: [main, 001-site-v1]
   workflow_dispatch:
 
 jobs:
