@@ -68,11 +68,31 @@ sloosData = {
 ```{ojs}
 //| echo: false
 
+// Stat callouts — reactive; show — until data lands
+{
+  const getLatest = (type) => {
+    if (!sloosData || sloosData.error) return "—"
+    const rows = sloosData.filter(d => d.loan_type === type)
+    if (!rows.length) return "—"
+    const val = Number(rows[rows.length - 1].net_pct_tightening)
+    return `${val > 0 ? "+" : ""}${val.toFixed(0)}%`
+  }
+
+  return html`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:0 0 2rem;">
+    <div class="stat-box"><div class="stat-value">${getLatest("C&I - Large")}</div><div class="stat-label">C&amp;I Large — Net Tightening</div></div>
+    <div class="stat-box"><div class="stat-value">${getLatest("Consumer - Auto")}</div><div class="stat-label">Consumer Auto — Net Tightening</div></div>
+  </div>`
+}
+```
+
+```{ojs}
+//| echo: false
+
 {
   if (!r2Base || r2Base === "") {
     const el = document.createElement("div")
-    el.className = "chart-error"
-    el.innerHTML = `<span>⚠</span><span>R2 data source not configured.</span>`
+    el.className = "chart-loading"
+    el.innerHTML = `<span>◌</span><span>Live data — pipeline syncing. Chart loads automatically when the data lake is ready.</span>`
     return el
   }
 

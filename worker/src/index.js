@@ -22,10 +22,17 @@ const ALLOWED_PREFIXES = [
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const origin = request.headers.get("Origin") || "";
+
+    // Determine the effective allowed origin:
+    // - exact match of ALLOWED_ORIGIN env var
+    // - any *.pages.dev or *.workers.dev subdomain
+    // - localhost on any port
+    const allowedOrigin = resolveOrigin(origin, env.ALLOWED_ORIGIN);
 
     // CORS preflight
     if (request.method === "OPTIONS") {
-      return corsResponse(null, 204, env.ALLOWED_ORIGIN);
+      return corsResponse(null, 204, allowedOrigin);
     }
 
     // Only GET allowed
@@ -54,6 +61,7 @@ export default {
     // Fetch from R2
     const object = await env.DATA_LAKE.get(key);
 
+
     if (!object) {
       return corsResponse("Not found", 404, env.ALLOWED_ORIGIN);
     }
@@ -62,14 +70,34 @@ export default {
     const headers = new Headers({
       "Content-Type": "application/octet-stream",
       "Content-Length": object.size.toString(),
-      "Cache-Control": "public, max-age=3600",  // 1 hour cache — data doesn't change mid-day
-      "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN,
+      "Cache-Control": "public, max-age=3600",
+      "Access-Control-Allow-Origin": allowedOrigin,
       "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Range",
+      "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
     });
 
     return new Response(object.body, { status: 200, headers });
   },
 };
+
+/**
+ * Resolve the effective CORS allowed origin.
+ * Allows: exact ALLOWED_ORIGIN env match, *.pages.dev, *.workers.dev, localhost.
+ */
+function resolveOrigin(requestOrigin, configuredOrigin) {
+  if (!requestOrigin) return configuredOrigin;
+  if (requestOrigin === configuredOrigin) return requestOrigin;
+  if (
+    requestOrigin.startsWith("http://localhost") ||
+    requestOrigin.startsWith("http://127.0.0.1") ||
+    requestOrigin.endsWith(".pages.dev") ||
+    requestOrigin.endsWith(".workers.dev")
+  ) {
+    return requestOrigin;
+  }
+  return configuredOrigin;
+}
 
 /**
  * Helper — return a response with CORS headers.
@@ -81,6 +109,7 @@ function corsResponse(body, status, allowedOrigin) {
       "Content-Type": "text/plain",
       "Access-Control-Allow-Origin": allowedOrigin ?? "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Range",
     },
   });
 }

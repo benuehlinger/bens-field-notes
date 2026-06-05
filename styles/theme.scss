@@ -3,7 +3,7 @@
 /*------------------------------------------------------------------------*/
 /* Light mode palette                                                       */
 /*------------------------------------------------------------------------*/
-$body-bg:           #F5F0E8;   /* warm off-white parchment */
+$body-bg:           #F7F6F2;   /* clean off-white, minimal warmth */
 $body-color:        #2C2C2C;   /* near-black charcoal */
 $link-color:        #4A6FA5;   /* muted slate blue */
 $link-hover-color:  #2E4B78;
@@ -37,7 +37,7 @@ $border-radius-sm: 2px;
 /*------------------------------------------------------------------------*/
 /* Quarto-specific overrides                                               */
 /*------------------------------------------------------------------------*/
-$navbar-bg:         #F5F0E8;
+$navbar-bg:         #F7F6F2;
 $navbar-fg:         #2C2C2C;
 $navbar-hl:         #4A6FA5;
 $footer-bg:         #EDE8E0;
@@ -96,6 +96,14 @@ h4, h5, h6 {
     color: #5A5A5A !important;
     &:hover { color: #2C2C2C !important; }
   }
+
+  .nav-item .nav-link.active,
+  .nav-item.active .nav-link {
+    color: #1C1C1E !important;
+    font-weight: 500;
+    border-bottom: 2px solid #4A6FA5;
+    padding-bottom: calc(0.5rem - 2px);
+  }
 }
 
 /* Main content — generous whitespace */
@@ -105,12 +113,152 @@ main.content {
   max-width: 900px;
 }
 
+/* Landing hero */
+.hero-section {
+  max-width: 38rem;
+  padding: 2.5rem 0 2rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid #4A6FA5;
+  padding-left: 1.25rem;
+  margin-left: -0.125rem; /* align optical left edge with content */
+}
+
+.hero-meta {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #8A8A8A;
+  margin-top: 1.15rem;
+  margin-bottom: 0;
+  font-weight: 400;
+}
+
 /* Lead paragraph on landing */
 .lead {
   font-size: 1.15rem;
   line-height: 1.7;
   color: #4A4A4A;
   font-weight: 300;
+  margin-bottom: 0;
+}
+
+/* Home page section headings (Dashboards, Recent Notes) */
+h2.home-section-title {
+  font-size: 1.35rem;
+  margin-top: 2.25rem;
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #D8D3C8;
+}
+
+/* Dashboard teaser tiles on home */
+.dashboard-tiles {
+  margin-top: 1rem;
+}
+
+.dashboard-tile {
+  height: 100%;
+  padding: 1.35rem 1.5rem;
+  border: 1px solid #D8D3C8;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 1px 0 rgba(44, 44, 44, 0.04);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dashboard-tile:hover {
+  border-color: #B8B0A0;
+  box-shadow: 0 4px 14px rgba(44, 44, 44, 0.06);
+  transform: translateY(-1px);
+}
+
+.dashboard-tile > p:first-of-type {
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+}
+
+.dashboard-tile > p:first-of-type a {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #1C1C1E;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-tile > p:first-of-type a:hover {
+  color: #4A6FA5;
+}
+
+.dashboard-tile > p:last-of-type {
+  margin-bottom: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #5A5A5A;
+}
+
+a.home-all-notes-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #4A6FA5;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a.home-all-notes-link:hover {
+  color: #2E4B78;
+  border-bottom-color: currentColor;
+}
+
+/* Data tables (data-sources page and inline) */
+.table {
+  font-size: 0.875rem;
+  border-color: #D8D3C8;
+
+  thead th {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    color: #5A5A5A;
+    border-bottom: 2px solid #D8D3C8;
+    background: transparent;
+    padding-bottom: 0.65rem;
+  }
+
+  td {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    color: #4A4A4A;
+    border-color: #E8E3D8;
+    vertical-align: top;
+    padding: 0.55rem 0.75rem;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+/* Post title block — date, categories */
+.quarto-title-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: #8A8A8A;
+  margin-top: 0.65rem;
+  text-transform: uppercase;
+}
+
+.quarto-title-meta-heading {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: #AAAAAA;
+  margin-bottom: 0.2rem;
 }
 
 /* Source/as-of caption pattern under charts */
@@ -217,8 +365,69 @@ hr {
     color: #E8E3D8;
   }
 
+  .lead {
+    color: #B8B3A8;
+  }
+
   h1, h2, h3 { color: #F0EBE0; }
   h4, h5, h6 { color: #9A9A9A; }
+
+  .hero-section {
+    border-left-color: #7BA3C8;
+  }
+
+  .hero-meta {
+    color: #6A6A6A;
+  }
+
+  h2.home-section-title {
+    border-bottom-color: #3A3A3C;
+  }
+
+  .dashboard-tile {
+    background: rgba(42, 42, 44, 0.6);
+    border-color: #3A3A3C;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .dashboard-tile:hover {
+    border-color: #5A5A5A;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .dashboard-tile > p:first-of-type a {
+    color: #F0EBE0;
+  }
+
+  .dashboard-tile > p:first-of-type a:hover {
+    color: #7BA3C8;
+  }
+
+  .dashboard-tile > p:last-of-type {
+    color: #9A9A9A;
+  }
+
+  a.home-all-notes-link {
+    color: #7BA3C8;
+  }
+
+  a.home-all-notes-link:hover {
+    color: #A8C4E0;
+  }
+
+  .nav-item .nav-link.active,
+  .nav-item.active .nav-link {
+    color: #F0EBE0 !important;
+    border-bottom-color: #7BA3C8;
+  }
+
+  .table {
+    thead th { color: #9A9A9A; border-bottom-color: #3A3A3C; }
+    td { color: #B8B3A8; border-color: #2E2E30; }
+  }
+
+  .quarto-title-meta { color: #6A6A6A; }
+  .quarto-title-meta-heading { color: #5A5A5A; }
 
   .navbar {
     background: #1C1C1E !important;

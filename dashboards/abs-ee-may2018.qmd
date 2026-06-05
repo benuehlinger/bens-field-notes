@@ -1,0 +1,429 @@
+---
+title: "Auto Loan Credit — May 2018"
+subtitle: "ABS-EE Loan-Level Panel · SEC EDGAR Securitization Filings"
+description: "706,856 loans across 12 auto ABS trusts, reporting April 2018 performance. Pre-computed from raw SEC EDGAR ABS-EE filings via DuckDB."
+toc: true
+toc-depth: 2
+---
+
+```{=html}
+<div class="data-note">
+  <strong>Reporting period:</strong> April 30, 2018 —
+  20 ABS-EE parquet files · 12 trusts · 706,856 loans · Aggregated from SEC EDGAR Form ABS-EE.
+  See <a href="../data-sources.qmd">Data Sources</a> for full methodology.
+</div>
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+TRUSTS = [
+  {name:"Ally Auto 2017-1",               loans:118931, avg_bal:22061, avg_fico:729},
+  {name:"Hyundai Auto 2017-A",            loans: 71274, avg_bal:21192, avg_fico:739},
+  {name:"Toyota Auto Recv. 2017-A",       loans: 69923, avg_bal:26015, avg_fico:760},
+  {name:"Ally Auto 2017-2",               loans: 67717, avg_bal:21490, avg_fico:726},
+  {name:"Honda Auto Recv. 2017-1",        loans: 63515, avg_bal:23783, avg_fico:763},
+  {name:"CarMax Auto 2017-1",             loans: 61139, avg_bal:19003, avg_fico:703},
+  {name:"Santander Drive 2017-1",         loans: 52577, avg_bal:20177, avg_fico:602},
+  {name:"Ford Credit Auto 2017-A",        loans: 50945, avg_bal:32292, avg_fico:645},
+  {name:"World Omni Auto 2017-A",         loans: 50000, avg_bal:27059, avg_fico:720},
+  {name:"Nissan Auto Recv. 2017-A",       loans: 41719, avg_bal:27849, avg_fico:776},
+  {name:"AmeriCredit Auto 2017-1",        loans: 38379, avg_bal:23173, avg_fico:574},
+  {name:"California Republic 2017-1",     loans: 20737, avg_bal:20708, avg_fico:700}
+]
+
+FICO = [
+  {bucket:"Sub-600", n:81610,  ord:1},
+  {bucket:"600–649", n:61018,  ord:2},
+  {bucket:"650–699", n:128212, ord:3},
+  {bucket:"700–749", n:145972, ord:4},
+  {bucket:"750–799", n:124419, ord:5},
+  {bucket:"800+",    n:154419, ord:6}
+]
+
+STATES = [
+  {state:"CA", n:93719}, {state:"TX", n:80416}, {state:"FL", n:74315},
+  {state:"IL", n:33066}, {state:"GA", n:31012}, {state:"NC", n:29076},
+  {state:"PA", n:26076}, {state:"NY", n:22126}, {state:"OH", n:18968},
+  {state:"NJ", n:18900}
+]
+
+RATES = [
+  {bucket:"< 2%",  n:106656, ord:1},
+  {bucket:"2–4%",  n:156536, ord:2},
+  {bucket:"4–6%",  n:117585, ord:3},
+  {bucket:"6–8%",  n: 74020, ord:4},
+  {bucket:"8–10%", n: 43441, ord:5},
+  {bucket:"10%+",  n:114504, ord:6}
+]
+
+VINTAGE = [
+  {year:"2011", n:3692},  {year:"2012", n:35285},
+  {year:"2013", n:29860}, {year:"2014", n:50597},
+  {year:"2015", n:134061},{year:"2016", n:421175},
+  {year:"2017", n:32103}
+]
+
+DELINQ = [
+  {bucket:"Current",    n:470136, ord:1},
+  {bucket:"1 period",   n:2285,   ord:2},
+  {bucket:"2 periods",  n:2825,   ord:3},
+  {bucket:"3 periods",  n:2810,   ord:4},
+  {bucket:"4+ periods", n:51764,  ord:5}
+]
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+bandForFico = (score) => score >= 740
+  ? "Prime (740+)"
+  : score >= 700
+    ? "Near-prime (700-739)"
+    : score >= 650
+      ? "Mid (650-699)"
+      : "Subprime (<650)"
+
+shortTrustName = (name) => name
+  .replace(" Auto Receivables ", " ")
+  .replace(" Automobile ", " ")
+  .replace(" Receivables ", " ")
+  .replace(" Drive Auto ", " Drive ")
+  .replace(" Credit Auto ", " Credit ")
+  .replace(" California Republic ", " Calif. Republic ")
+  .replace(" 2017-", " '17-")
+
+TRUSTS_VIEW = TRUSTS
+  .map((d) => ({ ...d, share: (d.loans * 100) / 706856, fico_band: bandForFico(d.avg_fico) }))
+  .sort((a, b) => b.loans - a.loans)
+  .slice(0, 10)
+  .map((d) => ({ ...d, short_name: shortTrustName(d.name) }))
+
+STATES_VIEW = STATES
+  .map((d) => ({ ...d, share: (d.n * 100) / 529820 }))
+  .sort((a, b) => b.n - a.n)
+  .slice(0, 10)
+
+FICO_VIEW = FICO.map((d) => ({ ...d, share: (d.n * 100) / 695650 }))
+RATES_VIEW = RATES.map((d) => ({ ...d, share: (d.n * 100) / 612742 }))
+VINTAGE_VIEW = VINTAGE.map((d) => ({ ...d, share: (d.n * 100) / 706856 }))
+DELINQ_VIEW = DELINQ.map((d) => ({ ...d, share: (d.n * 100) / 529820 }))
+```
+
+```{ojs}
+//| echo: false
+
+// KPI strip
+html`
+<div class="showcase-meta">
+  <span class="showcase-period">April 2018 reporting period</span>
+  <span class="static-badge">curated snapshot</span>
+</div>
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-value">706,856</div>
+    <div class="kpi-label">Total Loans</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">12</div>
+    <div class="kpi-label">ABS Trusts</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">712</div>
+    <div class="kpi-label">Avg FICO</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">$21,945</div>
+    <div class="kpi-label">Median Balance</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">5.52%</div>
+    <div class="kpi-label">Avg Rate</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">63.5%</div>
+    <div class="kpi-label">New Vehicles</div>
+  </div>
+</div>`
+```
+
+---
+
+## Portfolio Composition {#portfolio-composition .showcase-section}
+
+::: {.grid .showcase-grid}
+::: {.g-col-12 .g-col-md-7}
+
+**Trust loan counts** — 12 trusts, all 2017 vintage, reporting April 2018 performance.
+
+```{ojs}
+//| echo: false
+
+{
+  const xMax = Math.max(...TRUSTS_VIEW.map((d) => d.loans)) * 1.3
+  return Plot.plot({
+    marginLeft: 160,
+    marginRight: 80,
+    height: 320,
+    x: { axis: null, domain: [0, xMax] },
+    y: { label: null, tickSize: 0 },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
+    marks: [
+      Plot.barX(TRUSTS_VIEW, {
+        x: "loans",
+        y: "short_name",
+        fill: d => d.avg_fico >= 740 ? "#4A6FA5"
+                 : d.avg_fico >= 700 ? "#7BA3C8"
+                 : d.avg_fico >= 650 ? "#B8C8DC"
+                 : "#C86A50",
+        sort: { y: "-x" },
+        rx: 2
+      }),
+      Plot.text(TRUSTS_VIEW, {
+        x: "loans",
+        y: "short_name",
+        text: d => `${(d.loans / 1000).toFixed(0)}K`,
+        dx: 8,
+        textAnchor: "start",
+        fill: "#6E6E6E",
+        fontSize: 11
+      })
+    ]
+  })
+}
+```
+
+<p class="chart-caption">Color = avg FICO band: blue ≥ 740 · mid-blue ≥ 700 · light ≥ 650 · red < 650</p>
+:::
+
+::: {.g-col-12 .g-col-md-5}
+
+**Top 10 states by loan count** — CA, TX, FL account for 35% of the pool.
+
+```{ojs}
+//| echo: false
+
+{
+  const xMax = Math.max(...STATES_VIEW.map((d) => d.n)) * 1.3
+  return Plot.plot({
+    marginLeft: 36,
+    marginRight: 75,
+    height: 320,
+    x: { axis: null, domain: [0, xMax] },
+    y: { label: null, tickSize: 0 },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
+    marks: [
+      Plot.barX(STATES_VIEW, {
+        x: "n",
+        y: "state",
+        fill: "#C8A058",
+        sort: { y: "-x" },
+        rx: 2
+      }),
+      Plot.text(STATES_VIEW, {
+        x: "n",
+        y: "state",
+        text: d => `${(d.n/1000).toFixed(0)}K`,
+        dx: 8,
+        textAnchor: "start",
+        fill: "#6E6E6E",
+        fontSize: 11
+      })
+    ]
+  })
+}
+```
+
+<p class="chart-caption">obligorGeographicLocation field · 529K loans with state reported</p>
+:::
+:::
+
+---
+
+## Loan Characteristics {#loan-characteristics .showcase-section}
+
+::: {.grid .showcase-grid}
+::: {.g-col-12 .g-col-md-4}
+
+**FICO distribution** — avg 712, skewed prime.
+
+```{ojs}
+//| echo: false
+
+{
+  const ficoColors = ["#C86A50","#C8964A","#C8B86A","#7EA870","#5A8A8A","#4A6FA5"]
+  const total = FICO_VIEW.reduce((s, d) => s + d.n, 0)
+  return Plot.plot({
+    height: 300,
+    marginTop: 20,
+    x: { label: null, tickSize: 0 },
+    y: { axis: null },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
+    marks: [
+      Plot.barY(FICO_VIEW, {
+        x: "bucket",
+        y: "n",
+        fill: (d, i) => ficoColors[i],
+        rx: 2
+      }),
+      Plot.text(FICO_VIEW, {
+        x: "bucket",
+        y: "n",
+        text: d => (d.n * 100 / total).toFixed(1) + "%",
+        dy: -10,
+        fontSize: 11,
+        fill: "#6E6E6E"
+      }),
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
+    ]
+  })
+}
+```
+
+<p class="chart-caption">695K scored · Sub-600 = 11.5% · 800+ = 21.8%</p>
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**Origination vintage** — 59% of pool is 2016 origination.
+
+```{ojs}
+//| echo: false
+
+{
+  return Plot.plot({
+    height: 300,
+    marginTop: 20,
+    x: { label: null, tickSize: 0 },
+    y: { axis: null },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
+    marks: [
+      Plot.barY(VINTAGE_VIEW, {
+        x: "year",
+        y: "n",
+        fill: d => d.year === "2016" ? "#4A6FA5" : "#D4CFC4",
+        rx: 2
+      }),
+      Plot.text(VINTAGE_VIEW.filter(d => d.year === "2016"), {
+        x: "year",
+        y: "n",
+        text: d => (d.n/1000).toFixed(0) + "K",
+        dy: -10,
+        fontSize: 11,
+        fill: "#6E6E6E"
+      }),
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
+    ]
+  })
+}
+```
+
+<p class="chart-caption">Year of loan origination · 2016 vintage = 421K loans (59%)</p>
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**Rate distribution** — avg 5.52%, bimodal (captive vs. bank).
+
+```{ojs}
+//| echo: false
+
+{
+  const total = RATES_VIEW.reduce((s, d) => s + d.n, 0)
+  return Plot.plot({
+    height: 300,
+    marginTop: 20,
+    x: { label: null, tickSize: 0 },
+    y: { axis: null },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
+    marks: [
+      Plot.barY(RATES_VIEW, {
+        x: "bucket",
+        y: "n",
+        fill: d => d.ord <= 2 ? "#7BA3C8" : d.ord <= 4 ? "#8A7A6A" : "#C86A50",
+        rx: 2
+      }),
+      Plot.text(RATES_VIEW, {
+        x: "bucket",
+        y: "n",
+        text: d => (d.n * 100 / total).toFixed(1) + "%",
+        dy: -10,
+        fontSize: 11,
+        fill: "#6E6E6E"
+      }),
+      Plot.ruleY([0], { stroke: "#D8D3C8", strokeWidth: 1 })
+    ]
+  })
+}
+```
+
+<p class="chart-caption">612K non-zero rate loans · bimodal: low-rate captive + bank paper</p>
+:::
+:::
+
+---
+
+## Payment Performance {#payment-performance .showcase-section}
+
+30+ day delinquency of 3.1% among loans with status reported. ~177K loans have no status field in this filing.
+
+```{ojs}
+//| echo: false
+
+{
+  const reported = DELINQ_VIEW.reduce((s, d) => s + d.n, 0)
+  const xMax = Math.max(...DELINQ_VIEW.map((d) => d.n)) * 1.3
+  const delinqColors = {
+    "Current":    "#4A6FA5",
+    "1 period":   "#D8C090",
+    "2 periods":  "#C8A058",
+    "3 periods":  "#C87840",
+    "4+ periods": "#C85030"
+  }
+  return Plot.plot({
+    marginLeft: 110,
+    marginRight: 70,
+    height: 300,
+    x: { axis: null, domain: [0, xMax] },
+    y: { label: null, tickSize: 0 },
+    style: { fontFamily: "'DM Mono', monospace", fontSize: "12px", background: "transparent" },
+    marks: [
+      Plot.barX(DELINQ_VIEW, {
+        x: "n",
+        y: "bucket",
+        fill: d => delinqColors[d.bucket] || "#D8D3C8",
+        sort: { y: "-x" },
+        rx: 2
+      }),
+      Plot.text(DELINQ_VIEW, {
+        x: "n",
+        y: "bucket",
+        text: d => `${(d.n/1000).toFixed(0)}K  ${(d.n*100/reported).toFixed(1)}%`,
+        dx: 8,
+        textAnchor: "start",
+        fill: "#6E6E6E",
+        fontSize: 11
+      })
+    ]
+  })
+}
+```
+
+<p class="chart-caption">
+529,820 loans with status: 88.7% current · 11.3% one or more payments behind.
+Status codes: 0 = current, 1–3 = payment periods behind, 4+ = severely delinquent.
+</p>
+
+---
+
+## Methodology {#methodology}
+
+**What this page shows** — loan-level performance data from 20 ABS-EE parquet files, covering 12 auto loan securitization trusts that reported April 2018 data in their May 2018 SEC EDGAR filings. Aggregations were pre-computed from the raw loan records using DuckDB.
+
+**Data path** — SEC EDGAR ABS-EE (Form 10-D) → data lake pipeline → Hive-partitioned Parquet in Cloudflare R2 → DuckDB aggregation → embedded in this page as a static snapshot.
+
+**Trust coverage** — these are the trusts that filed for the May 2018 reporting period. Coverage skews toward bank-sponsored trusts (Ally, Toyota, Honda) and away from captive-heavy structures.
+
+For full dataset documentation, see [Data Sources →](../data-sources.qmd)

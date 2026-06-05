@@ -4,6 +4,8 @@ project:
   render:
     - "*.qmd"
     - "posts/**/*.qmd"
+    - "posts/**/*.ipynb"
+    - "drafts/**/*.ipynb"
     - "dashboards/**/*.qmd"
   resources:
     - "styles/**"
@@ -18,8 +20,10 @@ website:
         href: index.qmd
       - text: "Dashboards"
         menu:
-          - text: "Auto Loan Credit"
+          - text: "Auto Loan Credit — Live"
             href: dashboards/abs-ee.qmd
+          - text: "Auto Loan Credit — May 2018 Showcase"
+            href: dashboards/abs-ee-may2018.qmd
           - text: "Bank Lending Standards"
             href: dashboards/sloos.qmd
       - text: "Notes"

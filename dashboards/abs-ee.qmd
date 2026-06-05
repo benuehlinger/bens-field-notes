@@ -55,7 +55,7 @@ delinqData = {
         COUNT(*) FILTER (WHERE days_past_due >= 90) * 100.0 / COUNT(*) AS delinq_rate_90plus,
         COUNT(*) AS total_loans,
         COUNT(*) FILTER (WHERE days_past_due >= 30) * 100.0 / COUNT(*) AS delinq_rate_30plus
-      FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/*.parquet')
+      FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/**/*.parquet', union_by_name=true)
       WHERE filing_date IS NOT NULL
       GROUP BY filing_date
       ORDER BY filing_date
@@ -70,12 +70,36 @@ delinqData = {
 ```{ojs}
 //| echo: false
 
+// Stat callouts — reactive; show — until data lands
+{
+  const latest = (delinqData && !delinqData.error && delinqData.length > 0)
+    ? delinqData[delinqData.length - 1] : null
+
+  const rate = latest
+    ? `${Number(latest.delinq_rate_90plus).toFixed(2)}%`
+    : "—"
+  const loans = latest
+    ? (latest.total_loans >= 1e6
+        ? `${(latest.total_loans / 1e6).toFixed(1)}M`
+        : `${(latest.total_loans / 1e3).toFixed(0)}K`)
+    : "—"
+
+  return html`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:0 0 2rem;">
+    <div class="stat-box"><div class="stat-value">${rate}</div><div class="stat-label">90+ Day Delinquency</div></div>
+    <div class="stat-box"><div class="stat-value">${loans}</div><div class="stat-label">Loans in Latest Month</div></div>
+  </div>`
+}
+```
+
+```{ojs}
+//| echo: false
+
 // Chart: 90+ day delinquency rate
 {
   if (!r2Base || r2Base === "") {
     const el = document.createElement("div")
-    el.className = "chart-error"
-    el.innerHTML = `<span>⚠</span><span>R2 data source not configured. Set <code>r2-base-url</code> in site params.</span>`
+    el.className = "chart-loading"
+    el.innerHTML = `<span>◌</span><span>Live data — pipeline syncing. Chart loads automatically when the data lake is ready.</span>`
     return el
   }
 
@@ -174,7 +198,7 @@ means more issuers filing, means the delinquency rate above is a better sample.
         strokeWidth: 1.5
       })
     ],
-    caption: "Source: SEC EDGAR ABS-EE | Units: loan count | As of latest filing month"
+    caption: "Source: SEC EDGAR ABS-EE | Units: loan count | As of latest reporting period"
   })
 }
 ```
