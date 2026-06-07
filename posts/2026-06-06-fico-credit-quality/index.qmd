@@ -93,10 +93,12 @@ both, in the same dataset, filed to the same regulator, available for free.
     "750+  Prime+",
   ]
 
+  const labelStyle = "font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;color:#8A8A8A;margin-bottom:0.5rem"
+
   const countChart = Plot.plot({
-    title: "By loan count",
-    marginLeft: 140,
-    x: { label: "Loans (millions)", tickFormat: d => `${(d/1e6).toFixed(1)}M` },
+    marginLeft: 145,
+    marginTop: 6,
+    x: { label: null, tickFormat: d => `${(d/1e6).toFixed(1)}M` },
     y: { domain: tierOrder, label: null },
     style: { background: "transparent", fontSize: "12px" },
     marks: [
@@ -111,9 +113,9 @@ both, in the same dataset, filed to the same regulator, available for free.
   })
 
   const balChart = Plot.plot({
-    title: "By original balance",
-    marginLeft: 140,
-    x: { label: "Original balance ($B)", tickFormat: d => `$${(d/1000).toFixed(0)}B` },
+    marginLeft: 145,
+    marginTop: 6,
+    x: { label: null, tickFormat: d => `$${(d/1000).toFixed(0)}B` },
     y: { domain: tierOrder, label: null },
     style: { background: "transparent", fontSize: "12px" },
     marks: [
@@ -128,7 +130,8 @@ both, in the same dataset, filed to the same regulator, available for free.
   })
 
   return html`<div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:1.5rem 0">
-    ${countChart}${balChart}
+    <div><div style="${labelStyle}">Loan count</div>${countChart}</div>
+    <div><div style="${labelStyle}">Original balance</div>${balChart}</div>
   </div>
   <div class="chart-caption">Source: SEC EDGAR Form ABS-EE — autoloan asset class. As of ${period} reporting period.</div>`
 }
@@ -218,52 +221,60 @@ it's how subprime auto securitization works. The yield has to compensate for som
 
 ```{ojs}
 //| echo: false
+//| output: false
+d3 = require("d3@7")
+```
+
+```{ojs}
+//| echo: false
 {
   const maxLoans = Math.max(...top_deals.map(d => d.loan_count))
 
+  // RdYlGn is diverging — force sequential to avoid Plot centering it at 0
+  const ficoColor = d3.scaleSequential(d3.interpolateRdYlGn).domain([530, 830])
+
+  // Only label the most notable outliers to avoid overlap
+  const labeled = top_deals.filter(d =>
+    d.avg_ltv > 1.15 || d.median_fico > 793 || d.loan_count > 75000
+  )
+
   const chart = Plot.plot({
-    marginLeft: 20,
-    marginRight: 20,
-    width: 700,
-    height: 380,
+    marginLeft: 50,
+    marginRight: 30,
+    marginTop: 20,
+    height: 360,
     x: {
-      label: "Median FICO",
-      domain: [530, 830],
+      label: "Median FICO →",
+      domain: [530, 835],
       grid: true,
-      tickSpacing: 50,
     },
     y: {
-      label: "Average LTV",
-      domain: [0.7, 1.7],
-      tickFormat: d => d.toFixed(2),
-    },
-    color: {
-      scheme: "RdYlGn",
-      domain: [540, 820],
-      legend: true,
-      label: "Median FICO",
+      label: "↑ Avg LTV",
+      tickFormat: ".2f",
     },
     style: { background: "transparent", fontSize: "12px" },
     marks: [
-      Plot.ruleY([1.0], { stroke: "#8A8A8A", strokeDasharray: "4,3", strokeWidth: 1 }),
+      Plot.ruleY([1.0], { stroke: "#C8C3B8", strokeDasharray: "4,3", strokeWidth: 1.2 }),
       Plot.dot(top_deals, {
         x: "median_fico",
         y: "avg_ltv",
-        r: d => 4 + (d.loan_count / maxLoans) * 18,
-        fill: "median_fico",
-        fillOpacity: 0.82,
-        stroke: "currentColor",
-        strokeWidth: 0.5,
-        strokeOpacity: 0.3,
+        r: d => 5 + (d.loan_count / maxLoans) * 16,
+        fill: d => ficoColor(d.median_fico),
+        fillOpacity: 0.88,
+        stroke: "#ffffff",
+        strokeWidth: 0.8,
+        strokeOpacity: 0.6,
       }),
-      Plot.text(top_deals, {
+      Plot.text(labeled, {
         x: "median_fico",
         y: "avg_ltv",
-        text: d => (d.sponsor ?? "").slice(0, 18),
-        fontSize: 9,
-        dx: 2,
-        dy: -10,
+        text: d => (d.sponsor ?? "").split(" ").slice(0, 2).join(" "),
+        fontSize: 9.5,
+        dy: -12,
         fill: "currentColor",
+        stroke: "var(--body-bg, #F7F6F2)",
+        strokeWidth: 3,
+        paintOrder: "stroke",
       }),
     ]
   })
@@ -293,37 +304,40 @@ quality — what matters is who underwrote it.
   const ficoMin = Math.min(...top_makes.map(d => d.median_fico))
   const ficoMax = Math.max(...top_makes.map(d => d.median_fico))
 
+  // Sequential color scale — avoids the diverging-at-zero bug
+  const makeColor = d3.scaleSequential(d3.interpolateRdYlGn).domain([ficoMin, ficoMax])
+
+  // Sort ascending by FICO so highest is at top
+  const sorted = [...top_makes].sort((a, b) => a.median_fico - b.median_fico)
+
   const chart = Plot.plot({
-    marginLeft: 100,
+    marginLeft: 130,
+    marginRight: 40,
     x: {
-      label: "Median FICO at origination",
-      domain: [560, 820],
+      label: "Median FICO at origination →",
+      domain: [560, 800],
+      grid: true,
     },
     y: {
-      domain: top_makes.map(d => d.make),
+      domain: sorted.map(d => d.make),
       label: null,
-    },
-    color: {
-      scheme: "RdYlGn",
-      domain: [ficoMin, ficoMax],
     },
     style: { background: "transparent", fontSize: "12px" },
     marks: [
-      Plot.barX(top_makes, {
+      Plot.barX(sorted, {
         x: "median_fico",
         y: "make",
-        fill: "median_fico",
+        fill: d => makeColor(d.median_fico),
         rx: 2,
-        sort: { y: "x" },
+        clip: true,
       }),
-      Plot.text(top_makes, {
+      Plot.text(sorted, {
         x: "median_fico",
         y: "make",
         text: d => d.median_fico.toFixed(0),
         dx: 6,
         fontSize: 10,
         fill: "currentColor",
-        sort: { y: "x" },
       }),
       Plot.ruleX([560]),
     ]
