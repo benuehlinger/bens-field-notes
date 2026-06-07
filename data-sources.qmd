@@ -93,38 +93,6 @@ and writes Parquet to R2.
   Long historical comparisons should account for definitional shifts.
 - **Response rate**: Not all surveyed banks respond in every quarter.
 
----
-
-## FRED Macro Bundle
-
-**Publisher**: Federal Reserve Bank of St. Louis (FRED)
-**Source**: [FRED API](https://fred.stlouisfed.org/)
-**Update cadence**: Daily (FRED series updated as new data releases)
-
-### What it is
-
-A curated bundle of macroeconomic time series fetched from the FRED API.
-Includes financial stress indicators, credit spreads, and delinquency rates.
-The pipeline fetches only series that have updated since the last run (`--skip-if-unchanged`).
-
-**Included series (non-exhaustive)**:
-
-| Series ID | Description |
-|---|---|
-| `NFCI` | Chicago Fed National Financial Conditions Index |
-| `DRTSCIS` | Net % banks tightening C&I loan standards (from SLOOS, on FRED) |
-| Various | Credit spreads, consumer delinquency aggregates |
-
-### Status
-
-The FRED macro dataset is present in the data lake but **not yet surfaced on this site**.
-It will appear in a future post.
-
-### Known limitations
-
-- FRED series definitions, vintage dates, and revisions vary by source agency.
-- Some series are seasonally adjusted (SA); others are not (NSA).
-  Check the `units` field in the Parquet schema.
 
 ---
 

@@ -26,8 +26,8 @@ This post is the public version of that milestone — and the announcement that
 - [Bank Lending Standards — SLOOS](../../dashboards/sloos.qmd) — Fed senior loan officer survey
 - Background on [what ABS-EE is](../../data-sources.qmd) if you're new here
 
-Charts query Parquet through DuckDB-WASM in your browser. The R2 bucket stays private;
-a small Cloudflare Worker proxies read-only object fetches.
+Charts are pre-aggregated at deploy time and rendered as interactive Observable Plot
+visualizations. The R2 bucket stays private; data is embedded into the page at build time.
 
 ## What's running next
 

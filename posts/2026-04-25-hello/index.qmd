@@ -20,8 +20,7 @@ look at it directly.
 The main datasets right now:
 
 - **ABS-EE** — loan-level auto credit data from SEC EDGAR securitization filings
-- **SLOOS** — the Federal Reserve's survey of bank lending standards  
-- **FRED** — macroeconomic series (NFCI, credit spreads, delinquency rates)
+- **SLOOS** — the Federal Reserve's survey of bank lending standards
 
 More as the pipelines get built.
 
@@ -33,10 +32,10 @@ here's where it's incomplete. Conclusions are, per the tagline, questionable.
 
 ## How the charts work
 
-The dashboards on this site query live Parquet data from a private Cloudflare R2 bucket.
-The queries run in your browser via DuckDB-WASM — a WebAssembly build of DuckDB that
-runs client-side with no backend server. The data travels from R2 to your browser and
-nowhere else.
+The dashboards on this site are built from pre-aggregated Parquet snapshots.
+Data lives in a private Cloudflare R2 bucket; aggregation scripts run at deploy time
+and embed the results directly into each page. Interactive charts run in your browser
+via [Observable Plot](https://observablehq.com/plot/) — no backend server, no live queries.
 
 The ingestion pipeline that powers this site is private. If you're interested in the data
 or the pipeline, get in touch: [beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)
