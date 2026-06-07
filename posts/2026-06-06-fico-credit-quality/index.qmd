@@ -79,27 +79,12 @@ both, in the same dataset, filed to the same regulator, available for free.
 ```{ojs}
 //| echo: false
 {
-  const TIER_COLOR = {
-    "750+  Prime+":        "#4A6FA5",
-    "700-749  Prime":      "#5A8A8A",
-    "660-699  Near-Prime": "#7EA870",
-    "620-659  Subprime":   "#C8964A",
-    "<620  Deep Sub":      "#C86A50",
-  }
-
-  const tierOrder = [
-    "<620  Deep Sub",
-    "620-659  Subprime",
-    "660-699  Near-Prime",
-    "700-749  Prime",
-    "750+  Prime+",
-  ]
-
   const labelStyle = "font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;color:#8A8A8A;margin-bottom:0.5rem"
 
   const countChart = Plot.plot({
     marginLeft: 145,
     marginTop: 6,
+    height: 220,
     x: { label: null, tickFormat: d => `${(d/1e6).toFixed(1)}M` },
     y: { domain: tierOrder, label: null },
     style: { background: "transparent", fontSize: "12px" },
@@ -117,6 +102,7 @@ both, in the same dataset, filed to the same regulator, available for free.
   const balChart = Plot.plot({
     marginLeft: 145,
     marginTop: 6,
+    height: 220,
     x: { label: null, tickFormat: d => `$${(d/1000).toFixed(0)}B` },
     y: { domain: tierOrder, label: null },
     style: { background: "transparent", fontSize: "12px" },
@@ -153,27 +139,13 @@ you're eating a loss before the first payment was ever missed.
 ```{ojs}
 //| echo: false
 {
-  const TIER_COLOR = {
-    "750+  Prime+":        "#4A6FA5",
-    "700-749  Prime":      "#5A8A8A",
-    "660-699  Near-Prime": "#7EA870",
-    "620-659  Subprime":   "#C8964A",
-    "<620  Deep Sub":      "#C86A50",
-  }
-
-  const tierOrder = [
-    "<620  Deep Sub",
-    "620-659  Subprime",
-    "660-699  Near-Prime",
-    "700-749  Prime",
-    "750+  Prime+",
-  ]
-
   const chart = Plot.plot({
-    marginLeft: 140,
+    marginLeft: 170,
+    marginRight: 40,
+    height: 220,
     x: {
-      label: "Average LTV at origination",
-      domain: [0.75, 1.65],
+      label: "Average LTV at origination →",
+      domain: [0.75, 1.25],
       tickFormat: d => d.toFixed(2),
     },
     y: { domain: tierOrder, label: null },
@@ -225,6 +197,22 @@ it's how subprime auto securitization works. The yield has to compensate for som
 //| echo: false
 //| output: false
 d3 = require("d3@7")
+
+TIER_COLOR = ({
+  "750+  Prime+":        "#2E5E9E",
+  "700-749  Prime":      "#5892BC",
+  "660-699  Near-Prime": "#8FA882",
+  "620-659  Subprime":   "#C89050",
+  "<620  Deep Sub":      "#B84840",
+})
+
+tierOrder = [
+  "<620  Deep Sub",
+  "620-659  Subprime",
+  "660-699  Near-Prime",
+  "700-749  Prime",
+  "750+  Prime+",
+]
 ```
 
 ```{ojs}

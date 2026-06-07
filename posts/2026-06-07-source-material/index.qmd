@@ -1,0 +1,553 @@
+---
+title: "Source Material"
+subtitle: "Three asset classes, 38,880 Parquet files, and ten years of loan-level data from the SEC."
+description: "A guided tour of the raw data behind every analysis on this site: what we have, where it comes from, and how SEC XML filings become queryable columns."
+date: 2026-06-07
+categories: [structured-finance, abs-ee, data-lake, infrastructure]
+jupyter: python3
+freeze: false
+execute:
+  echo: false
+  warning: false
+---
+
+```{python}
+from pathlib import Path
+import pandas as pd
+
+OUTPUTS = Path("../../analysis/outputs")
+
+coverage = pd.read_parquet(OUTPUTS / "lake_coverage.parquet")
+
+# Clip obviously-partial trailing months (fewer than 10 trusts where prior month had 30+)
+def clip_partial(df, asset):
+    sub = df[df.asset_class == asset].sort_values("reporting_period")
+    if len(sub) < 2:
+        return sub
+    last = sub.iloc[-1]
+    prev = sub.iloc[-2]
+    if last.trust_count < prev.trust_count * 0.4:
+        return sub.iloc[:-1]
+    return sub
+
+coverage_clean = pd.concat([
+    clip_partial(coverage, a) for a in ["autoloan", "autolease", "cmbs"]
+])
+
+# Hardcoded schema matrix (field counts by category and asset class)
+CATEGORIES = [
+    "Borrower / lessee credit",
+    "Collateral",
+    "Loan / lease terms",
+    "Monthly performance",
+    "Servicing & fees",
+    "Loan structure",
+    "Distress / workout",
+    "Rate adjustment (ARM)",
+    "Pipeline metadata",
+]
+schema_matrix = [
+    # Auto Loan
+    {"asset": "Auto Loan",  "category": "Borrower / lessee credit", "fields": 6},
+    {"asset": "Auto Loan",  "category": "Collateral",               "fields": 7},
+    {"asset": "Auto Loan",  "category": "Loan / lease terms",       "fields": 9},
+    {"asset": "Auto Loan",  "category": "Monthly performance",      "fields": 12},
+    {"asset": "Auto Loan",  "category": "Servicing & fees",         "fields": 8},
+    {"asset": "Auto Loan",  "category": "Loan structure",           "fields": 3},
+    {"asset": "Auto Loan",  "category": "Distress / workout",       "fields": 1},
+    {"asset": "Auto Loan",  "category": "Rate adjustment (ARM)",    "fields": 0},
+    {"asset": "Auto Loan",  "category": "Pipeline metadata",        "fields": 9},
+    # Auto Lease
+    {"asset": "Auto Lease", "category": "Borrower / lessee credit", "fields": 7},
+    {"asset": "Auto Lease", "category": "Collateral",               "fields": 7},
+    {"asset": "Auto Lease", "category": "Loan / lease terms",       "fields": 9},
+    {"asset": "Auto Lease", "category": "Monthly performance",      "fields": 12},
+    {"asset": "Auto Lease", "category": "Servicing & fees",         "fields": 8},
+    {"asset": "Auto Lease", "category": "Loan structure",           "fields": 4},
+    {"asset": "Auto Lease", "category": "Distress / workout",       "fields": 1},
+    {"asset": "Auto Lease", "category": "Rate adjustment (ARM)",    "fields": 0},
+    {"asset": "Auto Lease", "category": "Pipeline metadata",        "fields": 9},
+    # CMBS
+    {"asset": "CMBS",       "category": "Borrower / lessee credit", "fields": 0},
+    {"asset": "CMBS",       "category": "Collateral",               "fields": 2},
+    {"asset": "CMBS",       "category": "Loan / lease terms",       "fields": 12},
+    {"asset": "CMBS",       "category": "Monthly performance",      "fields": 14},
+    {"asset": "CMBS",       "category": "Servicing & fees",         "fields": 6},
+    {"asset": "CMBS",       "category": "Loan structure",           "fields": 9},
+    {"asset": "CMBS",       "category": "Distress / workout",       "fields": 9},
+    {"asset": "CMBS",       "category": "Rate adjustment (ARM)",    "fields": 10},
+    {"asset": "CMBS",       "category": "Pipeline metadata",        "fields": 9},
+]
+
+# Sample records — one per asset class, curated fields only
+autoloan_sample = [
+    {"field": "Sponsor",             "value": "Santander Consumer USA"},
+    {"field": "Trust",               "value": "Santander Drive ART"},
+    {"field": "FICO at origination", "value": "673  (Bureau)"},
+    {"field": "PTI ratio",           "value": "14.1%"},
+    {"field": "Income verification", "value": "Level 2"},
+    {"field": "Vehicle",             "value": "2017 Dodge Charger  (New)"},
+    {"field": "Vehicle value",       "value": "$43,738"},
+    {"field": "Original balance",    "value": "$52,827"},
+    {"field": "Rate",                "value": "1.90%  (fixed)"},
+    {"field": "Term",                "value": "72 months"},
+    {"field": "LTV at origination",  "value": "1.21×"},
+    {"field": "Subvented",           "value": "Yes"},
+]
+autolease_sample = [
+    {"field": "Sponsor",             "value": "World Omni Financial Corp"},
+    {"field": "FICO at origination", "value": "641"},
+    {"field": "PTI ratio",           "value": "15.95%"},
+    {"field": "Lessee location",     "value": "NC"},
+    {"field": "Vehicle",             "value": "2024 Toyota 4Runner  (New, SUV)"},
+    {"field": "Vehicle value",       "value": "$54,404"},
+    {"field": "Acquisition cost",    "value": "$51,639"},
+    {"field": "Contract residual",   "value": "$31,020"},
+    {"field": "Base residual",       "value": "$27,808"},
+    {"field": "Lease term",          "value": "48 months"},
+    {"field": "Sched. termination",  "value": "April 2028"},
+    {"field": "Subvented",           "value": "No"},
+]
+cmbs_sample = [
+    {"field": "Originator",          "value": "Deutsche Bank AG  (NY)"},
+    {"field": "Origination date",    "value": "2020-05-13"},
+    {"field": "Maturity date",       "value": "2026-10-09"},
+    {"field": "Original balance",    "value": "$85,000,000"},
+    {"field": "Rate",                "value": "3.55%  (fixed)"},
+    {"field": "Loan term",           "value": "77 months"},
+    {"field": "Lien position",       "value": "1st"},
+    {"field": "Loan structure",      "value": "A2"},
+    {"field": "Interest-only",       "value": "Yes  (full-term IO)"},
+    {"field": "Balloon",             "value": "Yes"},
+    {"field": "P&I payment",         "value": "$259,840 / period"},
+    {"field": "Properties (orig.)",  "value": "68  →  51 current"},
+]
+
+ojs_define(
+    coverage=coverage_clean.to_dict(orient="records"),
+    schema_matrix=schema_matrix,
+    categories=CATEGORIES,
+    autoloan_sample=autoloan_sample,
+    autolease_sample=autolease_sample,
+    cmbs_sample=cmbs_sample,
+)
+```
+
+Every post on this site is built from the same source: loan-level data filed directly with the SEC.
+Under Regulation AB II, issuers of publicly-registered ABS are required to file monthly asset-level
+data through Form ABS-EE — every loan, every trust, every reporting period, in structured XML.
+It's been a legal requirement since roughly 2016. The data exists, it's public, and EDGAR serves it for free.
+
+The catch is that "publicly available" and "usable at scale" are different things. The filings are
+XML, the schema drifts by trust and vintage, and parsing 38,000 files is enough friction that most
+analysts don't bother. This site does. Below is what that looks like.
+
+---
+
+## The pipeline
+
+From SEC filing to queryable column is a four-step process. The ingest side runs on a schedule;
+the analysis side runs on demand when building a post.
+
+```{ojs}
+//| echo: false
+{
+  const details = [
+    ["Form ABS-EE", "EX-102 XML", "~2,400 filings/qtr"],
+    ["XML → Parquet", "Hive partitioning", "abs_lake module"],
+    ["lending-data-lake", "38,880 Parquet files", "asset_class= / period= / cik="],
+    ["httpfs extension", "read_parquet() over S3", "union_by_name=true"],
+    ["SQL aggregations", "aggregated Parquet", "ojs_define() → charts"],
+  ]
+  const titles = ["SEC EDGAR", "Python pipeline", "Cloudflare R2", "DuckDB", "Analysis layer"]
+
+  const stagesHtml = titles.map((title, i) => {
+    const hl = i === 2
+    const border = hl ? "#4A6FA5" : "#D8D3C8"
+    const bg = hl ? "rgba(74,111,165,0.06)" : "rgba(255,255,255,0.25)"
+    const detailsHtml = details[i].map(d =>
+      `<div style="color:#8A8A8A;font-family:'DM Mono',monospace;font-size:0.7rem;line-height:1.6;">${d}</div>`
+    ).join("")
+    const box = `<div style="flex:1;min-width:100px;border:1px solid ${border};border-radius:4px;padding:0.9rem 0.75rem;text-align:center;background:${bg};">
+      <div style="font-family:'DM Serif Display',serif;font-size:0.9rem;color:#1C1C1E;margin-bottom:0.5rem;">${title}</div>
+      ${detailsHtml}
+    </div>`
+    const arrow = i < 4
+      ? `<div style="display:flex;align-items:center;padding:0 4px;margin-top:2.2rem;color:#AAAAAA;font-size:0.9rem;flex-shrink:0;">→</div>`
+      : ""
+    return box + arrow
+  }).join("")
+
+  const div = document.createElement("div")
+  div.innerHTML = `<div style="display:flex;align-items:flex-start;margin:2rem 0;overflow-x:auto;">${stagesHtml}</div><div class="chart-caption">Ingest pipeline runs on a cron schedule. Analysis scripts run at render time against the R2 bucket.</div>`
+  return div
+}
+```
+
+The R2 bucket is organized by Hive-style partitions — each Parquet file lives under a path like
+`abs_ee/curated/asset_class=autoloan/reporting_period=2026-04/cik=1234567/accession=.../loans.parquet`.
+DuckDB reads directly from S3 and infers the partition keys as columns, so a single glob pattern
+covers a decade of filings without any local storage.
+
+---
+
+## Coverage
+
+The mandate had a slow start. Early filings were sparse — three autoloan trusts in January 2017,
+a handful of CMBS. That's not a data quality problem; it's the SEC enforcement curve. Trusts took
+a year or two to get compliant, and the regulator wasn't aggressive about it immediately. By
+mid-2018 the universe had stabilized.
+
+```{ojs}
+//| echo: false
+//| output: false
+d3_inv = require("d3@7")
+
+ASSET_COLOR = ({
+  "autoloan":  "#4A6FA5",
+  "autolease": "#5A9A82",
+  "cmbs":      "#C89050",
+})
+
+ASSET_LABEL = ({
+  "autoloan":  "Auto Loan",
+  "autolease": "Auto Lease",
+  "cmbs":      "CMBS",
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const chart = Plot.plot({
+    marginLeft: 40,
+    marginRight: 100,
+    marginTop: 16,
+    height: 260,
+    x: {
+      label: null,
+      type: "utc",
+      tickFormat: d3_inv.utcFormat("%Y"),
+    },
+    y: {
+      label: "Trusts reporting",
+      grid: true,
+    },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      ...["autoloan", "autolease", "cmbs"].flatMap(asset => [
+        Plot.areaY(coverage.filter(d => d.asset_class === asset), {
+          x: d => new Date(d.reporting_period + "-01"),
+          y: "trust_count",
+          fill: ASSET_COLOR[asset],
+          fillOpacity: 0.08,
+          curve: "monotone-x",
+        }),
+        Plot.lineY(coverage.filter(d => d.asset_class === asset), {
+          x: d => new Date(d.reporting_period + "-01"),
+          y: "trust_count",
+          stroke: ASSET_COLOR[asset],
+          strokeWidth: 1.8,
+          curve: "monotone-x",
+        }),
+      ]),
+      // Right-side labels
+      ...["autoloan", "autolease", "cmbs"].map(asset => {
+        const last = coverage.filter(d => d.asset_class === asset).at(-1)
+        return Plot.text([last], {
+          x: d => new Date(d.reporting_period + "-01"),
+          y: "trust_count",
+          text: () => ASSET_LABEL[asset],
+          dx: 8,
+          fontSize: 10.5,
+          fill: ASSET_COLOR[asset],
+          textAnchor: "start",
+        })
+      }),
+    ]
+  })
+
+  return html`<div style="margin:1.5rem 0">${chart}</div>
+  <div class="chart-caption">Trusts filing per reporting period. Trailing partial months excluded. Source: SEC EDGAR Form ABS-EE.</div>`
+}
+```
+
+Three asset classes, three distinct profiles. CMBS launched earliest (November 2016) and grew to
+the largest trust count — commercial mortgage deals are longer-lived and re-file for years. Auto loan
+peaked around 250 trusts. Auto lease is the thinnest shelf: fewer originators securitize leases, and
+it shows.
+
+---
+
+## Auto Loan
+
+```{ojs}
+//| echo: false
+{
+  const stats = [
+    ["Coverage", "Jan 2017 – Apr 2026"],
+    ["Reporting periods", "101"],
+    ["Peak trust count", "247 trusts"],
+    ["Active loans (Apr 2026)", "~5.4M"],
+    ["Parquet files", "23,289"],
+    ["Fields per loan", "~70"],
+  ]
+  const div = document.createElement("div")
+  div.style.cssText = "display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:1.5rem 0;font-family:'DM Mono',monospace;font-size:0.75rem;"
+  div.innerHTML = stats.map(([label, val]) =>
+    `<div style="border:1px solid #D8D3C8;border-radius:4px;padding:0.75rem;background:rgba(255,255,255,0.2);">
+      <div style="color:#AAAAAA;font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.3rem;">${label}</div>
+      <div style="color:#2C2C2C;font-size:0.85rem;">${val}</div>
+    </div>`
+  ).join("")
+  return div
+}
+```
+
+The auto loan asset class is the richest in the lake. Each monthly record captures the full
+origination snapshot — FICO score, vehicle make and value, loan amount, rate, term — plus the
+current payment status for that reporting month. Active loans (`zeroBalanceCode IS NULL`) are still
+in the pool; everything else has paid off, charged off, or been repurchased.
+
+One sample loan from the March 2026 universe — a middle-shelf trust by filing count:
+
+```{ojs}
+//| echo: false
+{
+  const accentColor = "#4A6FA5"
+  return html`<div style="
+    border-left: 3px solid ${accentColor};
+    padding: 0.1rem 0 0.1rem 1.25rem;
+    margin: 1.5rem 0;
+  ">
+    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#AAAAAA;margin-bottom:0.75rem;">Auto Loan — sample record, 2026-03</div>
+    <table style="border-collapse:collapse;width:100%;max-width:520px;">
+      ${autoloan_sample.map((row, i) => html`<tr style="border-bottom:1px solid #E8E3D8;">
+        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#8A8A8A;padding:0.35rem 1rem 0.35rem 0;white-space:nowrap;vertical-align:top;">${row.field}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:#2C2C2C;padding:0.35rem 0;">${row.value}</td>
+      </tr>`)}
+    </table>
+  </div>`
+}
+```
+
+A 673 FICO Dodge Charger at 1.21× LTV on a 72-month term. Not a disaster — a 1.9% rate means
+it was either subvented by the manufacturer or this is a very old loan near payoff. Probably the
+former. That field (`subvented = Yes`) is why the number looks wrong.
+
+**Key fields:** `obligorCreditScore`, `vehicleManufacturerName`, `vehicleModelName`, `vehicleModelYear`,
+`vehicleValueAmount`, `originalLoanAmount`, `originalInterestRatePercentage`, `originalLoanTerm`,
+`currentDelinquencyStatus`, `zeroBalanceCode`, `chargedOffAmount`, `paymentToIncomePercentage`,
+`obligorGeographicLocation`, `subvented`, `underwritingIndicator`
+
+---
+
+## Auto Lease
+
+```{ojs}
+//| echo: false
+{
+  const stats = [
+    ["Coverage", "Feb 2017 – Jun 2026"],
+    ["Reporting periods", "113"],
+    ["Peak trust count", "32 trusts"],
+    ["Active leases (Apr 2026)", "~1.3M"],
+    ["Parquet files", "3,618"],
+    ["Fields per lease", "72"],
+  ]
+  const div = document.createElement("div")
+  div.style.cssText = "display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:1.5rem 0;font-family:'DM Mono',monospace;font-size:0.75rem;"
+  div.innerHTML = stats.map(([label, val]) =>
+    `<div style="border:1px solid #D8D3C8;border-radius:4px;padding:0.75rem;background:rgba(255,255,255,0.2);">
+      <div style="color:#AAAAAA;font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.3rem;">${label}</div>
+      <div style="color:#2C2C2C;font-size:0.85rem;">${val}</div>
+    </div>`
+  ).join("")
+  return div
+}
+```
+
+Auto leases are structurally similar to auto loans but with a critical addition: residual value.
+At the end of a lease, the lessee either returns the car or buys it at the `contractResidualValue`.
+The gap between `vehicleValueAmount` and `contractResidualValue` is what the trust is betting on —
+if used car prices collapse, so does the residual.
+
+That bet is in the data. `baseResidualValue` is the unsubsidized estimate;
+`contractResidualValue` is what was promised to the lessee. The spread between them is the cost of
+any manufacturer subvention. Filed monthly, for every lease in every pool.
+
+```{ojs}
+//| echo: false
+{
+  const accentColor = "#5A9A82"
+  return html`<div style="
+    border-left: 3px solid ${accentColor};
+    padding: 0.1rem 0 0.1rem 1.25rem;
+    margin: 1.5rem 0;
+  ">
+    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#AAAAAA;margin-bottom:0.75rem;">Auto Lease — sample record, 2026-05</div>
+    <table style="border-collapse:collapse;width:100%;max-width:520px;">
+      ${autolease_sample.map((row, i) => html`<tr style="border-bottom:1px solid #E8E3D8;">
+        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#8A8A8A;padding:0.35rem 1rem 0.35rem 0;white-space:nowrap;vertical-align:top;">${row.field}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:#2C2C2C;padding:0.35rem 0;">${row.value}</td>
+      </tr>`)}
+    </table>
+  </div>`
+}
+```
+
+The World Omni/Toyota relationship is interesting here. Acquisition cost ($51,639) is below vehicle
+value ($54,404) — the trust paid less than the car is worth, or the value estimate is stale.
+The residual gap is $3,212 — World Omni is paying $3k to lower the lessee's end-of-lease buy price.
+That's a subsidy to move Toyotas off lots, and it shows up as a direct cost in the trust.
+
+**Key fields:** `lesseeCreditScore`, `lesseeCreditScoreType`, `vehicleManufacturerName`,
+`vehicleValueAmount`, `acquisitionCost`, `contractResidualValue`, `baseResidualValue`,
+`originalLeaseTermNumber`, `scheduledTerminationDate`, `currentDelinquencyStatus`,
+`zeroBalanceCode`, `reportingPeriodSecuritizationValueAmount`
+
+---
+
+## CMBS
+
+```{ojs}
+//| echo: false
+{
+  const stats = [
+    ["Coverage", "Nov 2016 – May 2026"],
+    ["Reporting periods", "115"],
+    ["Peak trust count", "213 trusts"],
+    ["Active loans (Apr 2026)", "~15K"],
+    ["Parquet files", "11,973"],
+    ["Fields per loan", "106"],
+  ]
+  const div = document.createElement("div")
+  div.style.cssText = "display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:1.5rem 0;font-family:'DM Mono',monospace;font-size:0.75rem;"
+  div.innerHTML = stats.map(([label, val]) =>
+    `<div style="border:1px solid #D8D3C8;border-radius:4px;padding:0.75rem;background:rgba(255,255,255,0.2);">
+      <div style="color:#AAAAAA;font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.3rem;">${label}</div>
+      <div style="color:#2C2C2C;font-size:0.85rem;">${val}</div>
+    </div>`
+  ).join("")
+  return div
+}
+```
+
+CMBS is a different world. No borrower FICO, no vehicle. The collateral is commercial real estate
+— office buildings, hotels, warehouses — and the schema reflects it. Structural complexity
+dominates: interest-only periods, balloon maturities, prepayment premiums, workout strategies,
+ARM rate reset mechanics. 106 fields per loan because commercial lending is complicated by design.
+
+The loan count is two orders of magnitude smaller than auto (15k vs 5.4M) but the individual
+loans are much larger. That Deutsche Bank sample is $85M on a single note backed by 68 properties.
+Those properties have since become 51 — that attrition is filed monthly too.
+
+```{ojs}
+//| echo: false
+{
+  const accentColor = "#C89050"
+  return html`<div style="
+    border-left: 3px solid ${accentColor};
+    padding: 0.1rem 0 0.1rem 1.25rem;
+    margin: 1.5rem 0;
+  ">
+    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#AAAAAA;margin-bottom:0.75rem;">CMBS — sample record, 2026-04</div>
+    <table style="border-collapse:collapse;width:100%;max-width:520px;">
+      ${cmbs_sample.map((row, i) => html`<tr style="border-bottom:1px solid #E8E3D8;">
+        <td style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#8A8A8A;padding:0.35rem 1rem 0.35rem 0;white-space:nowrap;vertical-align:top;">${row.field}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:#2C2C2C;padding:0.35rem 0;">${row.value}</td>
+      </tr>`)}
+    </table>
+  </div>`
+}
+```
+
+3.55%, full-term interest-only, balloon maturity in October 2026. That balloon is a few months
+away. Either the borrower refinances, the trust extends, or this loan becomes a workout situation —
+and if the latter, there's a `workoutStrategyCode` field that will tell you exactly what strategy
+the special servicer is pursuing.
+
+**Key fields:** `originalLoanAmount`, `originalInterestRatePercentage`, `originalTermLoanNumber`,
+`maturityDate`, `interestOnlyIndicator`, `balloonIndicator`, `loanStructureCode`,
+`paymentStatusLoanCode`, `workoutStrategyCode`, `nonRecoverabilityIndicator`,
+`NumberPropertiesSecuritization`, `NumberProperties`, `realizedLossToTrustAmount`
+
+---
+
+## Schema comparison
+
+The three asset classes share a pipeline skeleton but diverge sharply in what they measure.
+Auto loan and lease are borrower-centric — credit score, income, the car. CMBS drops borrower
+credit entirely and adds structural complexity that consumer lending doesn't have: ARM mechanics,
+workout codes, distress tracking, property counts.
+
+```{ojs}
+//| echo: false
+{
+  const assetOrder = ["Auto Loan", "Auto Lease", "CMBS"]
+  const catOrder = categories.slice().reverse()
+  const maxFields = Math.max(...schema_matrix.map(d => d.fields))
+
+  const chart = Plot.plot({
+    marginLeft: 165,
+    marginBottom: 50,
+    marginTop: 30,
+    height: 310,
+    color: {
+      scheme: "blues",
+      domain: [0, maxFields],
+      unknown: "transparent",
+    },
+    x: {
+      domain: assetOrder,
+      label: null,
+      axis: "top",
+    },
+    y: {
+      label: null,
+      domain: catOrder,
+    },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.cell(schema_matrix, {
+        x: "asset",
+        y: "category",
+        fill: d => d.fields > 0 ? d.fields : null,
+        rx: 3,
+      }),
+      Plot.text(schema_matrix, {
+        x: "asset",
+        y: "category",
+        text: d => d.fields > 0 ? String(d.fields) : "—",
+        fill: d => d.fields >= 10 ? "white" : (d.fields === 0 ? "#CCCCCC" : "#2C2C2C"),
+        fontSize: 11,
+        fontFamily: "'DM Mono', monospace",
+      }),
+    ]
+  })
+
+  return html`<div style="margin:1.5rem 0">${chart}</div>
+  <div class="chart-caption">Approximate field counts by category. Pipeline metadata fields are identical across all three asset classes.</div>`
+}
+```
+
+---
+
+## Reading it
+
+Every analysis script on this site follows the same pattern: DuckDB connects to R2 via the
+`httpfs` extension, a glob pattern selects the relevant partitions, and `read_parquet()` with
+`union_by_name=true` handles schema drift across trust vintages. One glob covers a decade:
+
+```sql
+SELECT * FROM read_parquet(
+  's3://lending-data-lake/abs_ee/curated/asset_class=autoloan/reporting_period=*/cik=*/**/*.parquet',
+  hive_partitioning = true,
+  union_by_name    = true
+)
+```
+
+Aggregated outputs are written to local Parquet files, loaded in each post's Python cell, and
+passed to Observable Plot via `ojs_define()`. The raw lake is never queried at page-render time —
+just pre-computed summaries. The analysis scripts in `bens-field-notes/analysis/` are the boundary
+between "raw SEC filing" and "chart on screen."
