@@ -32,7 +32,10 @@ fully invested during.
 
 import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
 db_sloos = DuckDBClient.of({})
-r2Base = params["r2-base-url"]
+r2Base = {
+  try { return (typeof params !== "undefined" && params["r2-base-url"]) ? params["r2-base-url"] : "" }
+  catch(e) { return "" }
+}
 ```
 
 ```{ojs}
