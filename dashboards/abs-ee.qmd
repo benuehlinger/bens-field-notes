@@ -27,16 +27,20 @@ Check the volume chart.
 
 ---
 
+```{python}
+#| echo: false
+#| output: false
+import os
+ojs_define(r2_base_url=os.environ.get("R2_BASE_URL", ""))
+```
+
 ```{ojs}
 //| echo: false
 //| output: false
 
 import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
 db = DuckDBClient.of({})
-r2Base = {
-  try { return (typeof params !== "undefined" && params["r2-base-url"]) ? params["r2-base-url"] : "" }
-  catch(e) { return "" }
-}
+r2Base = r2_base_url
 ```
 
 ```{ojs}
