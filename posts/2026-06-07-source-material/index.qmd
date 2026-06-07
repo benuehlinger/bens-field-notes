@@ -155,8 +155,8 @@ the analysis side runs on demand when building a post.
   const details = [
     ["Form ABS-EE", "EX-102 XML", "~2,400 filings/qtr"],
     ["XML → Parquet", "Hive partitioning", "abs_lake module"],
-    ["lending-data-lake", "38,880 Parquet files", "asset_class= / period= / cik="],
-    ["httpfs extension", "read_parquet() over S3", "union_by_name=true"],
+    ["Private Parquet lake", "38,880 files", "Hive-partitioned by asset class, period, trust"],
+    ["SQL query layer", "Serverless S3 reads", "Schema-adaptive merge"],
     ["SQL aggregations", "aggregated Parquet", "ojs_define() → charts"],
   ]
   const titles = ["SEC EDGAR", "Python pipeline", "Cloudflare R2", "DuckDB", "Analysis layer"]
@@ -184,10 +184,9 @@ the analysis side runs on demand when building a post.
 }
 ```
 
-The R2 bucket is organized by Hive-style partitions — each Parquet file lives under a path like
-`abs_ee/curated/asset_class=autoloan/reporting_period=2026-04/cik=1234567/accession=.../loans.parquet`.
-DuckDB reads directly from S3 and infers the partition keys as columns, so a single glob pattern
-covers a decade of filings without any local storage.
+The lake is Hive-partitioned by asset class, reporting period, and trust — so a single query pattern
+covers a full decade of filings without any local storage. Pre-computed aggregates power the charts;
+the raw lake is never queried at page-render time.
 
 ---
 
@@ -222,7 +221,7 @@ ASSET_LABEL = ({
   const chart = Plot.plot({
     marginLeft: 40,
     marginRight: 100,
-    marginTop: 16,
+    marginTop: 40,
     height: 260,
     x: {
       label: null,
@@ -272,10 +271,11 @@ ASSET_LABEL = ({
 }
 ```
 
-Three asset classes, three distinct profiles. CMBS launched earliest (November 2016) and grew to
-the largest trust count — commercial mortgage deals are longer-lived and re-file for years. Auto loan
-peaked around 250 trusts. Auto lease is the thinnest shelf: fewer originators securitize leases, and
-it shows.
+Three asset classes, three distinct profiles. Auto loan has the largest trust count — peaked around
+250 and held there. CMBS launched earliest (November 2016) but that serrated pattern is real:
+commercial deals mature and roll off the filing roster regularly, so the count swings month to month
+as new deals come on and old ones pay off. Auto lease is the thinnest shelf: fewer originators
+securitize leases, and it shows.
 
 ---
 
@@ -533,21 +533,10 @@ workout codes, distress tracking, property counts.
 
 ---
 
-## Reading it
+## Interested in the data?
 
-Every analysis script on this site follows the same pattern: DuckDB connects to R2 via the
-`httpfs` extension, a glob pattern selects the relevant partitions, and `read_parquet()` with
-`union_by_name=true` handles schema drift across trust vintages. One glob covers a decade:
-
-```sql
-SELECT * FROM read_parquet(
-  's3://lending-data-lake/abs_ee/curated/asset_class=autoloan/reporting_period=*/cik=*/**/*.parquet',
-  hive_partitioning = true,
-  union_by_name    = true
-)
-```
-
-Aggregated outputs are written to local Parquet files, loaded in each post's Python cell, and
-passed to Observable Plot via `ojs_define()`. The raw lake is never queried at page-render time —
-just pre-computed summaries. The analysis scripts in `bens-field-notes/analysis/` are the boundary
-between "raw SEC filing" and "chart on screen."
+The ingestion pipeline that built this lake — EDGAR scraping at scale, XML schema normalization
+across trust vintages, Parquet conversion, partition management — lives in a private repository.
+The effort to get here was non-trivial. If you're a researcher, institution, or potential
+collaborator interested in the data or the pipeline, reach out:
+[beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)

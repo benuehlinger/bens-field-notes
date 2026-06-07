@@ -38,9 +38,8 @@ The queries run in your browser via DuckDB-WASM — a WebAssembly build of DuckD
 runs client-side with no backend server. The data travels from R2 to your browser and
 nowhere else.
 
-The data lake pipeline that ingests this data lives separately at
-[bens-data-lake](https://github.com/benuehlinger/bens-data-lake).
-This repo is just the visualization layer.
+The ingestion pipeline that powers this site is private. If you're interested in the data
+or the pipeline, get in touch: [beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)
 
 ---
 

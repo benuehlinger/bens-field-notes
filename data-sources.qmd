@@ -9,19 +9,15 @@ This page documents what each dataset is, who publishes it, how it gets
 from the source to this site, and what known limitations you should keep in mind
 before drawing any strong conclusions from it.
 
-Transparency about methodology is not optional here. See the
-[constitution](https://github.com/benuehlinger/bens-field-notes/blob/main/.specify/memory/constitution.md)
-if you want the full doctrine.
+Transparency about methodology is not optional here.
 
 ---
 
 ## ABS-EE Autoloan Panel
 
-**Publisher**: SEC / Office of Structured Finance  
-**Source**: [SEC EDGAR ABS-EE filings](https://www.sec.gov/cgi-bin/browse-edgar)  
-**Update cadence**: Monthly (new filings processed as they appear on EDGAR)  
-**R2 prefix**: `abs_ee/curated/asset_class=autoloan/`  
-**Pipeline**: `bens-data-lake/pipelines/scripts/ingest_autoloan_panel_incremental.py`
+**Publisher**: SEC / Office of Structured Finance
+**Source**: [SEC EDGAR ABS-EE filings](https://www.sec.gov/cgi-bin/browse-edgar)
+**Update cadence**: Monthly (new filings processed as they appear on EDGAR)
 
 ### What it is
 
@@ -59,11 +55,9 @@ parses the XML schema, and writes structured Parquet files partitioned by filing
 
 ## SLOOS — Senior Loan Officer Opinion Survey
 
-**Publisher**: Federal Reserve Board  
-**Source**: [Federal Reserve SLOOS release](https://www.federalreserve.gov/releases/sloos/)  
-**Update cadence**: Quarterly (typically released ~2 weeks after survey close)  
-**R2 prefix**: `sloos/curated/source=fed_sloos_table_1/`  
-**Pipeline**: `bens-data-lake/pipelines/scripts/ingest_sloos_tables_to_r2.py`
+**Publisher**: Federal Reserve Board
+**Source**: [Federal Reserve SLOOS release](https://www.federalreserve.gov/releases/sloos/)
+**Update cadence**: Quarterly (typically released ~2 weeks after survey close)
 
 ### What it is
 
@@ -103,11 +97,9 @@ and writes Parquet to R2.
 
 ## FRED Macro Bundle
 
-**Publisher**: Federal Reserve Bank of St. Louis (FRED)  
-**Source**: [FRED API](https://fred.stlouisfed.org/)  
-**Update cadence**: Daily (FRED series updated as new data releases)  
-**R2 prefix**: `macro/curated/source=fred_api/`  
-**Pipeline**: `bens-data-lake/pipelines/scripts/ingest_fred_series_bundle_to_r2.py`
+**Publisher**: Federal Reserve Bank of St. Louis (FRED)
+**Source**: [FRED API](https://fred.stlouisfed.org/)
+**Update cadence**: Daily (FRED series updated as new data releases)
 
 ### What it is
 
@@ -126,8 +118,7 @@ The pipeline fetches only series that have updated since the last run (`--skip-i
 ### Status
 
 The FRED macro dataset is present in the data lake but **not yet surfaced on this site**.
-It will appear in v2 of the dashboard. The R2 data is there if you want to query it
-directly: `macro/curated/source=fred_api/*.parquet`.
+It will appear in a future post.
 
 ### Known limitations
 
@@ -137,5 +128,4 @@ directly: `macro/curated/source=fred_api/*.parquet`.
 
 ---
 
-*Last updated: 2026-04-25. For data pipeline documentation, see
-[bens-data-lake](https://github.com/benuehlinger/bens-data-lake).*
+*Last updated: 2026-06-07. Interested in the data or the pipeline? [beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)*

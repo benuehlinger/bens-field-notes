@@ -15,11 +15,10 @@ This post is the public version of that milestone — and the announcement that
 
 ## What shipped
 
-**Data lake (`bens-data-lake`):**
+**Data lake (private):**
 
-- Full ABS-EE **autoloan** history on Cloudflare R2 under `abs_ee/curated/asset_class=autoloan/`
-- Monthly ingest catalogs at `abs_ee/curated/catalog/{YYYYMM}_autoloan.parquet`
-- VM runbook so backfills don't depend on my laptop staying awake
+- Full ABS-EE **autoloan** history — every filing month from 2016 through present
+- Monthly ingest catalogs and a VM runbook so backfills don't depend on my laptop staying awake
 
 **This site:**
 
@@ -35,25 +34,9 @@ a small Cloudflare Worker proxies read-only object fetches.
 Autoloan was the first Schedule AL class because the schema is well understood and the
 filings are manageable on a 2 GB VM with swap.
 
-The same ingest path now supports the other Reg AB II classes:
-
-| `--asset-class` | Collateral |
-|-----------------|------------|
-| `autolease`     | Auto leases |
-| `rmbs`          | Residential mortgages |
-| `cmbs`          | Commercial mortgages |
-| `debtsec`       | Debt securities |
-
-On the VM:
-
-```bash
-python -m scripts.backfill_all_abs_ee_asset_classes \
-  --start 201611 --end-today --continue-on-error --max-local-gb 50
-```
-
-**Cost sanity check:** the VM is cheap; **R2 storage** is the line item that scales —
-especially RMBS, where a single EX-102 can be gigabytes. I'm running autolease first,
-watching bucket growth, then deciding how aggressive to be on mortgages.
+The same pipeline now supports the other Reg AB II asset classes: auto leases, commercial
+mortgages, residential mortgages, and debt securities. Autolease is running next —
+watching storage growth before committing to RMBS, where individual filings can be gigabytes.
 
 ## How to read the autoloan dashboard
 
@@ -69,11 +52,6 @@ Not useful for:
 
 - Bank-held loans that never hit a securitization trust
 - Real-time credit decisions (filings lag the reporting period by weeks)
-
-## Links
-
-- Data pipeline: [github.com/benuehlinger/bens-data-lake](https://github.com/benuehlinger/bens-data-lake)
-- Site repo: [github.com/benuehlinger/bens-field-notes](https://github.com/benuehlinger/bens-field-notes)
 
 More notes when there's something worth writing — or when RMBS finishes and I need
 a place to complain about XML file sizes.
