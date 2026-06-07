@@ -1,0 +1,350 @@
+---
+title: "Who Gets the Good Rates?"
+subtitle: "FICO, LTV, and Credit Quality Across the ABS-EE Universe"
+description: "A first look at borrower credit quality across 5.4 million active securitized auto loans — how FICO and LTV vary by deal sponsor, vehicle make, and credit tier."
+date: 2026-06-06
+categories: [structured-finance, consumer-credit, abs-ee, credit-quality]
+jupyter: python3
+freeze: false
+execute:
+  echo: false
+  warning: false
+---
+
+```{python}
+from pathlib import Path
+import pandas as pd
+
+PERIOD = "2026-04"
+OUTPUTS = Path("../../analysis/outputs")
+
+by_deal = pd.read_parquet(OUTPUTS / f"fico_by_deal_{PERIOD}.parquet")
+by_make = pd.read_parquet(OUTPUTS / f"fico_by_make_{PERIOD}.parquet")
+by_tier = pd.read_parquet(OUTPUTS / f"fico_by_tier_{PERIOD}.parquet")
+
+# Tier totals (collapse new/used)
+tier_totals = (
+    by_tier.groupby("tier")[["loan_count", "orig_bal_mm", "avg_ltv"]]
+    .agg({"loan_count": "sum", "orig_bal_mm": "sum", "avg_ltv": "mean"})
+    .reset_index()
+    .sort_values("tier")
+)
+
+# Top 20 deals by loan count
+top_deals = by_deal.nlargest(20, "loan_count").copy()
+
+# Top 20 makes by loan count
+top_makes = (
+    by_make.groupby("make")
+    .agg(loan_count=("loan_count", "sum"),
+         median_fico=("median_fico", "mean"),
+         avg_ltv=("avg_ltv", "mean"))
+    .reset_index()
+    .nlargest(20, "loan_count")
+    .sort_values("median_fico")
+)
+
+ojs_define(
+    tier_totals=tier_totals.to_dict(orient="records"),
+    top_deals=top_deals.to_dict(orient="records"),
+    top_makes=top_makes.to_dict(orient="records"),
+    period=PERIOD,
+)
+```
+
+Every month, auto loan securitization trusts file loan-level data with the SEC under
+Form ABS-EE: balance, payment status, days past due, vehicle make, borrower credit
+score — for every individual loan in the pool. It's public. It's on EDGAR. Most
+people don't parse it.
+
+In April 2026 the filed universe covers **5.4 million active loans** across 171 trusts.
+This note looks at one slice: who's borrowing, what their credit profile looked like
+at origination, and how much the car was worth relative to the loan.
+
+- **FICO** — obligor credit score at origination (when the lender was still optimistic)
+- **LTV** — original loan amount ÷ vehicle value at origination
+- **Credit tier** — FICO buckets: prime+, prime, near-prime, subprime, deep sub
+
+---
+
+## Credit tier mix
+
+About a third of the filed pool is prime-plus (FICO 750+). The deep subprime shelf —
+below 620 — is nearly as large. This is what a cross-section of the US securitized
+auto market looks like. It's not a subprime story, and it's not a prime story. It's
+both, in the same dataset, filed to the same regulator, available for free.
+
+```{ojs}
+//| echo: false
+{
+  const TIER_COLOR = {
+    "750+  Prime+":        "#4A6FA5",
+    "700-749  Prime":      "#5A8A8A",
+    "660-699  Near-Prime": "#7EA870",
+    "620-659  Subprime":   "#C8964A",
+    "<620  Deep Sub":      "#C86A50",
+  }
+
+  const tierOrder = [
+    "<620  Deep Sub",
+    "620-659  Subprime",
+    "660-699  Near-Prime",
+    "700-749  Prime",
+    "750+  Prime+",
+  ]
+
+  const countChart = Plot.plot({
+    title: "By loan count",
+    marginLeft: 140,
+    x: { label: "Loans (millions)", tickFormat: d => `${(d/1e6).toFixed(1)}M` },
+    y: { domain: tierOrder, label: null },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.barX(tier_totals, {
+        x: "loan_count",
+        y: "tier",
+        fill: d => TIER_COLOR[d.tier] ?? "#8A8A8A",
+        rx: 2,
+      }),
+      Plot.ruleX([0]),
+    ]
+  })
+
+  const balChart = Plot.plot({
+    title: "By original balance",
+    marginLeft: 140,
+    x: { label: "Original balance ($B)", tickFormat: d => `$${(d/1000).toFixed(0)}B` },
+    y: { domain: tierOrder, label: null },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.barX(tier_totals, {
+        x: "orig_bal_mm",
+        y: "tier",
+        fill: d => TIER_COLOR[d.tier] ?? "#8A8A8A",
+        rx: 2,
+      }),
+      Plot.ruleX([0]),
+    ]
+  })
+
+  return html`<div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:1.5rem 0">
+    ${countChart}${balChart}
+  </div>
+  <div class="chart-caption">Source: SEC EDGAR Form ABS-EE — autoloan asset class. As of ${period} reporting period.</div>`
+}
+```
+
+---
+
+## When the loan is bigger than the car
+
+Prime borrowers borrow about 90 cents for every dollar of vehicle value. Deep subprime
+borrowers borrow $1.16 for every dollar — on day one, before the car has left the lot.
+
+That gap matters when things go wrong. Repossess a car from a prime borrower and the
+proceeds likely cover the balance. Repossess one from a deep subprime borrower and
+you're eating a loss before the first payment was ever missed.
+
+```{ojs}
+//| echo: false
+{
+  const TIER_COLOR = {
+    "750+  Prime+":        "#4A6FA5",
+    "700-749  Prime":      "#5A8A8A",
+    "660-699  Near-Prime": "#7EA870",
+    "620-659  Subprime":   "#C8964A",
+    "<620  Deep Sub":      "#C86A50",
+  }
+
+  const tierOrder = [
+    "<620  Deep Sub",
+    "620-659  Subprime",
+    "660-699  Near-Prime",
+    "700-749  Prime",
+    "750+  Prime+",
+  ]
+
+  const chart = Plot.plot({
+    marginLeft: 140,
+    x: {
+      label: "Average LTV at origination",
+      domain: [0.75, 1.65],
+      tickFormat: d => d.toFixed(2),
+    },
+    y: { domain: tierOrder, label: null },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.barX(tier_totals, {
+        x: "avg_ltv",
+        y: "tier",
+        fill: d => TIER_COLOR[d.tier] ?? "#8A8A8A",
+        rx: 2,
+      }),
+      Plot.ruleX([1.0], { stroke: "#8A8A8A", strokeDasharray: "4,3", strokeWidth: 1.5 }),
+      Plot.text(tier_totals, {
+        x: "avg_ltv",
+        y: "tier",
+        text: d => d.avg_ltv.toFixed(2),
+        dx: 6,
+        fontSize: 11,
+        fill: "currentColor",
+      }),
+      Plot.ruleX([0]),
+    ]
+  })
+
+  return html`<div style="margin:1.5rem 0">
+    ${chart}
+    <div style="margin-top:0.5rem;font-size:0.72rem;color:#8A8A8A;font-family:'DM Mono',monospace">
+      Dashed line = LTV 1.0 (loan equals vehicle value)
+    </div>
+  </div>
+  <div class="chart-caption">Source: SEC EDGAR Form ABS-EE — autoloan asset class. As of ${period} reporting period.</div>`
+}
+```
+
+---
+
+## The primest shelves in the room
+
+Captive finance arms lend to the customers buying their own cars. GM Financial
+(median FICO 786, avg LTV 0.93), Nissan (797, 0.90), BMW (801, 0.83) — employed people
+with decent credit, buying a car they want, at a dealer motivated to close the sale.
+Good loans, almost by construction.
+
+Bridgecrest (FICO 567, LTV 1.53) is a different business. The average Bridgecrest loan
+at origination is worth 53% more than the underlying vehicle. That's not a mistake —
+it's how subprime auto securitization works. The yield has to compensate for something.
+
+```{ojs}
+//| echo: false
+{
+  const maxLoans = Math.max(...top_deals.map(d => d.loan_count))
+
+  const chart = Plot.plot({
+    marginLeft: 20,
+    marginRight: 20,
+    width: 700,
+    height: 380,
+    x: {
+      label: "Median FICO",
+      domain: [530, 830],
+      grid: true,
+      tickSpacing: 50,
+    },
+    y: {
+      label: "Average LTV",
+      domain: [0.7, 1.7],
+      tickFormat: d => d.toFixed(2),
+    },
+    color: {
+      scheme: "RdYlGn",
+      domain: [540, 820],
+      legend: true,
+      label: "Median FICO",
+    },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.ruleY([1.0], { stroke: "#8A8A8A", strokeDasharray: "4,3", strokeWidth: 1 }),
+      Plot.dot(top_deals, {
+        x: "median_fico",
+        y: "avg_ltv",
+        r: d => 4 + (d.loan_count / maxLoans) * 18,
+        fill: "median_fico",
+        fillOpacity: 0.82,
+        stroke: "currentColor",
+        strokeWidth: 0.5,
+        strokeOpacity: 0.3,
+      }),
+      Plot.text(top_deals, {
+        x: "median_fico",
+        y: "avg_ltv",
+        text: d => (d.sponsor ?? "").slice(0, 18),
+        fontSize: 9,
+        dx: 2,
+        dy: -10,
+        fill: "currentColor",
+      }),
+    ]
+  })
+
+  return html`<div style="margin:1.5rem 0">${chart}</div>
+  <div class="chart-caption">Top 20 deals by loan count. Bubble size = loan count.
+  Source: SEC EDGAR Form ABS-EE. As of ${period} reporting period.</div>`
+}
+```
+
+---
+
+## The car doesn't know who's driving it
+
+The same Toyota Camry gets financed by a FICO-780 Capital One Prime customer and a
+FICO-580 Exeter customer. Luxury brands cluster at the top — the overlap between
+"people who buy new BMWs" and "people with 800 FICOs" is real, and not particularly
+surprising.
+
+The interesting cases are volume brands with wide distributions: same make, very
+different borrower. At that point the brand tells you almost nothing about credit
+quality — what matters is who underwrote it.
+
+```{ojs}
+//| echo: false
+{
+  const ficoMin = Math.min(...top_makes.map(d => d.median_fico))
+  const ficoMax = Math.max(...top_makes.map(d => d.median_fico))
+
+  const chart = Plot.plot({
+    marginLeft: 100,
+    x: {
+      label: "Median FICO at origination",
+      domain: [560, 820],
+    },
+    y: {
+      domain: top_makes.map(d => d.make),
+      label: null,
+    },
+    color: {
+      scheme: "RdYlGn",
+      domain: [ficoMin, ficoMax],
+    },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.barX(top_makes, {
+        x: "median_fico",
+        y: "make",
+        fill: "median_fico",
+        rx: 2,
+        sort: { y: "x" },
+      }),
+      Plot.text(top_makes, {
+        x: "median_fico",
+        y: "make",
+        text: d => d.median_fico.toFixed(0),
+        dx: 6,
+        fontSize: 10,
+        fill: "currentColor",
+        sort: { y: "x" },
+      }),
+      Plot.ruleX([560]),
+    ]
+  })
+
+  return html`<div style="margin:1.5rem 0">${chart}</div>
+  <div class="chart-caption">Top 20 vehicle makes by loan count. Median FICO across all trusts reporting that make.
+  Source: SEC EDGAR Form ABS-EE. As of ${period} reporting period.</div>`
+}
+```
+
+---
+
+## Notes on the data
+
+- **FICO missing rate**: ~3.5% of loans in this period have no credit score on file —
+  excluded from all charts above. The SEC doesn't require FICO reporting under ABS-EE;
+  trusts report it voluntarily.
+- **Schema variation**: Different trusts file slightly different field sets. Handled
+  with a `union_by_name` merge; fields a given trust doesn't report appear as null.
+- **FICO timing**: The score is from origination — when the lender was still optimistic.
+  Loans two years into the pool may look quite different today.
+- **Source**: SEC EDGAR Form ABS-EE, Schedule AL — autoloan asset class.
+  Reporting period ending 2026-03-31, filed April 2026.
