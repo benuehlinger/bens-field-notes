@@ -21,6 +21,7 @@ OUTPUTS = Path("../../analysis/outputs")
 by_deal = pd.read_parquet(OUTPUTS / f"fico_by_deal_{PERIOD}.parquet")
 by_make = pd.read_parquet(OUTPUTS / f"fico_by_make_{PERIOD}.parquet")
 by_tier = pd.read_parquet(OUTPUTS / f"fico_by_tier_{PERIOD}.parquet")
+fico_dist = pd.read_parquet(OUTPUTS / f"fico_dist_sponsor_{PERIOD}.parquet")
 
 # Tier totals (collapse new/used)
 tier_totals = (
@@ -48,6 +49,7 @@ ojs_define(
     tier_totals=tier_totals.to_dict(orient="records"),
     top_deals=top_deals.to_dict(orient="records"),
     top_makes=top_makes.to_dict(orient="records"),
+    fico_dist=fico_dist.to_dict(orient="records"),
     period=PERIOD,
 )
 ```
@@ -233,9 +235,9 @@ d3 = require("d3@7")
   // RdYlGn is diverging — force sequential to avoid Plot centering it at 0
   const ficoColor = d3.scaleSequential(d3.interpolateRdYlGn).domain([530, 830])
 
-  // Only label the most notable outliers to avoid overlap
+  // Only label true outliers — the prime cluster is legible from color alone
   const labeled = top_deals.filter(d =>
-    d.avg_ltv > 1.15 || d.median_fico > 793 || d.loan_count > 75000
+    d.avg_ltv > 1.18 || d.loan_count > 90000
   )
 
   const chart = Plot.plot({
@@ -287,6 +289,79 @@ d3 = require("d3@7")
 
 ---
 
+## Every lender has a shape
+
+The scatter gives you one point per lender — median FICO, average LTV. Clean.
+But a median flattens everything.
+
+BMW Financial's distribution peaks hard above 800 and barely exists below 700.
+Bridgecrest's is so concentrated below 580 it barely looks like a distribution —
+it looks like a product spec. The wide, flat curves are the interesting cases:
+a lender spanning 550 to 800 is making judgment calls on individual borrowers.
+A lender with a spike is running a program.
+
+```{ojs}
+//| echo: false
+{
+  const sponsors_ordered = [...new Set(fico_dist.map(d => d.sponsor))]
+    .map(s => ({
+      sponsor: s,
+      short: fico_dist.find(d => d.sponsor === s).short_name,
+      median_fico: fico_dist.find(d => d.sponsor === s).median_fico,
+    }))
+    .sort((a, b) => b.median_fico - a.median_fico)  // highest FICO at top
+
+  const fyDomain = sponsors_ordered.map(s => s.short)
+
+  const ridgeColor = d3.scaleLinear()
+    .domain([560, 700, 810])
+    .range(["#C86A50", "#C8C3B8", "#4A6FA5"])
+
+  const chart = Plot.plot({
+    height: 42 * fyDomain.length + 50,
+    marginLeft: 165,
+    marginRight: 20,
+    marginTop: 10,
+    x: {
+      label: "FICO score at origination →",
+      domain: [440, 880],
+      grid: true,
+    },
+    y: { axis: null },
+    fy: {
+      label: null,
+      domain: fyDomain,
+    },
+    style: { background: "transparent", fontSize: "12px" },
+    marks: [
+      Plot.areaY(fico_dist, {
+        x: "fico_bin",
+        y: "density",
+        fy: "short_name",
+        fill: d => ridgeColor(d.median_fico),
+        fillOpacity: 0.22,
+        curve: "monotone-x",
+      }),
+      Plot.lineY(fico_dist, {
+        x: "fico_bin",
+        y: "density",
+        fy: "short_name",
+        stroke: d => ridgeColor(d.median_fico),
+        strokeWidth: 1.5,
+        curve: "monotone-x",
+      }),
+      Plot.ruleY([0]),
+    ]
+  })
+
+  return html`<div style="margin:1.5rem 0">${chart}</div>
+  <div class="chart-caption">Top 10 sponsors by loan count. FICO distribution at origination, 20-point bins, normalized per lender.
+  Source: SEC EDGAR Form ABS-EE. As of ${period} reporting period.</div>`
+}
+```
+
+---
+
 ## The car doesn't know who's driving it
 
 The same Toyota Camry gets financed by a FICO-780 Capital One Prime customer and a
@@ -304,8 +379,10 @@ quality — what matters is who underwrote it.
   const ficoMin = Math.min(...top_makes.map(d => d.median_fico))
   const ficoMax = Math.max(...top_makes.map(d => d.median_fico))
 
-  // Sequential color scale — avoids the diverging-at-zero bug
-  const makeColor = d3.scaleSequential(d3.interpolateRdYlGn).domain([ficoMin, ficoMax])
+  // Site palette: warm red → warm neutral → site blue
+  const makeColor = d3.scaleLinear()
+    .domain([ficoMin, (ficoMin + ficoMax) / 2, ficoMax])
+    .range(["#C86A50", "#C8C3B8", "#4A6FA5"])
 
   // Sort ascending by FICO so highest is at top
   const sorted = [...top_makes].sort((a, b) => a.median_fico - b.median_fico)
@@ -315,7 +392,7 @@ quality — what matters is who underwrote it.
     marginRight: 40,
     x: {
       label: "Median FICO at origination →",
-      domain: [560, 800],
+      domain: [Math.floor(ficoMin / 10) * 10 - 10, Math.ceil(ficoMax / 10) * 10 + 10],
       grid: true,
     },
     y: {

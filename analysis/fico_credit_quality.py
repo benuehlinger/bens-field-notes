@@ -62,7 +62,7 @@ def main() -> None:
     print(f"[{period}] aggregating by vehicle make...")
     by_make = con.execute(f"""
         SELECT
-            vehicleManufacturerName                                         AS make,
+            UPPER(TRIM(vehicleManufacturerName))                            AS make,
             vehicleNewUsedCode                                              AS new_used,
             count(*)                                                        AS loan_count,
             round(avg({FICO_EXPR}), 1)                                      AS avg_fico,
@@ -106,6 +106,47 @@ def main() -> None:
     out = OUTPUTS / f"fico_by_tier_{period}.parquet"
     by_tier.to_parquet(out, index=False)
     print(f"  → {out}  ({len(by_tier)} rows)")
+
+    # ── FICO distribution by top sponsor ─────────────────────────
+    print(f"[{period}] computing FICO distribution by top sponsors...")
+    import re as _re
+
+    def _shorten(name: str) -> str:
+        name = _re.sub(r"\s+(Auto\s+)?Receivables.*$", "", name, flags=_re.I)
+        name = _re.sub(r"\s+(Vehicle\s+)?Owner.*$", "", name, flags=_re.I)
+        name = _re.sub(r"\s+Auto\s+Securitization.*$", "", name, flags=_re.I)
+        name = _re.sub(r"\s+Lending\s*$", "", name, flags=_re.I)
+        name = _re.sub(r"\s+Automobile\s*$", "", name, flags=_re.I)
+        name = _re.sub(r"\s+(Enhanced|Prime|Auto|Loan)\s*$", "", name, flags=_re.I)
+        return name.strip()
+
+    top_sponsors = (
+        by_deal.drop_duplicates("sponsor").nlargest(10, "loan_count")["sponsor"]
+        .dropna().tolist()
+    )
+    sponsor_filter = ", ".join("'{}'".format(s.replace("'", "''")) for s in top_sponsors)
+    fico_dist = con.execute(f"""
+        SELECT
+            sponsor,
+            FLOOR({FICO_EXPR} / 20) * 20   AS fico_bin,
+            COUNT(*)                        AS n
+        FROM {READ}
+        WHERE {FICO_EXPR} IS NOT NULL
+          AND {FICO_EXPR} >= 300
+          AND sponsor IN ({sponsor_filter})
+        GROUP BY 1, 2
+        ORDER BY sponsor, fico_bin
+    """).fetchdf()
+    sponsor_median = by_deal.groupby("sponsor")["median_fico"].mean().reset_index()
+    fico_dist = fico_dist.merge(sponsor_median, on="sponsor", how="left")
+    fico_dist["density"] = fico_dist.groupby("sponsor")["n"].transform(
+        lambda x: x / x.sum()
+    )
+    fico_dist["short_name"] = fico_dist["sponsor"].apply(_shorten)
+    fico_dist["period"] = period
+    out = OUTPUTS / f"fico_dist_sponsor_{period}.parquet"
+    fico_dist.to_parquet(out, index=False)
+    print(f"  → {out}  ({len(fico_dist)} rows)")
 
     # Quick preview
     print(f"\n── Credit tier mix ──")
