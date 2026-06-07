@@ -30,133 +30,79 @@ Check the volume chart.
 ```{python}
 #| echo: false
 #| output: false
-import os
-ojs_define(r2_base_url=os.environ.get("R2_BASE_URL", ""))
+from pathlib import Path
+import pandas as pd
+
+_path = Path("../analysis/outputs/abs_ee_dashboard.parquet")
+if _path.exists():
+    _df = pd.read_parquet(_path)
+    _df["filing_date"] = pd.to_datetime(_df["filing_date"]).dt.strftime("%Y-%m-%d")
+    ojs_define(abs_data=_df.to_dict(orient="records"), data_ok=True)
+else:
+    ojs_define(abs_data=[], data_ok=False)
 ```
 
 ```{ojs}
 //| echo: false
 //| output: false
+import { Plot } from "npm:@observablehq/plot"
+import { timeFormat } from "npm:d3-time-format"
 
-import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
-db = DuckDBClient.of({})
-r2Base = r2_base_url
-```
+data = abs_data.map(d => ({...d, filing_date: new Date(d.filing_date)}))
 
-```{ojs}
-//| echo: false
-//| output: false
-
-// Load all three DPD buckets in one query — controls filter client-side
-panelData = {
-  if (!r2Base || r2Base === "") return null
-  try {
-    const result = await db.query(`
-      SELECT
-        filing_date,
-        COUNT(*) FILTER (WHERE days_past_due >= 30) * 100.0 / COUNT(*) AS d30,
-        COUNT(*) FILTER (WHERE days_past_due >= 60) * 100.0 / COUNT(*) AS d60,
-        COUNT(*) FILTER (WHERE days_past_due >= 90) * 100.0 / COUNT(*) AS d90,
-        COUNT(*) AS total_loans
-      FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/**/*.parquet', union_by_name=true)
-      WHERE filing_date IS NOT NULL
-      GROUP BY filing_date
-      ORDER BY filing_date
-    `)
-    return Array.from(result).map(d => ({
-      ...d,
-      filing_date: new Date(d.filing_date),
-      d30: Number(d.d30),
-      d60: Number(d.d60),
-      d90: Number(d.d90),
-      total_loans: Number(d.total_loans)
-    }))
-  } catch(e) {
-    return { error: e.message }
-  }
-}
-```
-
-```{ojs}
-//| echo: false
-//| output: false
-
-NBER_ABS = [
-  { start: new Date("2007-12-01"), end: new Date("2009-06-01") },
-  { start: new Date("2020-02-01"), end: new Date("2020-04-01") }
+DPD_META = [
+  {key: "d30_rate", label: "30+ days", color: "#2563eb"},
+  {key: "d60_rate", label: "60+ days", color: "#7c3aed"},
+  {key: "d90_rate", label: "90+ days", color: "#dc2626"}
 ]
 
-DPD_META = ({
-  30: { col: "d30", label: "30+ DPD", color: "#C8A058" },
-  60: { col: "d60", label: "60+ DPD", color: "#B07040" },
-  90: { col: "d90", label: "90+ DPD", color: "#4A6FA5" }
-})
+RECESSIONS = [
+  {start: new Date("2020-02-01"), end: new Date("2020-04-30"), label: "COVID-19"}
+]
+
+fmtDate = timeFormat("%b %Y")
+fmtPct  = d => `${(d * 100).toFixed(2)}%`
+fmtN    = d => d >= 1e6 ? `${(d/1e6).toFixed(1)}M` : d >= 1e3 ? `${(d/1e3).toFixed(0)}K` : String(d)
 ```
 
 ## Latest Month
 
 ```{ojs}
 //| echo: false
-
 {
-  if (!r2Base || r2Base === "") {
-    return html`<div class="chart-loading"><span>◌</span><span>Live data — chart loads when the data lake is ready.</span></div>`
-  }
-  if (!panelData || panelData.error) {
-    return html`<div class="chart-error"><span>⚠</span><span>Data unavailable — ${panelData?.error ?? "check R2 connection"}.</span></div>`
-  }
+  if (!data_ok) return html`<div class="chart-error">⚠ Run <code>python analysis/aggregate_abs_ee.py</code> to generate dashboard data.</div>`
 
-  const latest = panelData[panelData.length - 1]
-  const prior  = panelData[panelData.length - 2]
-  const yearAgo = panelData.find(d => {
-    const tgt = new Date(latest.filing_date)
-    tgt.setFullYear(tgt.getFullYear() - 1)
-    return Math.abs(d.filing_date - tgt) < 45 * 86400000
-  })
+  const latest = data.reduce((max, d) => d.filing_date > max ? d.filing_date : max, new Date(0))
+  const row = data.find(d => d.filing_date.getTime() === latest.getTime())
+  if (!row) return null
 
-  const fmt = v => v != null ? v.toFixed(2) + "%" : "—"
-  const fmtDelta = (a, b, col) => {
-    if (a == null || b == null) return ""
-    const delta = a[col] - b[col]
-    const sign = delta > 0 ? "+" : ""
-    const color = delta > 0 ? "#B04A38" : "#3A7A5A"
-    const arrow = delta > 0 ? "▲" : "▼"
-    return `<div style="font-family:'DM Mono',monospace;font-size:0.63rem;margin-top:0.3rem;color:${color}">${arrow} ${sign}${delta.toFixed(2)}pp vs prior mo</div>`
-  }
-  const fmtYoY = (a, b, col) => {
-    if (a == null || b == null) return ""
-    const delta = a[col] - b[col]
-    const sign = delta > 0 ? "+" : ""
-    const color = delta > 0 ? "#B04A38" : "#3A7A5A"
-    return `<div style="font-family:'DM Mono',monospace;font-size:0.63rem;margin-top:0.15rem;color:${color}">${sign}${delta.toFixed(2)}pp YoY</div>`
+  const prev = data.slice().sort((a, b) => b.filing_date - a.filing_date)[1]
+
+  const strip = html`<div class="kpi-strip"></div>`
+
+  for (const {key, label} of DPD_META) {
+    const val = row[key]
+    const chg = prev ? val - prev[key] : null
+    const chgStr = chg !== null ? ` ${chg > 0 ? "▲" : "▼"} ${Math.abs(chg * 100).toFixed(2)}pp` : ""
+    const chgColor = chg > 0 ? "#dc2626" : "#16a34a"
+    const card = html`<div class="kpi-card">
+      <div class="kpi-value">${fmtPct(val)}</div>
+      <div class="kpi-label">${label} DPD<span style="color:${chgColor};margin-left:6px;font-size:0.7rem">${chgStr}</span></div>
+    </div>`
+    strip.appendChild(card)
   }
 
-  const latestDateStr = latest.filing_date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-  const loans = latest.total_loans >= 1e6
-    ? `${(latest.total_loans / 1e6).toFixed(2)}M`
-    : `${(latest.total_loans / 1e3).toFixed(0)}K`
-
-  return html`<div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#8A8A8A;margin-bottom:0.5rem">Latest filing: ${latestDateStr}</div>
-    <div class="kpi-strip">
-      <div class="kpi-card">
-        <div class="kpi-value" style="color:#4A6FA5">${fmt(latest.d90)}</div>
-        <div class="kpi-label">90+ Day Delinquency</div>
-        ${fmtDelta(latest, prior, "d90")}
-        ${fmtYoY(latest, yearAgo, "d90")}
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value" style="color:#C8A058">${fmt(latest.d30)}</div>
-        <div class="kpi-label">30+ Day Delinquency</div>
-        ${fmtDelta(latest, prior, "d30")}
-        ${fmtYoY(latest, yearAgo, "d30")}
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value">${loans}</div>
-        <div class="kpi-label">Loans in Panel</div>
-      </div>
-    </div>
+  const volCard = html`<div class="kpi-card">
+    <div class="kpi-value">${fmtN(row.total_loans)}</div>
+    <div class="kpi-label">Loans in panel</div>
   </div>`
+  strip.appendChild(volCard)
+
+  const surveyed = html`<div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:#9A9A9A;margin-bottom:1.5rem;">
+    Reporting period: ${fmtDate(latest)}
+  </div>`
+
+  return html`<div>${surveyed}${strip}</div>`
 }
 ```
 
@@ -164,111 +110,79 @@ DPD_META = ({
 
 ```{ojs}
 //| echo: false
-
 viewof dpdBucket = Inputs.radio(
-  [30, 60, 90],
+  DPD_META.map(d => d.key),
   {
-    value: 90,
+    value: "d30_rate",
     label: "DPD bucket",
-    format: v => `${v}+ days`
+    format: k => DPD_META.find(d => d.key === k).label
   }
 )
 ```
 
 ```{ojs}
 //| echo: false
-
 viewof timeWindow = Inputs.radio(
   ["1Y", "2Y", "3Y", "All"],
-  { value: "All", label: "Period" }
+  {value: "All", label: "Period"}
 )
 ```
 
 ```{ojs}
 //| echo: false
-//| output: false
-
-filteredPanel = {
-  if (!panelData || panelData.error) return []
-  const cutoff = (() => {
-    if (timeWindow === "All") return new Date(0)
-    const d = new Date()
-    d.setFullYear(d.getFullYear() - parseInt(timeWindow))
-    return d
-  })()
-  return panelData.filter(d => d.filing_date >= cutoff)
-}
-```
-
-```{ojs}
-//| echo: false
-
 {
-  if (!r2Base || r2Base === "") {
-    return html`<div class="chart-loading"><span>◌</span><span>Live data — chart loads when the data lake is ready.</span></div>`
-  }
-  if (!panelData || panelData.error) {
-    return html`<div class="chart-error"><span>⚠</span><span>Data unavailable — ${panelData?.error ?? "unknown error"}.</span></div>`
-  }
+  if (!data_ok || data.length === 0) return html`<div class="chart-loading">No data</div>`
 
-  const meta = DPD_META[dpdBucket]
-  const maxDate = d3.max(filteredPanel, d => d.filing_date)
-  const asOfStr = maxDate
-    ? maxDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })
-    : "unknown"
+  const meta  = DPD_META.find(d => d.key === dpdBucket)
+  const now   = new Date()
+  const years = {"1Y": 1, "2Y": 2, "3Y": 3}
+  const cutoff = timeWindow in years
+    ? new Date(now.getFullYear() - years[timeWindow], now.getMonth())
+    : new Date(0)
+
+  const filtered = data.filter(d => d.filing_date >= cutoff)
+  const w = Math.min(800, window.innerWidth - 48)
 
   return Plot.plot({
-    width: 820,
-    height: 360,
-    marginLeft: 60,
-    marginRight: 20,
-    marginBottom: 50,
-    x: {
-      type: "time",
-      label: null,
-      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
-    },
-    y: {
-      label: `Delinquency Rate — ${meta.label} (%)`,
-      tickFormat: d => d.toFixed(1) + "%",
-      grid: true,
-      gridColor: "var(--border-color, #D8D3C8)",
-      zero: true
-    },
     marks: [
-      Plot.rect(NBER_ABS, {
-        x1: "start",
-        x2: "end",
-        fill: "#8A8A8A",
-        fillOpacity: 0.09
-      }),
-      Plot.ruleY([0], { stroke: "var(--border-color, #D8D3C8)" }),
-      Plot.areaY(filteredPanel, {
+      ...RECESSIONS.map(r => Plot.rect([r], {
+        x1: "start", x2: "end",
+        y1: 0, y2: 1,
+        fill: "#888", fillOpacity: 0.07
+      })),
+      Plot.areaY(filtered, {
         x: "filing_date",
-        y: meta.col,
+        y: dpdBucket,
         fill: meta.color,
-        fillOpacity: 0.12
-      }),
-      Plot.line(filteredPanel, {
-        x: "filing_date",
-        y: meta.col,
-        stroke: meta.color,
-        strokeWidth: 2,
+        fillOpacity: 0.12,
         curve: "monotone-x"
       }),
-      Plot.dot(filteredPanel, Plot.selectLast({
+      Plot.line(filtered, {
         x: "filing_date",
-        y: meta.col,
-        fill: meta.color,
-        r: 5
-      })),
-      Plot.tip(filteredPanel, Plot.pointerX({
+        y: dpdBucket,
+        stroke: meta.color,
+        strokeWidth: 2.5,
+        curve: "monotone-x"
+      }),
+      Plot.crosshair(filtered, {x: "filing_date", y: dpdBucket, color: meta.color}),
+      Plot.tip(filtered, Plot.pointer({
         x: "filing_date",
-        y: meta.col,
-        title: d => `${d.filing_date.toLocaleDateString("en-US", {month:"short",year:"numeric"})}\n${meta.label}: ${d[meta.col].toFixed(2)}%\nLoans: ${(d.total_loans/1e6).toFixed(2)}M`
+        y: dpdBucket,
+        title: d => `${meta.label} DPD\n${fmtDate(d.filing_date)}: ${fmtPct(d[dpdBucket])}`
       }))
     ],
-    caption: `Source: SEC EDGAR ABS-EE | ${meta.label} rate | Shaded = NBER recessions | As of ${asOfStr}`
+    x: {label: null, type: "time", tickFormat: "%b '%y"},
+    y: {
+      label: `${meta.label} DPD rate`,
+      tickFormat: fmtPct,
+      grid: true,
+      zero: true
+    },
+    width: w,
+    height: 320,
+    marginLeft: 65,
+    marginRight: 20,
+    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```
@@ -277,150 +191,116 @@ filteredPanel = {
 
 ```{ojs}
 //| echo: false
-
 {
-  if (!panelData || panelData.error || !r2Base) return null
+  if (!data_ok || data.length === 0) return null
 
-  const cutoff = (() => {
-    if (timeWindow === "All") return new Date(0)
-    const d = new Date()
-    d.setFullYear(d.getFullYear() - parseInt(timeWindow))
-    return d
-  })()
+  const now = new Date()
+  const cutoff = timeWindow in {"1Y":1,"2Y":2,"3Y":3}
+    ? new Date(now.getFullYear() - {"1Y":1,"2Y":2,"3Y":3}[timeWindow], now.getMonth())
+    : new Date(0)
 
-  // Reshape to long form for multi-line chart
-  const long = []
-  for (const row of filteredPanel) {
-    for (const [bucket, meta] of Object.entries(DPD_META)) {
-      long.push({ filing_date: row.filing_date, bucket: meta.label, rate: row[meta.col] })
-    }
-  }
+  const long = data
+    .filter(d => d.filing_date >= cutoff)
+    .flatMap(d => DPD_META.map(m => ({
+      filing_date: d.filing_date,
+      label: m.label,
+      color: m.color,
+      rate: d[m.key]
+    })))
 
-  const BUCKET_COLORS = {
-    "30+ DPD": "#C8A058",
-    "60+ DPD": "#B07040",
-    "90+ DPD": "#4A6FA5"
-  }
-  const BUCKET_ORDER = ["30+ DPD", "60+ DPD", "90+ DPD"]
+  const w = Math.min(800, window.innerWidth - 48)
 
   return Plot.plot({
-    title: "All Delinquency Buckets",
-    subtitle: "30+, 60+, and 90+ day past due — same panel, same period",
-    width: 820,
-    height: 300,
-    marginLeft: 60,
-    marginRight: 20,
-    marginBottom: 50,
-    color: {
-      domain: BUCKET_ORDER,
-      range: BUCKET_ORDER.map(b => BUCKET_COLORS[b]),
-      legend: true
-    },
-    x: {
-      type: "time",
-      label: null,
-      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
-    },
-    y: {
-      label: "Delinquency Rate (%)",
-      tickFormat: d => d.toFixed(1) + "%",
-      grid: true,
-      gridColor: "var(--border-color, #D8D3C8)"
-    },
     marks: [
-      Plot.rect(NBER_ABS, { x1: "start", x2: "end", fill: "#8A8A8A", fillOpacity: 0.09 }),
-      Plot.ruleY([0], { stroke: "var(--border-color, #D8D3C8)" }),
+      ...RECESSIONS.map(r => Plot.rect([r], {
+        x1: "start", x2: "end",
+        y1: 0, y2: 1,
+        fill: "#888", fillOpacity: 0.07
+      })),
       Plot.line(long, {
         x: "filing_date",
         y: "rate",
-        stroke: "bucket",
-        strokeWidth: 1.8,
+        stroke: "color",
+        strokeWidth: 2,
         curve: "monotone-x"
       }),
-      Plot.tip(long, Plot.pointerX({
+      Plot.crosshair(long, {x: "filing_date", y: "rate", color: "color"}),
+      Plot.tip(long, Plot.pointer({
         x: "filing_date",
         y: "rate",
-        stroke: "bucket"
+        title: d => `${d.label}\n${fmtDate(d.filing_date)}: ${fmtPct(d.rate)}`
       }))
     ],
-    caption: "Source: SEC EDGAR ABS-EE | All buckets are inclusive (30+ includes 60+ and 90+)"
+    x: {label: null, type: "time", tickFormat: "%b '%y"},
+    y: {
+      label: "DPD rate",
+      tickFormat: fmtPct,
+      grid: true,
+      zero: true
+    },
+    color: {
+      domain: DPD_META.map(d => d.color),
+      range: DPD_META.map(d => d.color),
+      legend: false
+    },
+    width: w,
+    height: 280,
+    marginLeft: 65,
+    marginRight: 20,
+    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```
 
 ## Loan Volume
 
-Total loans in the panel by filing month. More loans = better sample.
-Drops in coverage mean trusts exited the filing window — not that loans were paid off.
-
 ```{ojs}
 //| echo: false
-
 {
-  if (!panelData || panelData.error || !r2Base) {
-    return html`<div class="chart-loading"><span>◌</span><span>Waiting for data...</span></div>`
-  }
+  if (!data_ok || data.length === 0) return null
+
+  const now = new Date()
+  const cutoff = timeWindow in {"1Y":1,"2Y":2,"3Y":3}
+    ? new Date(now.getFullYear() - {"1Y":1,"2Y":2,"3Y":3}[timeWindow], now.getMonth())
+    : new Date(0)
+
+  const filtered = data.filter(d => d.filing_date >= cutoff)
+  const w = Math.min(800, window.innerWidth - 48)
 
   return Plot.plot({
-    width: 820,
-    height: 240,
-    marginLeft: 65,
-    marginRight: 20,
-    marginBottom: 50,
-    x: {
-      type: "time",
-      label: null,
-      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
-    },
-    y: {
-      label: "Loans in Panel",
-      tickFormat: d => d >= 1e6 ? `${(d/1e6).toFixed(1)}M` : d >= 1e3 ? `${(d/1e3).toFixed(0)}K` : d,
-      grid: true,
-      gridColor: "var(--border-color, #D8D3C8)"
-    },
     marks: [
-      Plot.rect(NBER_ABS, { x1: "start", x2: "end", fill: "#8A8A8A", fillOpacity: 0.09 }),
-      Plot.areaY(filteredPanel, {
+      Plot.areaY(filtered, {
         x: "filing_date",
         y: "total_loans",
-        fill: "#4A6FA5",
-        fillOpacity: 0.15
+        fill: "#6b7280",
+        fillOpacity: 0.15,
+        curve: "monotone-x"
       }),
-      Plot.line(filteredPanel, {
+      Plot.line(filtered, {
         x: "filing_date",
         y: "total_loans",
-        stroke: "#4A6FA5",
+        stroke: "#6b7280",
         strokeWidth: 1.5,
         curve: "monotone-x"
       }),
-      Plot.tip(filteredPanel, Plot.pointerX({
+      Plot.tip(filtered, Plot.pointer({
         x: "filing_date",
         y: "total_loans",
-        title: d => `${d.filing_date.toLocaleDateString("en-US", {month:"short",year:"numeric"})}\nLoans: ${(d.total_loans/1e6).toFixed(2)}M`
+        title: d => `${fmtDate(d.filing_date)}: ${fmtN(d.total_loans)} loans`
       }))
     ],
-    caption: "Source: SEC EDGAR ABS-EE | Drops indicate trusts exiting filing window, not loan payoffs"
+    x: {label: null, type: "time", tickFormat: "%b '%y"},
+    y: {
+      label: "Loans in panel",
+      tickFormat: fmtN,
+      grid: true,
+      zero: true
+    },
+    width: w,
+    height: 200,
+    marginLeft: 65,
+    marginRight: 20,
+    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```
-
----
-
-## Methodology
-
-**What counts as delinquent**: A loan is `days_past_due >= X` at the servicer-reported filing date.
-The 90+ bucket is the most severe and the most commonly cited. The 30+ bucket picks up stress earlier
-but is noisier — minor payment timing issues show up here that never progress.
-
-**What's included**: All loans in Hive-partitioned Parquet files under
-`abs_ee/curated/asset_class=autoloan/` on R2. Coverage limited to issuers registered
-with the SEC under Regulation AB II.
-
-**Known limitations**: Servicer definitions of "days past due" vary by issuer. A 30 DPD loan
-at Ally may not be identical to a 30 DPD loan at Santander. This is the data as filed —
-no cross-issuer harmonization has been applied.
-
-**Recession shading:** NBER-defined recession dates. EDGAR ABS-EE coverage begins November 2016,
-so only the COVID recession (Feb–Apr 2020) falls within the panel.
-
-For full source documentation, see [Data Sources →](../data-sources.qmd)

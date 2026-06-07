@@ -43,3 +43,21 @@ jobs:
           projectName: bens-field-notes
           directory: _site
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Email — new data notification
+        if: success() && contains(github.event.head_commit.message, '[data-update]')
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "Ben's Field Notes — New Data Live"
+          to: benuehlinger@gmail.com
+          from: "Ben's Field Notes <${{ secrets.GMAIL_USERNAME }}>"
+          body: |
+            New dashboard data is live at https://bensnotes.fyi
+
+            Dataset: ${{ github.event.inputs.dataset || 'auto' }}
+            Commit: ${{ github.event.head_commit.message }}

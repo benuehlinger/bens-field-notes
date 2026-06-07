@@ -1,0 +1,55 @@
+name: Refresh Dashboard Data
+
+# Triggered manually or via GitHub API from bens-data-lake after a successful ingest.
+# To trigger from bens-data-lake CI:
+#   curl -X POST \
+#     -H "Authorization: Bearer $GH_PAT" \
+#     -H "Accept: application/vnd.github.v3+json" \
+#     https://api.github.com/repos/benuehlinger/bens-field-notes/actions/workflows/update-data.yml/dispatches \
+#     -d '{"ref":"main","inputs":{"dataset":"sloos"}}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: "Which dataset to refresh"
+        required: false
+        default: "all"
+        type: choice
+        options: [all, sloos, abs_ee]
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python deps
+        run: pip install --quiet duckdb pandas pyarrow requests
+
+      - name: Refresh SLOOS
+        if: ${{ inputs.dataset == 'sloos' || inputs.dataset == 'all' }}
+        run: python analysis/aggregate_sloos.py
+        env:
+          R2_BASE_URL: ${{ secrets.R2_BASE_URL }}
+
+      - name: Refresh ABS-EE
+        if: ${{ inputs.dataset == 'abs_ee' || inputs.dataset == 'all' }}
+        run: python analysis/aggregate_abs_ee.py
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: lending-data-lake
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add analysis/outputs/sloos_dashboard.parquet analysis/outputs/abs_ee_dashboard.parquet
+          git diff --staged --quiet && echo "No changes to commit" || \
+            git commit -m "data: refresh dashboard parquet files [data-update]"
+          git push

@@ -6,13 +6,11 @@
  *   - Path validation (only allows known data prefixes)
  *   - No credentials exposed to the browser
  *
- * The browser calls:
- *   GET https://bens-field-notes-r2.YOUR-SUBDOMAIN.workers.dev/abs_ee/curated/.../*.parquet
- *
- * The Worker fetches from private R2 and streams the response back.
+ * Routes:
+ *   GET /_manifest/<prefix>  — list R2 keys under a prefix (returns JSON array)
+ *   GET /<key>               — stream a single .parquet file from R2
  */
 
-// Allowed R2 path prefixes — requests outside these are rejected with 403
 const ALLOWED_PREFIXES = [
   "abs_ee/curated/",
   "sloos/curated/",
@@ -23,11 +21,6 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin") || "";
-
-    // Determine the effective allowed origin:
-    // - exact match of ALLOWED_ORIGIN env var
-    // - any *.pages.dev or *.workers.dev subdomain
-    // - localhost on any port
     const allowedOrigin = resolveOrigin(origin, env.ALLOWED_ORIGIN);
 
     // CORS preflight
@@ -35,38 +28,52 @@ export default {
       return corsResponse(null, 204, allowedOrigin);
     }
 
-    // Only GET allowed
     if (request.method !== "GET") {
-      return corsResponse("Method not allowed", 405, env.ALLOWED_ORIGIN);
+      return corsResponse("Method not allowed", 405, allowedOrigin);
     }
 
-    // Strip leading slash to get the R2 key
+    // ── Manifest endpoint ──────────────────────────────────────────────────
+    // GET /_manifest/abs_ee/curated/asset_class=autoloan/
+    // Returns: JSON array of R2 keys matching the prefix
+    if (url.pathname.startsWith("/_manifest/")) {
+      const prefix = url.pathname.replace(/^\/_manifest\//, "");
+      const allowed = ALLOWED_PREFIXES.some(p => prefix.startsWith(p));
+      if (!allowed) return corsResponse("Forbidden", 403, allowedOrigin);
+
+      const keys = [];
+      let cursor;
+      do {
+        const listed = await env.DATA_LAKE.list({ prefix, cursor });
+        keys.push(...listed.objects.map(o => o.key));
+        cursor = listed.truncated ? listed.cursor : undefined;
+      } while (cursor);
+
+      return new Response(JSON.stringify(keys), {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": allowedOrigin,
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Cache-Control": "public, max-age=300",
+        },
+      });
+    }
+
+    // ── Parquet file endpoint ──────────────────────────────────────────────
     const key = url.pathname.replace(/^\//, "");
 
-    if (!key) {
-      return corsResponse("Missing path", 400, env.ALLOWED_ORIGIN);
-    }
+    if (!key) return corsResponse("Missing path", 400, allowedOrigin);
 
-    // Validate against allowed prefixes
     const allowed = ALLOWED_PREFIXES.some(prefix => key.startsWith(prefix));
-    if (!allowed) {
-      return corsResponse("Forbidden", 403, env.ALLOWED_ORIGIN);
-    }
+    if (!allowed) return corsResponse("Forbidden", 403, allowedOrigin);
 
-    // Only serve Parquet files
     if (!key.endsWith(".parquet")) {
-      return corsResponse("Only .parquet files are served", 403, env.ALLOWED_ORIGIN);
+      return corsResponse("Only .parquet files are served", 403, allowedOrigin);
     }
 
-    // Fetch from R2
     const object = await env.DATA_LAKE.get(key);
+    if (!object) return corsResponse("Not found", 404, allowedOrigin);
 
-
-    if (!object) {
-      return corsResponse("Not found", 404, env.ALLOWED_ORIGIN);
-    }
-
-    // Stream R2 object back to browser with correct content type
     const headers = new Headers({
       "Content-Type": "application/octet-stream",
       "Content-Length": object.size.toString(),
@@ -81,10 +88,6 @@ export default {
   },
 };
 
-/**
- * Resolve the effective CORS allowed origin.
- * Allows: exact ALLOWED_ORIGIN env match, *.pages.dev, *.workers.dev, localhost.
- */
 function resolveOrigin(requestOrigin, configuredOrigin) {
   if (!requestOrigin) return configuredOrigin;
   if (requestOrigin === configuredOrigin) return requestOrigin;
@@ -99,9 +102,6 @@ function resolveOrigin(requestOrigin, configuredOrigin) {
   return configuredOrigin;
 }
 
-/**
- * Helper — return a response with CORS headers.
- */
 function corsResponse(body, status, allowedOrigin) {
   return new Response(body, {
     status,
