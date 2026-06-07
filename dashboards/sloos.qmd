@@ -45,16 +45,14 @@ else:
 //| echo: false
 //| output: false
 import { Plot } from "npm:@observablehq/plot"
-import { format } from "npm:d3-format"
-import { timeFormat } from "npm:d3-time-format"
 
 data = sloos_data.map(d => ({...d, survey_date: new Date(d.survey_date)}))
 
 COLORS = ({
-  "C&I - Large":          "#1d4ed8",
-  "C&I - Small":          "#06b6d4",
+  "C&I - Large":            "#1d4ed8",
+  "C&I - Small":            "#06b6d4",
   "Consumer - Credit Card": "#b45309",
-  "Consumer - Auto":      "#be123c"
+  "Consumer - Auto":        "#be123c"
 })
 
 LOAN_TYPES = ["C&I - Large", "C&I - Small", "Consumer - Credit Card", "Consumer - Auto"]
@@ -63,7 +61,7 @@ RECESSIONS = [
   {start: new Date("2020-02-01"), end: new Date("2020-04-30"), label: "COVID-19"}
 ]
 
-fmtDate = timeFormat("%b %Y")
+fmtDate = d => d.toLocaleString("en-US", {month: "short", year: "numeric"})
 fmtPct  = d => `${d > 0 ? "+" : ""}${d}%`
 ```
 

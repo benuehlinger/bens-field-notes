@@ -46,7 +46,6 @@ else:
 //| echo: false
 //| output: false
 import { Plot } from "npm:@observablehq/plot"
-import { timeFormat } from "npm:d3-time-format"
 
 data = abs_data.map(d => ({...d, filing_date: new Date(d.filing_date)}))
 
@@ -60,7 +59,7 @@ RECESSIONS = [
   {start: new Date("2020-02-01"), end: new Date("2020-04-30"), label: "COVID-19"}
 ]
 
-fmtDate = timeFormat("%b %Y")
+fmtDate = d => d.toLocaleString("en-US", {month: "short", year: "numeric"})
 fmtPct  = d => `${(d * 100).toFixed(2)}%`
 fmtN    = d => d >= 1e6 ? `${(d/1e6).toFixed(1)}M` : d >= 1e3 ? `${(d/1e3).toFixed(0)}K` : String(d)
 ```
