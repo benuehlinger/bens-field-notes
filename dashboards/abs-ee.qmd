@@ -181,7 +181,7 @@ viewof timeWindow = Inputs.radio(
     height: 320,
     marginLeft: 65,
     marginRight: 20,
-    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
+    style: {background: "transparent", fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```
@@ -246,7 +246,7 @@ viewof timeWindow = Inputs.radio(
     height: 280,
     marginLeft: 65,
     marginRight: 20,
-    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
+    style: {background: "transparent", fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```
@@ -299,7 +299,7 @@ viewof timeWindow = Inputs.radio(
     height: 200,
     marginLeft: 65,
     marginRight: 20,
-    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
+    style: {background: "transparent", fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```

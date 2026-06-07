@@ -199,7 +199,7 @@ viewof selectedTypes = Inputs.checkbox(
     height: 340,
     marginLeft: 65,
     marginRight: 20,
-    style: {fontSize: "12px", fontFamily: "DM Mono, monospace"}
+    style: {background: "transparent", fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
 }
 ```
@@ -211,54 +211,75 @@ viewof selectedTypes = Inputs.checkbox(
 {
   if (!data_ok || data.length === 0) return null
 
+  // Last 3 survey dates, most recent first
   const surveys = [...new Set(data.map(d => d.survey_date.getTime()))]
     .sort((a, b) => b - a)
     .slice(0, 3)
     .map(t => new Date(t))
 
-  const recent = data.filter(d => surveys.some(s => s.getTime() === d.survey_date.getTime()))
+  const recent = data
+    .filter(d => surveys.some(s => s.getTime() === d.survey_date.getTime()))
+    .map(d => ({
+      ...d,
+      rank: surveys.findIndex(s => s.getTime() === d.survey_date.getTime())
+    }))
 
-  const w = Math.min(700, window.innerWidth - 48)
+  // Range line per loan type (from min to max of the 3 readings)
+  const ranges = LOAN_TYPES.map(lt => {
+    const vals = recent.filter(d => d.loan_type === lt).map(d => d.net_pct_tightening)
+    return {loan_type: lt, lo: Math.min(...vals), hi: Math.max(...vals)}
+  })
 
-  return Plot.plot({
+  const latest = recent.filter(d => d.rank === 0)
+  const w = Math.min(680, window.innerWidth - 48)
+
+  // Legend: survey dates with opacity
+  const legend = html`<div style="display:flex;gap:1.5rem;margin-bottom:0.75rem;font-family:'DM Mono',monospace;font-size:0.7rem;color:#9A9A9A">
+    ${surveys.map((s, i) => html`<span style="opacity:${[1,0.55,0.3][i]}">● ${fmtDate(s)}${i===0?" (latest)":""}</span>`)}
+  </div>`
+
+  const chart = Plot.plot({
     marks: [
-      Plot.ruleX([0], {stroke: "#9CA3AF", strokeWidth: 1}),
-      Plot.ruleX(recent, {
-        x: "net_pct_tightening",
-        y: d => `${d.loan_type} · ${fmtDate(d.survey_date)}`,
+      Plot.ruleX([0], {stroke: "#9CA3AF", strokeDasharray: "4,3", strokeWidth: 1}),
+      // Range line connecting the 3 readings
+      Plot.link(ranges, {
+        x1: "lo", x2: "hi",
+        y1: "loan_type", y2: "loan_type",
         stroke: d => COLORS[d.loan_type],
         strokeWidth: 2,
-        strokeOpacity: 0.5
+        strokeOpacity: 0.25
       }),
+      // Dots: largest + opaque = latest, smallest + faded = oldest
       Plot.dot(recent, {
         x: "net_pct_tightening",
-        y: d => `${d.loan_type} · ${fmtDate(d.survey_date)}`,
+        y: "loan_type",
         fill: d => COLORS[d.loan_type],
-        r: 5
+        fillOpacity: d => [1, 0.55, 0.3][d.rank],
+        r: d => [7, 5, 4][d.rank],
+        stroke: "white",
+        strokeWidth: 1.5
       }),
-      Plot.text(recent, {
+      // Value label on the latest dot only
+      Plot.text(latest, {
         x: "net_pct_tightening",
-        y: d => `${d.loan_type} · ${fmtDate(d.survey_date)}`,
+        y: "loan_type",
         text: d => fmtPct(d.net_pct_tightening),
-        dx: d => d.net_pct_tightening >= 0 ? 10 : -10,
-        textAnchor: d => d.net_pct_tightening >= 0 ? "start" : "end",
+        dx: 13,
         fontSize: 11,
-        fontFamily: "DM Mono, monospace",
-        fill: d => COLORS[d.loan_type]
+        fill: d => COLORS[d.loan_type],
+        fontWeight: "600"
       })
     ],
-    x: {
-      label: "Net % tightening",
-      tickFormat: fmtPct,
-      grid: true,
-      zero: true
-    },
-    y: {label: null},
+    x: {label: "Net % tightening →", tickFormat: fmtPct, grid: true, zero: true},
+    y: {label: null, domain: LOAN_TYPES},
     width: w,
-    height: Math.max(180, recent.length * 28 + 60),
-    marginLeft: 200,
-    marginRight: 60,
-    style: {fontSize: "11px", fontFamily: "DM Mono, monospace"}
+    height: 180,
+    marginLeft: 185,
+    marginRight: 70,
+    marginTop: 10,
+    style: {background: "transparent", fontSize: "12px", fontFamily: "DM Mono, monospace"}
   })
+
+  return html`<div>${legend}${chart}</div>`
 }
 ```
