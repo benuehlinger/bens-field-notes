@@ -96,4 +96,4 @@ and writes Parquet to R2.
 
 ---
 
-*Last updated: 2026-06-07. Interested in the data or the pipeline? [beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)*
+*Last updated: 2026-06-07. Interested in the data or the pipeline? [benuehlinger@gmail.com](mailto:benuehlinger@gmail.com)*

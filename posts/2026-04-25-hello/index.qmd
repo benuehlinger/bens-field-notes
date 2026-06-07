@@ -30,12 +30,6 @@ Not financial advice. Not a trading signal service. Not trying to have takes.
 The analysis here is descriptive — here's what the data shows, here's the methodology,
 here's where it's incomplete. Conclusions are, per the tagline, questionable.
 
-## How the charts work
-
-The dashboards on this site are built from pre-aggregated Parquet snapshots.
-Data lives in a private Cloudflare R2 bucket; aggregation scripts run at deploy time
-and embed the results directly into each page. Interactive charts run in your browser
-via [Observable Plot](https://observablehq.com/plot/) — no backend server, no live queries.
 
 The ingestion pipeline that powers this site is private. If you're interested in the data
 or the pipeline, get in touch: [beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)

@@ -539,4 +539,4 @@ The ingestion pipeline that built this lake — EDGAR scraping at scale, XML sch
 across trust vintages, Parquet conversion, partition management — lives in a private repository.
 The effort to get here was non-trivial. If you're a researcher, institution, or potential
 collaborator interested in the data or the pipeline, reach out:
-[beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)
+[benuehlinger@gmail.com](mailto:benuehlinger@gmail.com)

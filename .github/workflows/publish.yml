@@ -55,7 +55,7 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: "Ben's Field Notes — New Data Live"
           to: benuehlinger@gmail.com
-          from: "Ben's Field Notes <${{ secrets.GMAIL_USERNAME }}>"
+          from: "Ben's Field Notes <benuehlinger@gmail.com>"
           body: |
             New dashboard data is live at https://bensnotes.fyi
 
