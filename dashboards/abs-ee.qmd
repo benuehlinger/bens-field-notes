@@ -1,7 +1,7 @@
 ---
 title: "Auto Loan Credit"
 subtitle: "ABS-EE Loan-Level Panel — SEC EDGAR"
-description: "Delinquency trends from SEC EDGAR ABS-EE filings. Loan-level auto credit data, parsed from servicer reports so you don't have to."
+description: "Live delinquency trends from SEC EDGAR ABS-EE filings. Loan-level auto credit data, parsed from servicer reports so you don't have to."
 toc: true
 freeze: false
 ---
@@ -11,7 +11,8 @@ freeze: false
   <strong>Data source:</strong> SEC EDGAR ABS-EE autoloan panel —
   loan-level data from asset-backed securities filings.
   Parsed from raw XML filings via the bens-data-lake pipeline.
-  Coverage varies by issuer. See <a href="../data-sources.qmd">Data Sources</a> for full methodology.
+  Coverage limited to SEC-registered auto ABS trusts.
+  See <a href="../data-sources.qmd">Data Sources</a> for full methodology.
 </div>
 ```
 
@@ -20,47 +21,49 @@ to look at, except it's sitting in SEC EDGAR and nobody told you.
 ABS-EE filings contain loan-level performance data for auto loan ABS trusts:
 origination date, balance, days past due, payment status. The good stuff.
 
+Coverage varies by reporting month as trusts enter and exit the panel.
+A delinquency rate computed from 2M loans means something very different from one computed from 200K.
+Check the volume chart.
+
 ---
-
-## Delinquency Trends
-
-90+ day delinquency rate across all loans in the panel, by filing month.
-A number going up here means consumers are falling behind on car payments.
-Make of that what you will.
 
 ```{ojs}
 //| echo: false
 //| output: false
 
-// Initialize DuckDB-WASM
 import { DuckDBClient } from "npm:@duckdb/duckdb-wasm"
 db = DuckDBClient.of({})
-
-// R2 base URL — injected via Quarto site params or environment
 r2Base = params["r2-base-url"]
 ```
 
 ```{ojs}
 //| echo: false
+//| output: false
 
-// Query: 90+ day delinquency rate by filing month
-delinqData = {
-  if (!r2Base || r2Base === "") {
-    return null
-  }
+// Load all three DPD buckets in one query — controls filter client-side
+panelData = {
+  if (!r2Base || r2Base === "") return null
   try {
     const result = await db.query(`
       SELECT
         filing_date,
-        COUNT(*) FILTER (WHERE days_past_due >= 90) * 100.0 / COUNT(*) AS delinq_rate_90plus,
-        COUNT(*) AS total_loans,
-        COUNT(*) FILTER (WHERE days_past_due >= 30) * 100.0 / COUNT(*) AS delinq_rate_30plus
+        COUNT(*) FILTER (WHERE days_past_due >= 30) * 100.0 / COUNT(*) AS d30,
+        COUNT(*) FILTER (WHERE days_past_due >= 60) * 100.0 / COUNT(*) AS d60,
+        COUNT(*) FILTER (WHERE days_past_due >= 90) * 100.0 / COUNT(*) AS d90,
+        COUNT(*) AS total_loans
       FROM read_parquet('${r2Base}/abs_ee/curated/asset_class=autoloan/**/*.parquet', union_by_name=true)
       WHERE filing_date IS NOT NULL
       GROUP BY filing_date
       ORDER BY filing_date
     `)
-    return result
+    return Array.from(result).map(d => ({
+      ...d,
+      filing_date: new Date(d.filing_date),
+      d30: Number(d.d30),
+      d60: Number(d.d60),
+      d90: Number(d.d90),
+      total_loans: Number(d.total_loans)
+    }))
   } catch(e) {
     return { error: e.message }
   }
@@ -69,59 +72,243 @@ delinqData = {
 
 ```{ojs}
 //| echo: false
+//| output: false
 
-// Stat callouts — reactive; show — until data lands
+NBER_ABS = [
+  { start: new Date("2007-12-01"), end: new Date("2009-06-01") },
+  { start: new Date("2020-02-01"), end: new Date("2020-04-01") }
+]
+
+DPD_META = ({
+  30: { col: "d30", label: "30+ DPD", color: "#C8A058" },
+  60: { col: "d60", label: "60+ DPD", color: "#B07040" },
+  90: { col: "d90", label: "90+ DPD", color: "#4A6FA5" }
+})
+```
+
+## Latest Month
+
+```{ojs}
+//| echo: false
+
 {
-  const latest = (delinqData && !delinqData.error && delinqData.length > 0)
-    ? delinqData[delinqData.length - 1] : null
+  if (!r2Base || r2Base === "") {
+    return html`<div class="chart-loading"><span>◌</span><span>Live data — chart loads when the data lake is ready.</span></div>`
+  }
+  if (!panelData || panelData.error) {
+    return html`<div class="chart-error"><span>⚠</span><span>Data unavailable — ${panelData?.error ?? "check R2 connection"}.</span></div>`
+  }
 
-  const rate = latest
-    ? `${Number(latest.delinq_rate_90plus).toFixed(2)}%`
-    : "—"
-  const loans = latest
-    ? (latest.total_loans >= 1e6
-        ? `${(latest.total_loans / 1e6).toFixed(1)}M`
-        : `${(latest.total_loans / 1e3).toFixed(0)}K`)
-    : "—"
+  const latest = panelData[panelData.length - 1]
+  const prior  = panelData[panelData.length - 2]
+  const yearAgo = panelData.find(d => {
+    const tgt = new Date(latest.filing_date)
+    tgt.setFullYear(tgt.getFullYear() - 1)
+    return Math.abs(d.filing_date - tgt) < 45 * 86400000
+  })
 
-  return html`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:0 0 2rem;">
-    <div class="stat-box"><div class="stat-value">${rate}</div><div class="stat-label">90+ Day Delinquency</div></div>
-    <div class="stat-box"><div class="stat-value">${loans}</div><div class="stat-label">Loans in Latest Month</div></div>
+  const fmt = v => v != null ? v.toFixed(2) + "%" : "—"
+  const fmtDelta = (a, b, col) => {
+    if (a == null || b == null) return ""
+    const delta = a[col] - b[col]
+    const sign = delta > 0 ? "+" : ""
+    const color = delta > 0 ? "#B04A38" : "#3A7A5A"
+    const arrow = delta > 0 ? "▲" : "▼"
+    return `<div style="font-family:'DM Mono',monospace;font-size:0.63rem;margin-top:0.3rem;color:${color}">${arrow} ${sign}${delta.toFixed(2)}pp vs prior mo</div>`
+  }
+  const fmtYoY = (a, b, col) => {
+    if (a == null || b == null) return ""
+    const delta = a[col] - b[col]
+    const sign = delta > 0 ? "+" : ""
+    const color = delta > 0 ? "#B04A38" : "#3A7A5A"
+    return `<div style="font-family:'DM Mono',monospace;font-size:0.63rem;margin-top:0.15rem;color:${color}">${sign}${delta.toFixed(2)}pp YoY</div>`
+  }
+
+  const latestDateStr = latest.filing_date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+  const loans = latest.total_loans >= 1e6
+    ? `${(latest.total_loans / 1e6).toFixed(2)}M`
+    : `${(latest.total_loans / 1e3).toFixed(0)}K`
+
+  return html`<div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#8A8A8A;margin-bottom:0.5rem">Latest filing: ${latestDateStr}</div>
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-value" style="color:#4A6FA5">${fmt(latest.d90)}</div>
+        <div class="kpi-label">90+ Day Delinquency</div>
+        ${fmtDelta(latest, prior, "d90")}
+        ${fmtYoY(latest, yearAgo, "d90")}
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" style="color:#C8A058">${fmt(latest.d30)}</div>
+        <div class="kpi-label">30+ Day Delinquency</div>
+        ${fmtDelta(latest, prior, "d30")}
+        ${fmtYoY(latest, yearAgo, "d30")}
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">${loans}</div>
+        <div class="kpi-label">Loans in Panel</div>
+      </div>
+    </div>
   </div>`
+}
+```
+
+## Delinquency Trends
+
+```{ojs}
+//| echo: false
+
+viewof dpdBucket = Inputs.radio(
+  [30, 60, 90],
+  {
+    value: 90,
+    label: "DPD bucket",
+    format: v => `${v}+ days`
+  }
+)
+```
+
+```{ojs}
+//| echo: false
+
+viewof timeWindow = Inputs.radio(
+  ["1Y", "2Y", "3Y", "All"],
+  { value: "All", label: "Period" }
+)
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+filteredPanel = {
+  if (!panelData || panelData.error) return []
+  const cutoff = (() => {
+    if (timeWindow === "All") return new Date(0)
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - parseInt(timeWindow))
+    return d
+  })()
+  return panelData.filter(d => d.filing_date >= cutoff)
 }
 ```
 
 ```{ojs}
 //| echo: false
 
-// Chart: 90+ day delinquency rate
 {
   if (!r2Base || r2Base === "") {
-    const el = document.createElement("div")
-    el.className = "chart-loading"
-    el.innerHTML = `<span>◌</span><span>Live data — pipeline syncing. Chart loads automatically when the data lake is ready.</span>`
-    return el
+    return html`<div class="chart-loading"><span>◌</span><span>Live data — chart loads when the data lake is ready.</span></div>`
+  }
+  if (!panelData || panelData.error) {
+    return html`<div class="chart-error"><span>⚠</span><span>Data unavailable — ${panelData?.error ?? "unknown error"}.</span></div>`
   }
 
-  if (!delinqData || delinqData.error) {
-    const el = document.createElement("div")
-    el.className = "chart-error"
-    el.innerHTML = `<span>⚠</span><span>Data unavailable — ${delinqData?.error ?? "unknown error"}. Check R2 connection.</span>`
-    return el
-  }
-
-  const maxDate = d3.max(delinqData, d => new Date(d.filing_date))
+  const meta = DPD_META[dpdBucket]
+  const maxDate = d3.max(filteredPanel, d => d.filing_date)
   const asOfStr = maxDate
     ? maxDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })
     : "unknown"
 
   return Plot.plot({
-    title: "90+ Day Delinquency Rate",
-    subtitle: "% of loans 90+ days past due, by filing month",
-    width: 800,
-    height: 340,
-    marginLeft: 55,
-    marginBottom: 45,
+    width: 820,
+    height: 360,
+    marginLeft: 60,
+    marginRight: 20,
+    marginBottom: 50,
+    x: {
+      type: "time",
+      label: null,
+      tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+    },
+    y: {
+      label: `Delinquency Rate — ${meta.label} (%)`,
+      tickFormat: d => d.toFixed(1) + "%",
+      grid: true,
+      gridColor: "var(--border-color, #D8D3C8)",
+      zero: true
+    },
+    marks: [
+      Plot.rect(NBER_ABS, {
+        x1: "start",
+        x2: "end",
+        fill: "#8A8A8A",
+        fillOpacity: 0.09
+      }),
+      Plot.ruleY([0], { stroke: "var(--border-color, #D8D3C8)" }),
+      Plot.areaY(filteredPanel, {
+        x: "filing_date",
+        y: meta.col,
+        fill: meta.color,
+        fillOpacity: 0.12
+      }),
+      Plot.line(filteredPanel, {
+        x: "filing_date",
+        y: meta.col,
+        stroke: meta.color,
+        strokeWidth: 2,
+        curve: "monotone-x"
+      }),
+      Plot.dot(filteredPanel, Plot.selectLast({
+        x: "filing_date",
+        y: meta.col,
+        fill: meta.color,
+        r: 5
+      })),
+      Plot.tip(filteredPanel, Plot.pointerX({
+        x: "filing_date",
+        y: meta.col,
+        title: d => `${d.filing_date.toLocaleDateString("en-US", {month:"short",year:"numeric"})}\n${meta.label}: ${d[meta.col].toFixed(2)}%\nLoans: ${(d.total_loans/1e6).toFixed(2)}M`
+      }))
+    ],
+    caption: `Source: SEC EDGAR ABS-EE | ${meta.label} rate | Shaded = NBER recessions | As of ${asOfStr}`
+  })
+}
+```
+
+## All Three Buckets
+
+```{ojs}
+//| echo: false
+
+{
+  if (!panelData || panelData.error || !r2Base) return null
+
+  const cutoff = (() => {
+    if (timeWindow === "All") return new Date(0)
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - parseInt(timeWindow))
+    return d
+  })()
+
+  // Reshape to long form for multi-line chart
+  const long = []
+  for (const row of filteredPanel) {
+    for (const [bucket, meta] of Object.entries(DPD_META)) {
+      long.push({ filing_date: row.filing_date, bucket: meta.label, rate: row[meta.col] })
+    }
+  }
+
+  const BUCKET_COLORS = {
+    "30+ DPD": "#C8A058",
+    "60+ DPD": "#B07040",
+    "90+ DPD": "#4A6FA5"
+  }
+  const BUCKET_ORDER = ["30+ DPD", "60+ DPD", "90+ DPD"]
+
+  return Plot.plot({
+    title: "All Delinquency Buckets",
+    subtitle: "30+, 60+, and 90+ day past due — same panel, same period",
+    width: 820,
+    height: 300,
+    marginLeft: 60,
+    marginRight: 20,
+    marginBottom: 50,
+    color: {
+      domain: BUCKET_ORDER,
+      range: BUCKET_ORDER.map(b => BUCKET_COLORS[b]),
+      legend: true
+    },
     x: {
       type: "time",
       label: null,
@@ -129,76 +316,83 @@ delinqData = {
     },
     y: {
       label: "Delinquency Rate (%)",
-      tickFormat: d => `${d.toFixed(1)}%`,
+      tickFormat: d => d.toFixed(1) + "%",
       grid: true,
       gridColor: "var(--border-color, #D8D3C8)"
     },
     marks: [
+      Plot.rect(NBER_ABS, { x1: "start", x2: "end", fill: "#8A8A8A", fillOpacity: 0.09 }),
       Plot.ruleY([0], { stroke: "var(--border-color, #D8D3C8)" }),
-      Plot.line(delinqData, {
-        x: d => new Date(d.filing_date),
-        y: "delinq_rate_90plus",
-        stroke: "#4A6FA5",
-        strokeWidth: 2
+      Plot.line(long, {
+        x: "filing_date",
+        y: "rate",
+        stroke: "bucket",
+        strokeWidth: 1.8,
+        curve: "monotone-x"
       }),
-      Plot.dot(delinqData, Plot.selectLast({
-        x: d => new Date(d.filing_date),
-        y: "delinq_rate_90plus",
-        fill: "#4A6FA5",
-        r: 4
+      Plot.tip(long, Plot.pointerX({
+        x: "filing_date",
+        y: "rate",
+        stroke: "bucket"
       }))
     ],
-    caption: `Source: SEC EDGAR ABS-EE | Units: % of loans | No smoothing applied | As of ${asOfStr}`
+    caption: "Source: SEC EDGAR ABS-EE | All buckets are inclusive (30+ includes 60+ and 90+)"
   })
 }
 ```
 
----
-
 ## Loan Volume
 
-Total loans in the panel over time. This gives a sense of coverage — more loans
-means more issuers filing, means the delinquency rate above is a better sample.
+Total loans in the panel by filing month. More loans = better sample.
+Drops in coverage mean trusts exited the filing window — not that loans were paid off.
 
 ```{ojs}
 //| echo: false
 
 {
-  if (!delinqData || delinqData.error || !r2Base) return html`<div class="chart-loading"><span>◌</span><span>Waiting for data...</span></div>`
+  if (!panelData || panelData.error || !r2Base) {
+    return html`<div class="chart-loading"><span>◌</span><span>Waiting for data...</span></div>`
+  }
 
   return Plot.plot({
-    title: "Total Loans in Panel",
-    subtitle: "Count of loans reported in ABS-EE filings, by month",
-    width: 800,
-    height: 260,
+    width: 820,
+    height: 240,
     marginLeft: 65,
-    marginBottom: 45,
+    marginRight: 20,
+    marginBottom: 50,
     x: {
       type: "time",
       label: null,
       tickFormat: d => d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
     },
     y: {
-      label: "Loan Count",
+      label: "Loans in Panel",
       tickFormat: d => d >= 1e6 ? `${(d/1e6).toFixed(1)}M` : d >= 1e3 ? `${(d/1e3).toFixed(0)}K` : d,
       grid: true,
       gridColor: "var(--border-color, #D8D3C8)"
     },
     marks: [
-      Plot.areaY(delinqData, {
-        x: d => new Date(d.filing_date),
+      Plot.rect(NBER_ABS, { x1: "start", x2: "end", fill: "#8A8A8A", fillOpacity: 0.09 }),
+      Plot.areaY(filteredPanel, {
+        x: "filing_date",
         y: "total_loans",
         fill: "#4A6FA5",
         fillOpacity: 0.15
       }),
-      Plot.line(delinqData, {
-        x: d => new Date(d.filing_date),
+      Plot.line(filteredPanel, {
+        x: "filing_date",
         y: "total_loans",
         stroke: "#4A6FA5",
-        strokeWidth: 1.5
-      })
+        strokeWidth: 1.5,
+        curve: "monotone-x"
+      }),
+      Plot.tip(filteredPanel, Plot.pointerX({
+        x: "filing_date",
+        y: "total_loans",
+        title: d => `${d.filing_date.toLocaleDateString("en-US", {month:"short",year:"numeric"})}\nLoans: ${(d.total_loans/1e6).toFixed(2)}M`
+      }))
     ],
-    caption: "Source: SEC EDGAR ABS-EE | Units: loan count | As of latest reporting period"
+    caption: "Source: SEC EDGAR ABS-EE | Drops indicate trusts exiting filing window, not loan payoffs"
   })
 }
 ```
@@ -207,15 +401,19 @@ means more issuers filing, means the delinquency rate above is a better sample.
 
 ## Methodology
 
-**What counts as delinquent**: A loan is classified as 90+ days past due (`days_past_due >= 90`)
-at the servicer-reported filing date. The bucket used here is the most severe — it excludes
-30–59 day and 60–89 day buckets.
+**What counts as delinquent**: A loan is `days_past_due >= X` at the servicer-reported filing date.
+The 90+ bucket is the most severe and the most commonly cited. The 30+ bucket picks up stress earlier
+but is noisier — minor payment timing issues show up here that never progress.
 
 **What's included**: All loans in Hive-partitioned Parquet files under
-`abs_ee/curated/asset_class=autoloan/` on R2. Coverage is limited to issuers that
-file ABS-EE with the SEC — not all auto ABS trusts are required to do so.
+`abs_ee/curated/asset_class=autoloan/` on R2. Coverage limited to issuers registered
+with the SEC under Regulation AB II.
 
-**Known limitations**: Servicer definitions of "days past due" can vary slightly by issuer.
-This is the data as filed. No harmonization has been applied across issuers.
+**Known limitations**: Servicer definitions of "days past due" vary by issuer. A 30 DPD loan
+at Ally may not be identical to a 30 DPD loan at Santander. This is the data as filed —
+no cross-issuer harmonization has been applied.
+
+**Recession shading:** NBER-defined recession dates. EDGAR ABS-EE coverage begins November 2016,
+so only the COVID recession (Feb–Apr 2020) falls within the panel.
 
 For full source documentation, see [Data Sources →](../data-sources.qmd)

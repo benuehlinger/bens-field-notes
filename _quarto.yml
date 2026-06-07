@@ -19,10 +19,8 @@ website:
         href: index.qmd
       - text: "Dashboards"
         menu:
-          - text: "Auto Loan Credit — Live"
+          - text: "Auto Loan Credit"
             href: dashboards/abs-ee.qmd
-          - text: "Auto Loan Credit — May 2018 Showcase"
-            href: dashboards/abs-ee-may2018.qmd
           - text: "Bank Lending Standards"
             href: dashboards/sloos.qmd
       - text: "Notes"

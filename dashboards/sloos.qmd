@@ -1,7 +1,7 @@
 ---
 title: "Bank Lending Standards"
 subtitle: "Senior Loan Officer Opinion Survey — Federal Reserve"
-description: "The Fed asks banks if they're tightening credit. Banks answer. We chart it. Riveting."
+description: "The Fed asks senior loan officers if they're tightening credit. Four times a year. We chart it."
 toc: true
 freeze: false
 ---
@@ -9,28 +9,22 @@ freeze: false
 ```{=html}
 <div class="data-note">
   <strong>Data source:</strong> Federal Reserve Senior Loan Officer Opinion Survey (SLOOS) —
-  Table 1 (C&amp;I loans) and Table 2 (Consumer loans).
-  Quarterly survey. Net percentage = % tightening minus % easing.
+  Table 1 (domestic banks), parsed from Fed HTML tables via the bens-data-lake pipeline.
+  Net percentage = % reporting tighter standards minus % reporting easier standards.
+  All-respondent segment only.
   See <a href="../data-sources.qmd">Data Sources</a> for methodology.
 </div>
 ```
 
-Four times a year, the Federal Reserve asks senior loan officers at major banks
-whether they've been tightening or loosening lending standards. The result is reported
-as a "net percentage" — banks tightening minus banks easing. Positive means more banks
-are tightening than easing. Historically, sustained readings above +20% have preceded
-things worth paying attention to.
+Four times a year, the Federal Reserve asks senior loan officers at major US banks whether
+they've been tightening or loosening lending standards. The result is a diffusion index —
+net percentage tightening — which tells you how many banks changed, not by how much.
 
-This is survey data. It measures intent and perception, not actual loan volumes.
-Keep that in mind before drawing any strong conclusions. Or don't — your call.
+Sustained readings above +20% have historically preceded things worth paying attention to.
+Readings above +40% have historically preceded things you definitely don't want to be
+fully invested during.
 
 ---
-
-## Net Tightening by Loan Type
-
-Net percentage of banks reporting tighter lending standards.
-A value above zero means more banks are tightening than easing.
-The horizontal line at zero is there so you know where zero is.
 
 ```{ojs}
 //| echo: false
@@ -43,22 +37,57 @@ r2Base = params["r2-base-url"]
 
 ```{ojs}
 //| echo: false
+//| output: false
 
-sloosData = {
+// Aggregate net % tightening directly from raw parquet partitions.
+// Patterns identify headline standards tables via context_blob (accumulated question text).
+sloosRaw = {
   if (!r2Base || r2Base === "") return null
   try {
     const result = await db_sloos.query(`
+      WITH classified AS (
+        SELECT
+          release_code,
+          CASE
+            WHEN context_blob LIKE '%A. Standards for large and middle-market firms%'
+              AND context_blob NOT LIKE '%B. Standards for small firms%'
+              AND context_blob NOT LIKE '%a. Maximum size of credit lines%'
+              THEN 'C&I - Large'
+            WHEN context_blob LIKE '%B. Standards for small firms (annual sales of less than $50 million)%'
+              AND context_blob NOT LIKE '%a. Maximum size of credit lines%'
+              THEN 'C&I - Small'
+            WHEN context_blob LIKE '%credit cards from individuals or households changed%'
+              AND context_blob NOT LIKE '%Credit limits%'
+              THEN 'Consumer - Credit Card'
+            WHEN context_blob LIKE '%and lease financing.)%'
+              AND context_blob NOT LIKE '%Maximum maturity%'
+              THEN 'Consumer - Auto'
+          END AS loan_type,
+          SUM(CASE WHEN response_category IN ('Tightened considerably','Tightened somewhat') THEN value ELSE 0 END)
+            - SUM(CASE WHEN response_category IN ('Eased somewhat','Eased considerably') THEN value ELSE 0 END)
+            AS net_pct_tightening
+        FROM read_parquet(
+          '${r2Base}/sloos/curated/source=fed_sloos_table_1/release_code=*/observations.parquet',
+          union_by_name=true
+        )
+        WHERE metric = 'percent'
+          AND respondent_segment = 'all_respondents'
+          AND response_category IN ('Tightened considerably','Tightened somewhat','Eased somewhat','Eased considerably')
+        GROUP BY release_code, loan_type
+        HAVING loan_type IS NOT NULL
+      )
       SELECT
-        survey_date,
-        question_label,
+        strptime(release_code::VARCHAR, '%Y%m') AS survey_date,
         loan_type,
-        net_pct_tightening
-      FROM read_parquet('${r2Base}/sloos/curated/source=fed_sloos_table_1/*.parquet')
-      WHERE loan_type IN ('C&I - Large', 'C&I - Small', 'Consumer - Auto', 'Consumer - Credit Card')
-        AND survey_date IS NOT NULL
+        ROUND(net_pct_tightening, 1) AS net_pct_tightening
+      FROM classified
       ORDER BY survey_date, loan_type
     `)
-    return result
+    return Array.from(result).map(d => ({
+      ...d,
+      survey_date: new Date(d.survey_date),
+      net_pct_tightening: Number(d.net_pct_tightening)
+    }))
   } catch(e) {
     return { error: e.message }
   }
@@ -67,21 +96,108 @@ sloosData = {
 
 ```{ojs}
 //| echo: false
+//| output: false
 
-// Stat callouts — reactive; show — until data lands
+LOAN_COLORS = ({
+  "C&I - Large":            "#4A6FA5",
+  "C&I - Small":            "#7BA3C8",
+  "Consumer - Auto":        "#C8A058",
+  "Consumer - Credit Card": "#A07860"
+})
+
+LOAN_ORDER = ["C&I - Large", "C&I - Small", "Consumer - Auto", "Consumer - Credit Card"]
+
+RECESSIONS = [
+  { start: new Date("2001-03-01"), end: new Date("2001-11-01") },
+  { start: new Date("2007-12-01"), end: new Date("2009-06-01") },
+  { start: new Date("2020-02-01"), end: new Date("2020-04-01") }
+]
+```
+
+## Latest Reading
+
+```{ojs}
+//| echo: false
+
 {
-  const getLatest = (type) => {
-    if (!sloosData || sloosData.error) return "—"
-    const rows = sloosData.filter(d => d.loan_type === type)
-    if (!rows.length) return "—"
-    const val = Number(rows[rows.length - 1].net_pct_tightening)
-    return `${val > 0 ? "+" : ""}${val.toFixed(0)}%`
+  if (!r2Base || r2Base === "") {
+    return html`<div class="chart-loading"><span>◌</span><span>Live data — chart loads when the data lake is ready.</span></div>`
+  }
+  if (!sloosRaw || sloosRaw.error) {
+    return html`<div class="chart-error"><span>⚠</span><span>Data unavailable — ${sloosRaw?.error ?? "check R2 connection"}.</span></div>`
   }
 
-  return html`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:0 0 2rem;">
-    <div class="stat-box"><div class="stat-value">${getLatest("C&I - Large")}</div><div class="stat-label">C&amp;I Large — Net Tightening</div></div>
-    <div class="stat-box"><div class="stat-value">${getLatest("Consumer - Auto")}</div><div class="stat-label">Consumer Auto — Net Tightening</div></div>
+  const byType = {}
+  for (const lt of LOAN_ORDER) {
+    const rows = sloosRaw.filter(d => d.loan_type === lt).sort((a, b) => b.survey_date - a.survey_date)
+    byType[lt] = { latest: rows[0], prior: rows[1] }
+  }
+
+  const maxDate = d3.max(sloosRaw, d => d.survey_date)
+  const qNum = Math.ceil((maxDate.getMonth() + 1) / 3)
+  const qStr = `Q${qNum} ${maxDate.getFullYear()}`
+
+  const cards = LOAN_ORDER.map(lt => {
+    const { latest, prior } = byType[lt]
+    const val = latest?.net_pct_tightening
+    const prev = prior?.net_pct_tightening
+    const delta = (val != null && prev != null) ? val - prev : null
+    const sign = val >= 0 ? "+" : ""
+    const dSign = delta > 0 ? "+" : ""
+    const arrow = delta > 0 ? "▲" : delta < 0 ? "▼" : "—"
+    const arrowColor = delta > 0 ? "#B04A38" : delta < 0 ? "#3A7A5A" : "#8A8A8A"
+    const deltaStr = delta != null
+      ? `<div style="font-family:'DM Mono',monospace;font-size:0.63rem;margin-top:0.3rem;color:${arrowColor}">${arrow} ${dSign}${Math.abs(delta).toFixed(1)}pp vs prior qtr</div>`
+      : ""
+    return `<div class="kpi-card">
+      <div class="kpi-value" style="color:${LOAN_COLORS[lt]}">${val != null ? sign + val.toFixed(1) + "%" : "—"}</div>
+      <div class="kpi-label">${lt}</div>
+      ${deltaStr}
+    </div>`
+  }).join("")
+
+  return html`<div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#8A8A8A;margin-bottom:0.5rem">Latest survey: ${qStr}</div>
+    <div class="kpi-strip">${cards}</div>
   </div>`
+}
+```
+
+## Tightening Over Time
+
+```{ojs}
+//| echo: false
+
+viewof timeWindow = Inputs.radio(
+  ["2Y", "5Y", "All"],
+  { value: "All", label: "Period" }
+)
+```
+
+```{ojs}
+//| echo: false
+
+viewof loanFilter = Inputs.checkbox(
+  LOAN_ORDER,
+  { value: LOAN_ORDER, label: "Loan types" }
+)
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+filteredData = {
+  if (!sloosRaw || sloosRaw.error) return []
+  const cutoff = (() => {
+    if (timeWindow === "All") return new Date(0)
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - parseInt(timeWindow))
+    return d
+  })()
+  return sloosRaw
+    .filter(d => loanFilter.includes(d.loan_type))
+    .filter(d => d.survey_date >= cutoff)
 }
 ```
 
@@ -90,44 +206,31 @@ sloosData = {
 
 {
   if (!r2Base || r2Base === "") {
-    const el = document.createElement("div")
-    el.className = "chart-loading"
-    el.innerHTML = `<span>◌</span><span>Live data — pipeline syncing. Chart loads automatically when the data lake is ready.</span>`
-    return el
+    return html`<div class="chart-loading"><span>◌</span><span>Live data — chart loads when the data lake is ready.</span></div>`
+  }
+  if (!sloosRaw || sloosRaw.error) {
+    return html`<div class="chart-error"><span>⚠</span><span>${sloosRaw?.error ?? "unknown error"}</span></div>`
+  }
+  if (filteredData.length === 0) {
+    return html`<div class="chart-loading"><span>—</span><span>No data matches current filters.</span></div>`
   }
 
-  if (!sloosData || sloosData.error) {
-    const el = document.createElement("div")
-    el.className = "chart-error"
-    el.innerHTML = `<span>⚠</span><span>Data unavailable — ${sloosData?.error ?? "unknown error"}.</span>`
-    return el
-  }
-
-  const maxDate = d3.max(sloosData, d => new Date(d.survey_date))
+  const maxDate = d3.max(filteredData, d => d.survey_date)
   const asOfStr = maxDate
     ? maxDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })
     : "unknown"
 
-  // Color palette — 4 muted series colors
-  const loanColors = {
-    "C&I - Large":            "#4A6FA5",
-    "C&I - Small":            "#7BA3C8",
-    "Consumer - Auto":        "#C8A058",
-    "Consumer - Credit Card": "#8A7A5A"
-  }
-
-  const loanTypes = [...new Set(sloosData.map(d => d.loan_type))]
+  const activeLoanTypes = LOAN_ORDER.filter(lt => filteredData.some(d => d.loan_type === lt))
 
   return Plot.plot({
-    title: "Net % of Banks Tightening Lending Standards",
-    subtitle: "Positive = more banks tightening than easing",
-    width: 800,
-    height: 380,
-    marginLeft: 55,
+    width: 820,
+    height: 400,
+    marginLeft: 60,
+    marginRight: 20,
     marginBottom: 50,
     color: {
-      domain: loanTypes,
-      range: loanTypes.map(t => loanColors[t] ?? "#8A8A8A"),
+      domain: activeLoanTypes,
+      range: activeLoanTypes.map(lt => LOAN_COLORS[lt]),
       legend: true
     },
     x: {
@@ -137,39 +240,128 @@ sloosData = {
     },
     y: {
       label: "Net % Tightening",
-      tickFormat: d => `${d > 0 ? "+" : ""}${d}%`,
+      tickFormat: d => (d > 0 ? "+" : "") + d + "%",
       grid: true,
       gridColor: "var(--border-color, #D8D3C8)"
     },
     marks: [
-      Plot.ruleY([0], { stroke: "#8A8A8A", strokeWidth: 1.5, strokeDasharray: "4,3" }),
-      Plot.line(sloosData, {
-        x: d => new Date(d.survey_date),
+      Plot.rect(RECESSIONS, {
+        x1: "start",
+        x2: "end",
+        fill: "#8A8A8A",
+        fillOpacity: 0.09
+      }),
+      Plot.ruleY([0], { stroke: "#8A8A8A", strokeWidth: 1, strokeDasharray: "5,3" }),
+      Plot.ruleY([20], { stroke: "#C8A058", strokeWidth: 0.8, strokeDasharray: "3,4", strokeOpacity: 0.5 }),
+      Plot.line(filteredData, {
+        x: "survey_date",
         y: "net_pct_tightening",
         stroke: "loan_type",
         strokeWidth: 2,
         curve: "monotone-x"
+      }),
+      Plot.dot(filteredData, Plot.selectLast({
+        x: "survey_date",
+        y: "net_pct_tightening",
+        fill: "loan_type",
+        r: 4
+      })),
+      Plot.tip(filteredData, Plot.pointerX({
+        x: "survey_date",
+        y: "net_pct_tightening",
+        stroke: "loan_type"
+      }))
+    ],
+    caption: `Source: Fed SLOOS Table 1 | Net % = tightening minus easing | All respondents | Shaded = NBER recessions | Dashed amber = +20% | As of ${asOfStr}`
+  })
+}
+```
+
+## Last 3 Surveys
+
+```{ojs}
+//| echo: false
+
+{
+  if (!sloosRaw || sloosRaw.error || !r2Base) return null
+
+  const allDates = [...new Set(sloosRaw.map(d => d.survey_date.toISOString().slice(0, 7)))]
+    .sort().slice(-3)
+
+  const recent = sloosRaw.filter(d => allDates.includes(d.survey_date.toISOString().slice(0, 7)))
+  const activeLoanTypes = LOAN_ORDER.filter(lt => recent.some(d => d.loan_type === lt))
+
+  return Plot.plot({
+    title: "Net % Tightening — Last 3 Surveys",
+    width: 820,
+    height: 230,
+    marginLeft: 60,
+    marginRight: 80,
+    marginBottom: 40,
+    color: {
+      domain: activeLoanTypes,
+      range: activeLoanTypes.map(lt => LOAN_COLORS[lt]),
+      legend: true
+    },
+    x: {
+      label: "Net % Tightening",
+      tickFormat: d => (d > 0 ? "+" : "") + d + "%",
+      grid: true,
+      gridColor: "var(--border-color, #D8D3C8)"
+    },
+    y: { label: null, domain: activeLoanTypes },
+    fy: { label: null },
+    facet: {
+      data: recent,
+      y: d => d.survey_date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    },
+    marks: [
+      Plot.ruleX([0], { stroke: "#8A8A8A", strokeDasharray: "4,3" }),
+      Plot.ruleY(recent, {
+        x1: 0,
+        x2: "net_pct_tightening",
+        y: "loan_type",
+        stroke: "loan_type",
+        strokeWidth: 3,
+        strokeLinecap: "round"
+      }),
+      Plot.dot(recent, {
+        x: "net_pct_tightening",
+        y: "loan_type",
+        fill: "loan_type",
+        r: 6
+      }),
+      Plot.text(recent, {
+        x: "net_pct_tightening",
+        y: "loan_type",
+        text: d => (d.net_pct_tightening >= 0 ? "+" : "") + d.net_pct_tightening.toFixed(1) + "%",
+        dx: d => d.net_pct_tightening >= 0 ? 14 : -14,
+        textAnchor: d => d.net_pct_tightening >= 0 ? "start" : "end",
+        fontFamily: "DM Mono, monospace",
+        fontSize: 11,
+        fill: "loan_type"
       })
     ],
-    caption: `Source: Federal Reserve SLOOS Table 1 | Units: net % | Survey-based | As of ${asOfStr}`
+    caption: "Source: Fed SLOOS Table 1 | Each panel is one quarterly survey | Net % = tightening minus easing"
   })
 }
 ```
 
 ---
 
-## What Tightening Means in Practice
+## Methodology
 
-Net tightening is reported as: **(% tightening standards) − (% easing standards)**.
+**What the number means:** Net tightening = (% of respondents reporting tighter standards) − (% reporting easier standards). A reading of +30 means 30pp more banks tightened than eased — not that 30% of banks tightened.
 
-- **+40% or above**: Significant tightening — happened during the GFC (2008–2009)
-  and the early COVID period (2020).
-- **+20% to +40%**: Elevated tightening — historically associated with late-cycle
-  credit slowdowns.
-- **Near zero**: Roughly neutral — banks aren't materially changing standards.
-- **Negative**: Net easing — more banks loosening than tightening. Less common.
+**What's covered:** Domestic banks, all-respondent segment, headline credit standards questions only. Terms-of-loan tables (spreads, maturities, covenants) are excluded — this is standards, not pricing.
 
-This is a diffusion index, not a volume measure. It doesn't tell you how much
-standards tightened — only how many banks said they did.
+**Historical context:**
+- **+40% and above**: Significant tightening — GFC (2008–2009) and COVID (2020).
+- **+20% to +40%**: Elevated — late-cycle credit slowdowns.
+- **Near zero**: Roughly neutral. **Negative**: Net easing.
+
+**Data coverage:** Fed SLOOS Table 1 HTML tables, quarterly, back to Q3 2018. Source pages at federalreserve.gov/data/sloos.
+
+**Recession shading:** NBER-defined recession dates. Not a forecast.
 
 For full source documentation, see [Data Sources →](../data-sources.qmd)
