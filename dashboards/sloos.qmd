@@ -211,75 +211,52 @@ viewof selectedTypes = Inputs.checkbox(
 {
   if (!data_ok || data.length === 0) return null
 
-  // Last 3 survey dates, most recent first
   const surveys = [...new Set(data.map(d => d.survey_date.getTime()))]
     .sort((a, b) => b - a)
     .slice(0, 3)
     .map(t => new Date(t))
 
-  const recent = data
-    .filter(d => surveys.some(s => s.getTime() === d.survey_date.getTime()))
-    .map(d => ({
-      ...d,
-      rank: surveys.findIndex(s => s.getTime() === d.survey_date.getTime())
-    }))
+  // cell color: red = tightening, green = easing, grey = neutral
+  function cellColor(v) {
+    if (v > 20)  return {bg: "#FEE2E2", fg: "#991B1B"}
+    if (v > 0)   return {bg: "#FEF3C7", fg: "#92400E"}
+    if (v < 0)   return {bg: "#DCFCE7", fg: "#166534"}
+    return {bg: "transparent", fg: "#6B7280"}
+  }
 
-  // Range line per loan type (from min to max of the 3 readings)
-  const ranges = LOAN_TYPES.map(lt => {
-    const vals = recent.filter(d => d.loan_type === lt).map(d => d.net_pct_tightening)
-    return {loan_type: lt, lo: Math.min(...vals), hi: Math.max(...vals)}
+  const rows = LOAN_TYPES.map(lt => {
+    const cells = surveys.map(s => {
+      const row = data.find(d => d.loan_type === lt && d.survey_date.getTime() === s.getTime())
+      return row ? row.net_pct_tightening : null
+    })
+    return {lt, cells}
   })
 
-  const latest = recent.filter(d => d.rank === 0)
-  const w = Math.min(680, window.innerWidth - 48)
+  const mono = "font-family:'DM Mono',monospace"
+  const thead = html`<thead><tr>
+    <th style="${mono};font-size:0.7rem;text-align:left;padding:0.6rem 1rem;font-weight:500;color:#9A9A9A;border-bottom:1px solid #D8D3C8"></th>
+    ${surveys.map((s, i) => html`<th style="${mono};font-size:0.7rem;text-align:right;padding:0.6rem 1rem;font-weight:${i===0?700:400};color:${i===0?"#1C1C1E":"#9A9A9A"};border-bottom:1px solid #D8D3C8">
+      ${fmtDate(s)}${i===0?" ★":""}
+    </th>`)}
+  </tr></thead>`
 
-  // Legend: survey dates with opacity
-  const legend = html`<div style="display:flex;gap:1.5rem;margin-bottom:0.75rem;font-family:'DM Mono',monospace;font-size:0.7rem;color:#9A9A9A">
-    ${surveys.map((s, i) => html`<span style="opacity:${[1,0.55,0.3][i]}">● ${fmtDate(s)}${i===0?" (latest)":""}</span>`)}
-  </div>`
+  const tbody = html`<tbody>${rows.map(({lt, cells}) => {
+    const color = COLORS[lt]
+    return html`<tr>
+      <td style="${mono};font-size:0.75rem;padding:0.55rem 1rem;color:${color};font-weight:500;border-bottom:1px solid #EDEAE2">${lt}</td>
+      ${cells.map((v, i) => {
+        const {bg, fg} = v !== null ? cellColor(v) : {bg:"transparent", fg:"#ccc"}
+        return html`<td style="${mono};font-size:0.8rem;text-align:right;padding:0.55rem 1rem;
+          background:${i===0?bg:"transparent"};color:${i===0?fg:"#6B7280"};
+          font-weight:${i===0?600:400};border-bottom:1px solid #EDEAE2">
+          ${v !== null ? fmtPct(v) : "—"}
+        </td>`
+      })}
+    </tr>`
+  })}</tbody>`
 
-  const chart = Plot.plot({
-    marks: [
-      Plot.ruleX([0], {stroke: "#9CA3AF", strokeDasharray: "4,3", strokeWidth: 1}),
-      // Range line connecting the 3 readings
-      Plot.link(ranges, {
-        x1: "lo", x2: "hi",
-        y1: "loan_type", y2: "loan_type",
-        stroke: d => COLORS[d.loan_type],
-        strokeWidth: 2,
-        strokeOpacity: 0.25
-      }),
-      // Dots: largest + opaque = latest, smallest + faded = oldest
-      Plot.dot(recent, {
-        x: "net_pct_tightening",
-        y: "loan_type",
-        fill: d => COLORS[d.loan_type],
-        fillOpacity: d => [1, 0.55, 0.3][d.rank],
-        r: d => [7, 5, 4][d.rank],
-        stroke: "white",
-        strokeWidth: 1.5
-      }),
-      // Value label on the latest dot only
-      Plot.text(latest, {
-        x: "net_pct_tightening",
-        y: "loan_type",
-        text: d => fmtPct(d.net_pct_tightening),
-        dx: 13,
-        fontSize: 11,
-        fill: d => COLORS[d.loan_type],
-        fontWeight: "600"
-      })
-    ],
-    x: {label: "Net % tightening →", tickFormat: fmtPct, grid: true, zero: true},
-    y: {label: null, domain: LOAN_TYPES},
-    width: w,
-    height: 180,
-    marginLeft: 185,
-    marginRight: 70,
-    marginTop: 10,
-    style: {background: "transparent", fontSize: "12px", fontFamily: "DM Mono, monospace"}
-  })
-
-  return html`<div>${legend}${chart}</div>`
+  return html`<table style="width:100%;border-collapse:collapse;border:1px solid #D8D3C8;border-radius:4px;overflow:hidden">
+    ${thead}${tbody}
+  </table>`
 }
 ```
