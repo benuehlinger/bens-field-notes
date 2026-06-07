@@ -24,7 +24,7 @@ This post is the public version of that milestone — and the announcement that
 
 - [Auto Loan Credit — ABS-EE Panel](../../dashboards/abs-ee.qmd) — delinquency and pool stats from the lake
 - [Bank Lending Standards — SLOOS](../../dashboards/sloos.qmd) — Fed senior loan officer survey
-- Background on [what ABS-EE is](../../posts/2026-04-25-abs-ee-intro/index.qmd) if you're new here
+- Background on [what ABS-EE is](../../data-sources.qmd) if you're new here
 
 Charts query Parquet through DuckDB-WASM in your browser. The R2 bucket stays private;
 a small Cloudflare Worker proxies read-only object fetches.
