@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "robert-solow",
+      "label": "Robert Solow",
+      "type": "person",
+      "url": "/people/robert-solow.html"
+    },
+    {
+      "id": "paul-david",
+      "label": "Paul A. David",
+      "type": "person",
+      "url": "/people/paul-david.html"
+    },
+    {
+      "id": "erik-brynjolfsson",
+      "label": "Erik Brynjolfsson",
+      "type": "person",
+      "url": "/people/erik-brynjolfsson.html"
+    },
+    {
+      "id": "the-dynamo-and-the-computer",
+      "label": "The Dynamo and the Computer",
+      "type": "paper",
+      "url": "/sources/the-dynamo-and-the-computer.html"
+    },
+    {
+      "id": "tokenomics",
+      "label": "Tokenomics",
+      "type": "paper",
+      "url": "/sources/tokenomics.html"
+    },
+    {
+      "id": "the-productivity-j-curve",
+      "label": "The Productivity J-Curve",
+      "type": "paper",
+      "url": "/sources/the-productivity-j-curve.html"
+    },
+    {
+      "id": "2026-07-02-the-trough-looks-like-failure",
+      "label": "The Trough Looks Like Failure",
+      "type": "post",
+      "url": "/posts/2026-07-02-the-trough-looks-like-failure/"
+    }
+  ],
+  "edges": [
+    {
+      "source": "the-dynamo-and-the-computer",
+      "target": "paul-david",
+      "rel": "author"
+    },
+    {
+      "source": "the-productivity-j-curve",
+      "target": "erik-brynjolfsson",
+      "rel": "author"
+    },
+    {
+      "source": "2026-07-02-the-trough-looks-like-failure",
+      "target": "the-dynamo-and-the-computer",
+      "rel": "cites"
+    },
+    {
+      "source": "2026-07-02-the-trough-looks-like-failure",
+      "target": "the-productivity-j-curve",
+      "rel": "cites"
+    },
+    {
+      "source": "2026-07-02-the-trough-looks-like-failure",
+      "target": "tokenomics",
+      "rel": "cites"
+    },
+    {
+      "source": "2026-07-02-the-trough-looks-like-failure",
+      "target": "robert-solow",
+      "rel": "mentions"
+    },
+    {
+      "source": "2026-07-02-the-trough-looks-like-failure",
+      "target": "paul-david",
+      "rel": "mentions"
+    },
+    {
+      "source": "2026-07-02-the-trough-looks-like-failure",
+      "target": "erik-brynjolfsson",
+      "rel": "mentions"
+    }
+  ]
+}

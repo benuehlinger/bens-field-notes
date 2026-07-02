@@ -1,12 +1,14 @@
 project:
   type: website
   output-dir: _site
+  pre-render: python3 scripts/build_graph.py
   render:
     - "*.qmd"
     - "posts/**/*.qmd"
     - "posts/**/*.ipynb"
     - "people/**/*.qmd"
     - "sources/**/*.qmd"
+    - "map/**/*.qmd"
   resources:
     - "styles/**"
 
@@ -20,10 +22,8 @@ website:
         href: index.qmd
       - text: "Essays"
         href: posts/index.qmd
-      - text: "People"
-        href: people/index.qmd
-      - text: "Sources"
-        href: sources/index.qmd
+      - text: "Index"
+        href: map/index.qmd
       - text: "About"
         href: about.qmd
     right:
@@ -49,10 +49,10 @@ format:
       light: [flatly, styles/theme.scss]
       dark: [darkly, styles/theme.scss]
     css: styles/custom.css
-    toc: true
+    toc: false
     toc-depth: 3
     code-fold: true
-    code-tools: true
+    code-tools: false
     highlight-style: github-dark
     fig-responsive: true
     grid:

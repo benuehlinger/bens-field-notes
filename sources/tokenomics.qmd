@@ -2,7 +2,7 @@
 title: "Tokenomics"
 description: "Citadel Securities' 2026 note on AI's physical-input constraints and bifurcation."
 key: citadel2026
-authors: []
+by: []
 year: 2026
 venue: "Citadel Securities — research note"
 cited-in: [the-trough-looks-like-failure]

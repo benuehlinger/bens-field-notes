@@ -1,0 +1,133 @@
+---
+title: "The Index"
+subtitle: "The people, the papers, and the web that connects them."
+page-layout: full
+toc: false
+listing:
+  - id: cast
+    contents: "../people/*.qmd"
+    type: grid
+    grid-columns: 3
+    fields: [title, description]
+    sort: "title"
+    filter-ui: false
+    sort-ui: false
+  - id: stacks
+    contents: "../sources/*.qmd"
+    type: default
+    fields: [title, description]
+    sort: "title"
+    filter-ui: false
+    sort-ui: false
+---
+
+Everything that stands behind the essays, in one place — the web of connections, the people
+whose work the analysis leans on, and the papers themselves.
+
+## The Map
+
+Posts cite papers; papers are written by people; posts mention people. This web is generated
+straight from each piece's frontmatter. **Drag** a node to move it; **click** it to go there.
+
+```{ojs}
+//| echo: false
+d3 = require("d3@7")
+```
+
+```{ojs}
+//| echo: false
+graph = FileAttachment("graph.json").json()
+```
+
+```{ojs}
+//| echo: false
+html`<div style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;color:#8A8A8A;display:flex;flex-wrap:wrap;gap:1.5rem;margin:0.25rem 0 0.5rem;">
+  <span><span style="color:#4A6FA5;font-size:1rem;">&#9679;</span> post</span>
+  <span><span style="color:#B45309;font-size:1rem;">&#9679;</span> paper</span>
+  <span><span style="color:#7C6FB5;font-size:1rem;">&#9679;</span> person</span>
+  <span style="color:#B8B0A0;">&#8212; cites / authored &nbsp;&nbsp; &#8231;&#8231;&#8231; mentions</span>
+</div>`
+```
+
+```{ojs}
+//| echo: false
+chart = {
+  const width = 920;
+  const height = 440;
+  const color = {post: "#4A6FA5", paper: "#B45309", person: "#7C6FB5"};
+
+  const nodes = graph.nodes.map(d => ({...d}));
+  const links = graph.edges.map(d => ({...d}));
+
+  const sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+      .force("charge", d3.forceManyBody().strength(-1100))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("x", d3.forceX(width / 2).strength(0.05))
+      .force("y", d3.forceY(height / 2).strength(0.07))
+      .force("collide", d3.forceCollide(46));
+
+  const svg = d3.create("svg")
+      .attr("viewBox", [0, 0, width, height])
+      .attr("width", width)
+      .attr("style", "max-width:100%; height:auto; font-family:'DM Mono', monospace; overflow:visible;");
+
+  const link = svg.append("g")
+      .attr("stroke", "#B8B0A0")
+      .attr("stroke-opacity", 0.65)
+    .selectAll("line")
+    .data(links).join("line")
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", d => d.rel === "mentions" ? "3,3" : null);
+
+  const node = svg.append("g")
+    .selectAll("g")
+    .data(nodes).join("g")
+      .attr("cursor", "pointer")
+      .on("click", (event, d) => { if (d.url) window.location.href = d.url; })
+      .call(d3.drag()
+        .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+        .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  node.append("circle")
+      .attr("r", d => d.type === "post" ? 10 : 7)
+      .attr("fill", d => color[d.type])
+      .attr("stroke", "#F7F6F2")
+      .attr("stroke-width", 1.5);
+
+  node.append("text")
+      .text(d => d.label)
+      .attr("x", 13).attr("y", 4)
+      .attr("font-size", "11px")
+      .attr("fill", "#7A7A7A")
+      .attr("paint-order", "stroke")
+      .attr("stroke", "#F7F6F2")
+      .attr("stroke-width", 3);
+
+  node.append("title").text(d => `${d.type}: ${d.label}`);
+
+  sim.on("tick", () => {
+    link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+  invalidation.then(() => sim.stop());
+  return svg.node();
+}
+```
+
+## The Cast
+
+The authors and thinkers the analysis leans on.
+
+::: {#cast}
+:::
+
+## The Stacks
+
+The papers themselves — what I took from each, with links to read the originals.
+
+::: {#stacks}
+:::

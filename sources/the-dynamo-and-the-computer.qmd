@@ -2,7 +2,7 @@
 title: "The Dynamo and the Computer"
 description: "Paul David's 1990 origin statement of the reorganization lag."
 key: david1990
-authors: [paul-david]
+by: [paul-david]
 year: 1990
 venue: "American Economic Review 80(2)"
 cited-in: [the-trough-looks-like-failure]

@@ -2,7 +2,7 @@
 title: "The Productivity J-Curve"
 description: "Brynjolfsson, Rock & Syverson's 2018 model of why GPTs are mismeasured early."
 key: brs2018
-authors: [erik-brynjolfsson]
+by: [erik-brynjolfsson]
 year: 2018
 venue: "NBER Working Paper 25148"
 cited-in: [the-trough-looks-like-failure]
