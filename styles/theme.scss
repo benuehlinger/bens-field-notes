@@ -58,8 +58,9 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Headings — serif reserved for the big moments (site title, article H1);
-   sub-headings are clean sans to shed the magazine feel. */
+/* Headings — editorial serif throughout (title + sub-headers), one type voice.
+   The small uppercase section *labels* (.section-head / .home-section-title) opt
+   back out to sans below, since those are labels, not prose headings. */
 h1 {
   font-family: 'DM Serif Display', Georgia, serif;
   font-weight: 400;
@@ -68,14 +69,14 @@ h1 {
 }
 
 h2, h3 {
-  font-family: 'DM Sans', system-ui, sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.005em;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   color: #1C1C1E;
 }
 
-h2 { font-size: 1.4rem; margin-top: 2.5rem; }
-h3 { font-size: 1.12rem; margin-top: 1.8rem; }
+h2 { font-size: 1.6rem; margin-top: 2.5rem; }
+h3 { font-size: 1.3rem; margin-top: 1.8rem; }
 
 h4, h5, h6 {
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -154,6 +155,7 @@ main.content {
 
 /* Home page section headings — small tracked label, data-forward */
 h2.home-section-title {
+  font-family: 'DM Sans', system-ui, sans-serif;   /* label, not a prose heading */
   font-size: 1.05rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
