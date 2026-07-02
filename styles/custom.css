@@ -420,8 +420,8 @@ body, .navbar, pre, code, .data-note, .quarto-category {
   border-bottom: 3px double #1C1C1E;
 }
 
-/* Section heads as newspaper rules */
-h2.home-section-title { border-bottom: 3px double #1C1C1E; }
+/* Section heads — a single clean rule (not double) */
+h2.home-section-title { border-bottom: 2px solid #1C1C1E; }
 
 /* Front page — rules between items, mono dateline, category kickers */
 .quarto-listing .list > * {
@@ -532,7 +532,7 @@ h2.section-head {
   margin-top: 2.75rem;
   margin-bottom: 0.9rem;
   padding-bottom: 0.5rem;
-  border-bottom: 3px double #1C1C1E;
+  border-bottom: 2px solid #1C1C1E;
 }
 .quarto-dark h2.section-head { color: #9A9A9A; border-bottom-color: #E8E3D8; }
 
@@ -560,34 +560,37 @@ h2.section-head {
 }
 .graph-legend .lg-line b.dashed { border-top-style: dashed; }
 
-/* The Cast — clean text cards (no empty gray image boxes) */
-#cast .quarto-grid-item.card {
-  background: transparent;
-  border: 1px solid #D8D3C8;
-  border-radius: 4px;
+/* The Thinkers — borderless contributor directory; a hairline over each entry.
+   Scales cleanly to any number of people: the grid just adds more rows. */
+#listing-cast .quarto-grid-item.card {
+  background: transparent !important;
+  border: none;
+  border-top: 1px solid #C8C3B8;
+  border-radius: 0;
   box-shadow: none;
 }
-#cast .card-img-top, #cast .thumbnail-image, #cast .listing-item-img-placeholder { display: none !important; }
-#cast .card-body { padding: 1.05rem 1.15rem; }
-#cast .card-title.listing-title {
+#listing-cast .card-img-top, #listing-cast .thumbnail-image, #listing-cast .listing-item-img-placeholder { display: none !important; }
+#listing-cast .card-body { padding: 0.85rem 1.35rem 0.4rem 0; }
+#listing-cast .list > * { border-bottom: none !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+#listing-cast .card-title.listing-title {
   font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   line-height: 1.15;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
-#cast .listing-description { font-size: 0.85rem; line-height: 1.5; color: #5A5A5A; }
-.quarto-dark #cast .quarto-grid-item.card { border-color: #3A3A3C; }
-.quarto-dark #cast .listing-description { color: #9A9A9A; }
+#listing-cast .listing-description { font-size: 0.85rem; line-height: 1.5; color: #5A5A5A; }
+.quarto-dark #listing-cast .quarto-grid-item.card { border-top-color: #3A3A3C; }
+.quarto-dark #listing-cast .listing-description { color: #9A9A9A; }
 
 /* The Stacks — left-aligned reading list, no dead left gutter */
-#stacks .quarto-post { display: block; }
-#stacks .quarto-post .metadata, #stacks .quarto-post .thumbnail { display: none; }
-#stacks .quarto-post .body { width: 100%; max-width: none; flex: none; }
-#stacks .listing-title {
+#listing-stacks .quarto-post { display: block; }
+#listing-stacks .quarto-post .metadata, #listing-stacks .quarto-post .thumbnail { display: none; }
+#listing-stacks .quarto-post .body { width: 100%; max-width: none; flex: none; }
+#listing-stacks .listing-title {
   font-family: 'DM Serif Display', Georgia, serif;
   font-size: 1.3rem;
   line-height: 1.2;
   margin-bottom: 0.2rem;
 }
-#stacks .listing-description { font-size: 0.92rem; line-height: 1.55; color: #5A5A5A; }
-.quarto-dark #stacks .listing-description { color: #9A9A9A; }
+#listing-stacks .listing-description { font-size: 0.92rem; line-height: 1.55; color: #5A5A5A; }
+.quarto-dark #listing-stacks .listing-description { color: #9A9A9A; }

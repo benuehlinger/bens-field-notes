@@ -119,9 +119,9 @@ chart = {
 }
 ```
 
-## The Cast {.section-head}
+## The Thinkers {.section-head}
 
-The authors and thinkers the analysis leans on.
+The people whose work the analysis leans on.
 
 ::: {#cast}
 :::
