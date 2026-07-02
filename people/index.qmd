@@ -1,0 +1,22 @@
+---
+title: "The Cast"
+subtitle: "Authors, thinkers, and other people who keep showing up in the analysis."
+listing:
+  id: people-list
+  contents:
+    - "*.qmd"
+    - "!index.qmd"
+  type: grid
+  fields: [title, description]
+  sort: "title"
+  filter-ui: false
+  sort-ui: false
+page-layout: full
+toc: false
+---
+
+Every essay leans on people who did the original work. This is who they are — and each page
+links back to the pieces they show up in.
+
+::: {#people-list}
+:::

@@ -1,0 +1,34 @@
+---
+title: "The Productivity J-Curve"
+description: "Brynjolfsson, Rock & Syverson's 2018 model of why GPTs are mismeasured early."
+key: brs2018
+authors: [erik-brynjolfsson]
+year: 2018
+venue: "NBER Working Paper 25148"
+cited-in: [the-trough-looks-like-failure]
+original: "https://www.nber.org/system/files/working_papers/w25148/w25148.pdf"
+toc: false
+---
+
+[Source · 2018]{.type-badge}
+
+**Authors** — [Erik Brynjolfsson](/people/erik-brynjolfsson.qmd), Daniel Rock & Chad Syverson  ·  *NBER Working Paper 25148*
+
+## Why it's here
+The formal engine under David's history. GPTs demand large **intangible investment** the
+national accounts don't capture, so productivity is *underestimated* while the intangibles
+are built and *overestimated* when they're harvested — a J-curve. This is the model that
+turns "the trough looks like failure" from a metaphor into a measurable claim.
+
+::: {.pull-source}
+"…this leads to an underestimation of productivity growth in the early years of a new GPT,
+and… later, when the benefits of intangible investments are harvested, productivity growth
+will be overestimated."
+
+[— Brynjolfsson, Rock & Syverson, 2018]{.attribution}
+:::
+
+## Cited in
+- [The Trough Looks Like Failure](/posts/2026-07-02-the-trough-looks-like-failure/index.qmd)
+
+[Read the original →](https://www.nber.org/system/files/working_papers/w25148/w25148.pdf)

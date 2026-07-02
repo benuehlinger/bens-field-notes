@@ -1,0 +1,80 @@
+---
+title: "The Trough Looks Like Failure"
+subtitle: "AI's productivity payoff is hiding in the measurement — the same place electricity's hid for forty years."
+description: "Why the 95% 'failure' rate of enterprise AI pilots looks exactly like the bottom of a productivity J-curve, read through David's dynamo, Brynjolfsson's model, and Citadel's tokenomics."
+date: 2026-07-02
+categories: [AI, Economics]
+type: thesis
+bibliography: ../../references.bib
+sources: [david1990, brs2018, citadel2026]
+people: [robert-solow, paul-david, erik-brynjolfsson]
+---
+
+[Thesis]{.type-badge}
+
+In 1987, [Robert Solow](/people/robert-solow.qmd) wrote the most-quoted sentence in
+productivity economics: you could see the computer age everywhere but in the productivity
+statistics [@solow1987]. Thirty-eight years later, an MIT team reported that **95% of
+enterprise AI pilots** show no measurable return [@mit2025]. Both times the consensus
+reached for the same verdict — overhyped. Both times, it was staring at the *trough of a
+J-curve* and calling it a cliff.
+
+::: {.tape}
+**95%** — enterprise generative-AI pilots with no measurable P&L impact<br>
+`MIT Project NANDA · 2025`
+:::
+
+[Paul David](/people/paul-david.qmd) caught this rhyme a century back [@david1990].
+Electricity arrived in the 1880s. Factories electrified fast — and then productivity
+*didn't move for forty years*. The reason wasn't the dynamo. It was that firms first bolted
+electric motors onto the old steam-era layout: one big motor still turning a maze of line
+shafts and belts. The gains only came once they tore the shafts out and rebuilt around the
+*unit drive* — a motor on every machine, the floor plan freed, the single-story plant.
+Reorganization, not electrification, was the productivity event. And reorganization takes a
+generation.
+
+[Brynjolfsson, Rock and Syverson](/people/erik-brynjolfsson.qmd) turned that history into a
+model [@brs2018]. A general-purpose technology demands enormous *intangible* investment —
+new processes, business models, retrained people — that the national accounts simply don't
+count. So while a firm builds that hidden capital, its measured output is too low and its
+productivity looks worse than reality. Later, when the intangibles pay off, output rises
+against costs that were expensed years ago, and productivity looks *better* than reality.
+Plot the gap and you get a J:
+
+::: {.pull-source}
+"…this leads to an underestimation of productivity growth in the early years of a new GPT,
+and… later, when the benefits of intangible investments are harvested, productivity growth
+will be overestimated."
+
+[— Brynjolfsson, Rock & Syverson, 2018]{.attribution}
+:::
+
+Which brings us to the present, and to a productivity theorist from an unlikely address:
+Citadel Securities. Its *Tokenomics* note [@citadel2026] describes AI as rationed by
+physical inputs — compute, power, cooling — bifurcating into a frontier only deep balance
+sheets can afford and a cheap "good-enough" tier for everyone else. Strip the AI vocabulary
+and it is textbook GPT diffusion: the concentrated, capital-hungry early phase, exactly
+where David's dynamo sat in 1900. The 95% of pilots that "fail" are firms that bought the
+model and bolted it onto the old workflow. **Group drive, not unit drive.**
+
+None of this proves AI will pay off. It says the current disappointment is *uninformative* —
+which is precisely what the bottom of a J-curve looks like from inside.
+
+*What would prove me wrong:* if total factor productivity in the most AI-exposed industries
+shows no J — no dip, no recovery — five years out, the reorganization-lag story is dead, and
+the skeptics were right that this one is different. It's a measurable bet, and the data
+(BLS total factor productivity by industry) will settle it. I intend to keep score.
+
+::: {.connection}
+**Builds toward** — Tokenomics as GPT Diffusion: Equity Is a Condition, Not a Property *(forthcoming)*<br>
+**Uses data** — BEA intangible investment · BLS total factor productivity (NAICS)
+:::
+
+## Sources
+
+::: {#refs}
+:::
+
+::: {.cast}
+**Cast** — [Robert Solow](/people/robert-solow.qmd) · [Paul David](/people/paul-david.qmd) · [Erik Brynjolfsson](/people/erik-brynjolfsson.qmd)
+:::

@@ -5,6 +5,8 @@ project:
     - "*.qmd"
     - "posts/**/*.qmd"
     - "posts/**/*.ipynb"
+    - "people/**/*.qmd"
+    - "sources/**/*.qmd"
   resources:
     - "styles/**"
 
@@ -18,6 +20,10 @@ website:
         href: index.qmd
       - text: "Essays"
         href: posts/index.qmd
+      - text: "People"
+        href: people/index.qmd
+      - text: "Sources"
+        href: sources/index.qmd
       - text: "About"
         href: about.qmd
     right:

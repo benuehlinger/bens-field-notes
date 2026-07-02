@@ -1,0 +1,16 @@
+---
+title: "Robert Solow"
+description: "MIT economist, 1987 Nobel laureate, and the man who named the productivity paradox (1924–2023)."
+toc: false
+---
+
+**Robert Solow** (1924–2023) was an MIT economist and 1987 Nobel laureate, the architect of
+modern growth theory. His growth accounting showed that most long-run growth comes not from
+adding capital and labor but from technological progress — the "Solow residual," which
+became total factor productivity (he called it "a measure of our ignorance"). He named the
+productivity paradox in 1987 with a single line: *"You can see the computer age everywhere
+but in the productivity statistics."* Precise and skeptical, he spent a career warning
+against over-claiming what the models actually show.
+
+## Referenced in
+- [The Trough Looks Like Failure](/posts/2026-07-02-the-trough-looks-like-failure/index.qmd)

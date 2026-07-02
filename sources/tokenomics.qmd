@@ -1,0 +1,37 @@
+---
+title: "Tokenomics"
+description: "Citadel Securities' 2026 note on AI's physical-input constraints and bifurcation."
+key: citadel2026
+authors: []
+year: 2026
+venue: "Citadel Securities — research note"
+cited-in: [the-trough-looks-like-failure]
+toc: false
+---
+
+[Source · 2026]{.type-badge}
+
+**Author** — Citadel Securities  ·  *Research note*
+
+## Why it's here
+The live-market read. Citadel describes AI as rationed by physical inputs — compute, power,
+cooling — bifurcating into a frontier only deep balance sheets can afford and a cheap
+"good-enough" tier for everyone else. Strip the AI vocabulary and it's the concentrated,
+capital-hungry early phase of general-purpose-technology diffusion — David's dynamo in 1900.
+It's the spark behind the *Tokenomics as GPT Diffusion* thesis.
+
+::: {.pull-source}
+Four mechanisms, abstracted from the AI specifics: a GPT bound by physical inputs; price
+rationing into a bifurcated market; falling unit costs unlocking *more* usage (Jevons); and
+durable gains only where the technology *complements* labor rather than replacing it.
+
+[— Citadel Securities, 2026]{.attribution}
+:::
+
+::: {.data-note}
+Proprietary research note — no public copy to link. Cited here for attribution; the analysis
+above is my own reading of it.
+:::
+
+## Cited in
+- [The Trough Looks Like Failure](/posts/2026-07-02-the-trough-looks-like-failure/index.qmd)
