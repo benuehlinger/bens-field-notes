@@ -1,5 +1,5 @@
 ---
-title: "Essays"
+title: "Notes"
 subtitle: "Data-driven pieces on credit, economics, AI, and the occasional detour."
 listing:
   id: all-posts

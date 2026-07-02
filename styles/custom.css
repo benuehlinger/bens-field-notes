@@ -301,26 +301,32 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 
 /* The Tape — cold-data interlude between prose beats */
 .tape {
-  font-family: 'DM Mono', monospace;
+  font-family: 'DM Sans', system-ui, sans-serif;   /* body font — in-system */
   border: 1px solid #1C1C1E;
-  border-left: 4px solid #4A6FA5;
   background: #F0EBE3;
-  padding: 1.1rem 1.35rem;
-  margin: 1.9rem 0;
-  font-size: 0.9rem;
+  padding: 1.35rem 1.6rem;
+  margin: 2rem 0;
+  font-size: 1rem;
   line-height: 1.5;
-  color: #1C1C1E;
+  color: #2C2C2C;
 }
-.tape strong {
-  font-size: 1.7rem;
-  font-weight: 700;
+.tape strong {          /* the headline figure — editorial serif, like the masthead */
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  line-height: 1;
   letter-spacing: -0.02em;
+  color: #1C1C1E;
+  vertical-align: -0.12em;
+  margin-right: 0.1rem;
 }
-.tape code {
+.tape code {            /* source line — small mono caption, like a dateline */
   background: none;
+  font-family: 'DM Mono', monospace;
   color: #8A8A8A;
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* Pull-source — let a cited source testify in its own words */
@@ -383,9 +389,9 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 .quarto-dark .tape {
   background: #26262A;
   border-color: #E8E3D8;
-  border-left-color: #7BA3C8;
-  color: #E8E3D8;
+  color: #C8C3B8;
 }
+.quarto-dark .tape strong { color: #F0EBE0; }
 .quarto-dark .tape code { color: #7A7A7A; }
 .quarto-dark .pull-source { color: #B8B3A8; border-left-color: #5A5A5A; }
 .quarto-dark .pull-source .attribution { color: #7A7A7A; }
@@ -393,3 +399,74 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 .quarto-dark .connection strong,
 .quarto-dark .cast strong { color: #8A7F6A; }
 .quarto-dark .cast { color: #9A9A9A; }
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/* Newspaper / field-note treatment                                         */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+/* Masthead signal — a double rule under the whole navbar (nameplate = brand) */
+.navbar { border-bottom: 3px double #1C1C1E !important; }
+.navbar .navbar-brand { font-size: 1.22rem; }
+
+/* Edition line — the under-masthead strip on the home page */
+.edition-line {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 3px double #1C1C1E;
+}
+
+/* Section heads as newspaper rules */
+h2.home-section-title { border-bottom: 3px double #1C1C1E; }
+
+/* Front page — rules between items, mono dateline, category kickers */
+.quarto-listing .list > * {
+  border-bottom: 1px solid #D8D3C8;
+  padding: 1.15rem 0;
+}
+.quarto-listing .list > *:last-child { border-bottom: none; }
+
+.quarto-listing .listing-title {
+  font-size: 1.4rem;
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+}
+.quarto-listing .listing-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #9A8F7A;
+}
+.quarto-listing .listing-category {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.13em !important;
+  text-transform: uppercase;
+  background: none !important;
+  border: none !important;
+  color: #B45309 !important;
+  padding: 0 0.7rem 0 0 !important;
+}
+.quarto-listing .listing-category:hover { color: #8A3F06 !important; background: none !important; }
+
+/* Drop cap — first paragraph of an essay (badge → prose); skips source bylines */
+main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 3.2rem;
+  line-height: 0.72;
+  float: left;
+  padding: 0.4rem 0.65rem 0 0;
+  color: #1C1C1E;
+}
+
+/* ── Dark-mode newspaper variants ───────────────────────────────────────── */
+.quarto-dark .navbar { border-bottom-color: #E8E3D8 !important; }
+.quarto-dark .edition-line { color: #7A7A7A; border-bottom-color: #E8E3D8; }
+.quarto-dark h2.home-section-title { border-bottom-color: #E8E3D8; }
+.quarto-dark .quarto-listing .list > * { border-bottom-color: #3A3A3C; }
+.quarto-dark main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter { color: #F0EBE0; }

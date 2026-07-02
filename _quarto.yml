@@ -20,7 +20,7 @@ website:
     left:
       - text: "Home"
         href: index.qmd
-      - text: "Essays"
+      - text: "Notes"
         href: posts/index.qmd
       - text: "Index"
         href: map/index.qmd

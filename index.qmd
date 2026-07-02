@@ -16,6 +16,10 @@ listing:
   sort-ui: false
 ---
 
+::: {.edition-line}
+Field Notes — No. 1 — Est. 2026 — Rigorous analysis, questionable conclusions
+:::
+
 ::: {.hero-section}
 <p class="lead">
   Data-driven field notes on whatever I'm digging into — credit markets, economics, AI,
@@ -29,9 +33,9 @@ listing:
 
 ---
 
-## Recent Essays {.home-section-title}
+## Recent Notes {.home-section-title}
 
 ::: {#recent-posts}
 :::
 
-[All essays →](posts/index.qmd){.home-all-notes-link}
+[All notes →](posts/index.qmd){.home-all-notes-link}
