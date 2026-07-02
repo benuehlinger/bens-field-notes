@@ -1,0 +1,40 @@
+---
+title: "About"
+subtitle: "What this is, and who's to blame."
+toc: false
+---
+
+## The premise
+
+Field Notes is a data journal with one rule: every piece starts from real data, runs on
+code you can see, and ends somewhere I didn't fully expect. The *method* is the throughline —
+downloading the raw numbers, analyzing them honestly, and drawing conclusions that are, per
+the tagline, questionable by design. The *topics* are whatever I'm currently obsessed with.
+
+Mostly that's **credit markets, economics, and AI** — with the occasional detour into
+whatever else the data makes interesting. If that range looks scattered, it isn't: it's one
+person following curiosity with a consistent standard. You're subscribing to the analysis,
+not the subject.
+
+## Who's writing this
+
+I'm a credit analyst by day, which means I spend a lot of time with data that most people
+are content to see summarized in someone else's chart with a footnote reading *"Source:
+Federal Reserve."* I'm more interested in where those numbers come from, and what the raw
+data actually shows when you look at it directly.
+
+## How to read it
+
+- **Real data, shown.** Every chart traces back to a public source, cited.
+- **Real code, shared.** The analysis is reproducible — the code folds open on the page.
+- **Conclusions, questionable.** This is descriptive, not advice. Here's what the data shows,
+  here's the method, here's where it's incomplete.
+
+Topics are tagged — **Credit**, **Economics**, **AI**, and more as they come up — so you can
+follow a thread or take the whole grab-bag.
+
+See [Data & methods](data-sources.qmd) for how the data gets from source to page.
+
+---
+
+*Interested in the data, the code, or an argument? [benuehlinger@gmail.com](mailto:benuehlinger@gmail.com)*

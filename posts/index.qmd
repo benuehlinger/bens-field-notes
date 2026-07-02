@@ -1,6 +1,6 @@
 ---
-title: "Notes"
-subtitle: "Notebooks, signals, and the occasional explainer."
+title: "Essays"
+subtitle: "Data-driven pieces on credit, economics, AI, and the occasional detour."
 listing:
   id: all-posts
   contents: "."

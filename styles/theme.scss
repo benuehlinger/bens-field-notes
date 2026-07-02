@@ -21,11 +21,11 @@ $font-family-sans-serif: 'DM Sans', system-ui, sans-serif;
 $font-family-monospace:  'DM Mono', 'Fira Mono', monospace;
 $headings-font-family:   'DM Serif Display', Georgia, serif;
 
-$font-size-base:    1.0625rem;  /* ~17px — comfortable reading size */
-$line-height-base:  1.75;
+$font-size-base:    1rem;       /* 16px — tighter, less magazine */
+$line-height-base:  1.6;
 $headings-line-height: 1.2;
-$headings-font-weight: 400;     /* Serif display at 400 is already bold enough */
-$paragraph-margin-bottom: 1.4rem;
+$headings-font-weight: 400;
+$paragraph-margin-bottom: 1.15rem;
 
 /*------------------------------------------------------------------------*/
 /* Spacing & layout                                                         */
@@ -47,7 +47,7 @@ $sidebar-bg:        #F0EBE3;
 /*-- scss:rules --*/
 
 /*-- Google Fonts --*/
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=DM+Mono:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=DM+Mono:wght@300;400&display=swap');
 
 /*------------------------------------------------------------------------*/
 /* Component overrides                                                      */
@@ -58,13 +58,24 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Headings */
-h1, h2, h3 {
+/* Headings — serif reserved for the big moments (site title, article H1);
+   sub-headings are clean sans to shed the magazine feel. */
+h1 {
   font-family: 'DM Serif Display', Georgia, serif;
   font-weight: 400;
   letter-spacing: -0.02em;
   color: #1C1C1E;
 }
+
+h2, h3 {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #1C1C1E;
+}
+
+h2 { font-size: 1.4rem; margin-top: 2.5rem; }
+h3 { font-size: 1.12rem; margin-top: 1.8rem; }
 
 h4, h5, h6 {
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -106,11 +117,11 @@ h4, h5, h6 {
   }
 }
 
-/* Main content — generous whitespace */
+/* Main content — tighter measure, less airy */
 main.content {
-  padding-top: 3rem;
-  padding-bottom: 4rem;
-  max-width: 900px;
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+  max-width: 860px;
 }
 
 /* Landing hero */
@@ -141,11 +152,15 @@ main.content {
   margin-bottom: 0;
 }
 
-/* Home page section headings (Dashboards, Recent Notes) */
+/* Home page section headings — small tracked label, data-forward */
 h2.home-section-title {
-  font-size: 1.35rem;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: #5A5A5A;
   margin-top: 2.25rem;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid #D8D3C8;
 }
@@ -313,7 +328,7 @@ pre.sourceCode {
 hr {
   border: none;
   border-top: 1px solid #D8D3C8;
-  margin: 2.5rem 0;
+  margin: 2rem 0;
 }
 
 /* Footer */

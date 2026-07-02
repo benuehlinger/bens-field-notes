@@ -5,7 +5,6 @@ project:
     - "*.qmd"
     - "posts/**/*.qmd"
     - "posts/**/*.ipynb"
-    - "dashboards/**/*.qmd"
   resources:
     - "styles/**"
 
@@ -17,16 +16,10 @@ website:
     left:
       - text: "Home"
         href: index.qmd
-      - text: "Dashboards"
-        menu:
-          - text: "Auto Loan Credit"
-            href: dashboards/abs-ee.qmd
-          - text: "Bank Lending Standards"
-            href: dashboards/sloos.qmd
-      - text: "Notes"
+      - text: "Essays"
         href: posts/index.qmd
-      - text: "Data Sources"
-        href: data-sources.qmd
+      - text: "About"
+        href: about.qmd
     right:
       - icon: github
         href: https://github.com/benuehlinger/bens-field-notes
@@ -36,7 +29,7 @@ website:
     left: |
       Ben's Field Notes — Rigorous Analysis. Questionable Conclusions.
     right: |
-      Built with [Quarto](https://quarto.org). Data from SEC EDGAR, Federal Reserve, FRED.
+      Built with [Quarto](https://quarto.org). [Data & methods](/data-sources.qmd).
 
   search: true
 

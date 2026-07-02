@@ -22,9 +22,9 @@ This post is the public version of that milestone — and the announcement that
 
 **This site:**
 
-- [Auto Loan Credit — ABS-EE Panel](../../dashboards/abs-ee.qmd) — delinquency and pool stats from the lake
-- [Bank Lending Standards — SLOOS](../../dashboards/sloos.qmd) — Fed senior loan officer survey
-- Background on [what ABS-EE is](../../data-sources.qmd) if you're new here
+- [Bank Lending Standards — SLOOS](../2026-06-05-bank-lending-standards/index.qmd) — Fed senior loan officer survey
+- An auto-credit panel from the ABS-EE lake (the live dashboard has since been retired in favor of standalone pieces)
+- Background on [where the data comes from](../../data-sources.qmd) if you're new here
 
 Charts are pre-aggregated at deploy time and rendered as interactive Observable Plot
 visualizations. The R2 bucket stays private; data is embedded into the page at build time.

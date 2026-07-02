@@ -2,8 +2,10 @@
 title: "Bank Lending Standards"
 subtitle: "Senior Loan Officer Opinion Survey — Federal Reserve"
 description: "The Fed asks senior loan officers if they're tightening credit. Four times a year. We chart it."
+date: 2026-06-05
+categories: [Credit, Economics]
 toc: true
-freeze: false
+freeze: true
 ---
 
 ```{=html}
@@ -12,7 +14,7 @@ freeze: false
   Table 1 (domestic banks), parsed from Fed HTML tables via the bens-data-lake pipeline.
   Net percentage = % reporting tighter standards minus % reporting easier standards.
   All-respondent segment only.
-  See <a href="../data-sources.qmd">Data Sources</a> for methodology.
+  See <a href="../../data-sources.qmd">Data Sources</a> for methodology.
 </div>
 ```
 
@@ -32,7 +34,7 @@ fully invested during.
 from pathlib import Path
 import pandas as pd
 
-_path = Path("../analysis/outputs/sloos_dashboard.parquet")
+_path = Path("../../analysis/outputs/sloos_dashboard.parquet")
 if _path.exists():
     _df = pd.read_parquet(_path)
     _df["survey_date"] = _df["survey_date"].dt.strftime("%Y-%m-%d")

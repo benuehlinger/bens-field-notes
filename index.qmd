@@ -10,7 +10,7 @@ listing:
     - "!posts/index.qmd"
   sort: "date desc"
   type: default
-  max-items: 5
+  max-items: 8
   fields: [date, title, description, categories]
   filter-ui: false
   sort-ui: false
@@ -18,48 +18,20 @@ listing:
 
 ::: {.hero-section}
 <p class="lead">
-  A public data journal. Mostly credit markets, occasionally macro, always overengineered.
-  I spend an unreasonable amount of time downloading and parsing financial datasets
-  so you don't have to — though you probably also don't want to.
+  Data-driven field notes on whatever I'm digging into — credit markets, economics, AI,
+  and the occasional detour. I download and parse the raw data, write the code, make the
+  charts, and draw conclusions that are questionable by design.
 </p>
 <p class="hero-meta">
-  Data from SEC EDGAR, the Federal Reserve, and FRED.
-  Analysis my own. Conclusions questionable by design.
+  Real data, shown. Real code, shared. One credit analyst's curiosity, applied broadly.
 </p>
 :::
 
 ---
 
-## Dashboards {.home-section-title}
-
-Live charts querying the data lake directly. Updated when the pipelines run, which is to say,
-whenever I remember to run them.
-
-::: {.grid .dashboard-tiles}
-::: {.g-col-12 .g-col-md-6}
-::: {.dashboard-tile}
-[**Auto Loan Credit — ABS-EE Panel**](dashboards/abs-ee.qmd)
-
-Loan-level delinquency data from SEC EDGAR ABS-EE filings. Consumer auto credit,
-aggregated from servicer reports. Not exactly a beach read.
-:::
-:::
-
-::: {.g-col-12 .g-col-md-6}
-::: {.dashboard-tile}
-[**Bank Lending Standards — SLOOS**](dashboards/sloos.qmd)
-
-The Fed's Senior Loan Officer Opinion Survey. Banks self-reporting whether they're
-tightening credit. Spoiler: when they tighten a lot, things tend to get interesting.
-:::
-:::
-:::
-
----
-
-## Recent Notes {.home-section-title}
+## Recent Essays {.home-section-title}
 
 ::: {#recent-posts}
 :::
 
-[All notes →](posts/index.qmd){.home-all-notes-link}
+[All essays →](posts/index.qmd){.home-all-notes-link}
