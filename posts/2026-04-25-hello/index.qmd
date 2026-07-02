@@ -32,7 +32,7 @@ here's where it's incomplete. Conclusions are, per the tagline, questionable.
 
 
 The ingestion pipeline that powers this site is private. If you're interested in the data
-or the pipeline, get in touch: [beneuhlinger@gmail.com](mailto:beneuhlinger@gmail.com)
+or the pipeline, get in touch: [benuehlinger@gmail.com](mailto:benuehlinger@gmail.com)
 
 ---
 

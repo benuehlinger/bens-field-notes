@@ -10,4 +10,4 @@ bucket_name = "lending-data-lake"   # replace with your actual R2 bucket name
 [vars]
 # Allowed origin for CORS — your Cloudflare Pages domain
 # Update this once you have your Pages URL (e.g. https://bens-field-notes.pages.dev)
-ALLOWED_ORIGIN = "http://localhost:4321"
+ALLOWED_ORIGIN = "https://bensnotes.fyi"
