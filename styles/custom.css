@@ -470,3 +470,124 @@ main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter {
 .quarto-dark h2.home-section-title { border-bottom-color: #E8E3D8; }
 .quarto-dark .quarto-listing .list > * { border-bottom-color: #3A3A3C; }
 .quarto-dark main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter { color: #F0EBE0; }
+
+/* ═══ Home masthead (front-page treatment) ═══════════════════════════════ */
+.masthead {
+  text-align: left;
+  margin: 1rem 0 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 3px double #1C1C1E;   /* the single masthead separator */
+}
+.masthead .nameplate {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 3rem;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: #1C1C1E;
+}
+.masthead .motto {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  color: #6A6A6A;
+  margin-top: 0.4rem;
+}
+.masthead .folio {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #9A9A9A;
+  margin-top: 0.9rem;
+}
+.standfirst {
+  max-width: 42rem;
+  margin: 0 0 1.5rem;
+  text-align: left;
+}
+.standfirst p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: #3A3A3A;
+  font-weight: 300;
+  margin: 0;
+}
+/* dark variants */
+.quarto-dark .masthead .nameplate { color: #F0EBE0; }
+.quarto-dark .masthead .motto { color: #9A9A9A; }
+.quarto-dark .masthead { border-bottom-color: #E8E3D8; }
+.quarto-dark .masthead .folio { color: #7A7A7A; }
+.quarto-dark .standfirst p { color: #C8C3B8; }
+
+/* ═══ Index page — consistent section labels, legend, Cast, Stacks ════════ */
+
+/* Section heads — same label treatment as the home "RECENT NOTES" */
+h2.section-head {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: #5A5A5A;
+  margin-top: 2.75rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px double #1C1C1E;
+}
+.quarto-dark h2.section-head { color: #9A9A9A; border-bottom-color: #E8E3D8; }
+
+/* Graph legend — crisp circles + line samples, baseline-aligned */
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  margin: 0.5rem 0 1.25rem;
+}
+.graph-legend .lg { display: inline-flex; align-items: center; gap: 0.45rem; }
+.graph-legend .lg i {
+  width: 9px; height: 9px; border-radius: 50%;
+  display: inline-block; flex: none;
+}
+.graph-legend .lg-line b {
+  width: 22px; height: 0; display: inline-block;
+  border-top: 1.5px solid #B8B0A0;
+}
+.graph-legend .lg-line b.dashed { border-top-style: dashed; }
+
+/* The Cast — clean text cards (no empty gray image boxes) */
+#cast .quarto-grid-item.card {
+  background: transparent;
+  border: 1px solid #D8D3C8;
+  border-radius: 4px;
+  box-shadow: none;
+}
+#cast .card-img-top, #cast .thumbnail-image, #cast .listing-item-img-placeholder { display: none !important; }
+#cast .card-body { padding: 1.05rem 1.15rem; }
+#cast .card-title.listing-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.15;
+  margin-bottom: 0.4rem;
+}
+#cast .listing-description { font-size: 0.85rem; line-height: 1.5; color: #5A5A5A; }
+.quarto-dark #cast .quarto-grid-item.card { border-color: #3A3A3C; }
+.quarto-dark #cast .listing-description { color: #9A9A9A; }
+
+/* The Stacks — left-aligned reading list, no dead left gutter */
+#stacks .quarto-post { display: block; }
+#stacks .quarto-post .metadata, #stacks .quarto-post .thumbnail { display: none; }
+#stacks .quarto-post .body { width: 100%; max-width: none; flex: none; }
+#stacks .listing-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+}
+#stacks .listing-description { font-size: 0.92rem; line-height: 1.55; color: #5A5A5A; }
+.quarto-dark #stacks .listing-description { color: #9A9A9A; }

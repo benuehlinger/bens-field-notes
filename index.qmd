@@ -1,6 +1,6 @@
 ---
-title: "Ben's Field Notes"
-subtitle: "Rigorous Analysis. Questionable Conclusions. Overengineered Charts."
+pagetitle: "Ben's Field Notes"
+description: "Data-driven field notes on credit, economics, AI, and the occasional detour."
 page-layout: full
 toc: false
 listing:
@@ -16,22 +16,17 @@ listing:
   sort-ui: false
 ---
 
-::: {.edition-line}
-Field Notes — No. 1 — Est. 2026 — Rigorous analysis, questionable conclusions
+::: {.masthead}
+<div class="nameplate">Ben's Field Notes</div>
+<div class="motto">Rigorous Analysis · Questionable Conclusions · Overengineered Charts</div>
+<div class="folio">Credit · Economics · AI &nbsp;&nbsp;—&nbsp;&nbsp; No. 1 &nbsp;&nbsp;—&nbsp;&nbsp; Est. 2026</div>
 :::
 
-::: {.hero-section}
-<p class="lead">
-  Data-driven field notes on whatever I'm digging into — credit markets, economics, AI,
-  and the occasional detour. I download and parse the raw data, write the code, make the
-  charts, and draw conclusions that are questionable by design.
-</p>
-<p class="hero-meta">
-  Real data, shown. Real code, shared. One credit analyst's curiosity, applied broadly.
-</p>
+::: {.standfirst}
+Data-driven field notes on whatever I'm digging into — credit markets, economics, AI, and the
+occasional detour. I download and parse the raw data, write the code, make the charts, and draw
+conclusions that are questionable by design.
 :::
-
----
 
 ## Recent Notes {.home-section-title}
 

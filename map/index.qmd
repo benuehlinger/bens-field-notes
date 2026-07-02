@@ -24,7 +24,7 @@ listing:
 Everything that stands behind the essays, in one place — the web of connections, the people
 whose work the analysis leans on, and the papers themselves.
 
-## The Map
+## The Map {.section-head}
 
 Posts cite papers; papers are written by people; posts mention people. This web is generated
 straight from each piece's frontmatter. **Drag** a node to move it; **click** it to go there.
@@ -41,11 +41,12 @@ graph = FileAttachment("graph.json").json()
 
 ```{ojs}
 //| echo: false
-html`<div style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;color:#8A8A8A;display:flex;flex-wrap:wrap;gap:1.5rem;margin:0.25rem 0 0.5rem;">
-  <span><span style="color:#4A6FA5;font-size:1rem;">&#9679;</span> post</span>
-  <span><span style="color:#B45309;font-size:1rem;">&#9679;</span> paper</span>
-  <span><span style="color:#7C6FB5;font-size:1rem;">&#9679;</span> person</span>
-  <span style="color:#B8B0A0;">&#8212; cites / authored &nbsp;&nbsp; &#8231;&#8231;&#8231; mentions</span>
+html`<div class="graph-legend">
+  <span class="lg"><i style="background:#4A6FA5"></i>Post</span>
+  <span class="lg"><i style="background:#B45309"></i>Paper</span>
+  <span class="lg"><i style="background:#7C6FB5"></i>Person</span>
+  <span class="lg lg-line"><b></b>Cites / authored</span>
+  <span class="lg lg-line"><b class="dashed"></b>Mentions</span>
 </div>`
 ```
 
@@ -118,14 +119,14 @@ chart = {
 }
 ```
 
-## The Cast
+## The Cast {.section-head}
 
 The authors and thinkers the analysis leans on.
 
 ::: {#cast}
 :::
 
-## The Stacks
+## The Stacks {.section-head}
 
 The papers themselves — what I took from each, with links to read the originals.
 
