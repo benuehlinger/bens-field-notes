@@ -611,3 +611,19 @@ nav[role="doc-toc"] > h2#toc-title {
   margin-top: 0;
   color: #1C1C1E;
 }
+
+/* ═══ Thesis evidence embedded in a Note (charts inside an essay) ═════════ */
+.jc-fig { margin: 1.7rem 0; }
+.jc-fig svg, .jc-panels svg { max-width: 100%; height: auto; }
+.jc-fig figcaption { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.03em; line-height: 1.55; color: #7A7A7A; margin-top: 0.4rem; max-width: 40rem; }
+.jc-panels { display: flex; gap: 0 2rem; align-items: flex-start; margin: 1.5rem 0; }
+.jc-panels > * { flex: 1 1 0; min-width: 0; margin: 0; }
+.jc-panels .left { border-right: 1px solid #C8C3B8; padding-right: 2rem; }
+.jc-cap { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.13em; text-transform: uppercase; color: #1C1C1E; font-weight: 500; margin-bottom: 0.3rem; }
+.jc-legend { display: flex; gap: 1rem; font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.05em; text-transform: uppercase; color: #6A6A6A; margin: 0.3rem 0; }
+.jc-legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.3rem; vertical-align: middle; }
+.jc-read { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.88rem; line-height: 1.5; color: #5A5A5A; margin-top: 0.35rem; }
+.ill { color: #B45309; }
+.ill-note { font-family: 'DM Mono', monospace; font-size: 0.62rem; line-height: 1.6; letter-spacing: 0.02em; color: #7A7A7A; border-top: 1px solid #D8D3C8; margin-top: 1.6rem; padding-top: 0.6rem; }
+.ill-note strong { color: #B45309; letter-spacing: 0.08em; }
+@media (max-width: 700px) { .jc-panels { flex-direction: column; gap: 1.4rem; } .jc-panels .left { border-right: none; padding-right: 0; } }
