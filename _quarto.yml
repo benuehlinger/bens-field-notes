@@ -1,7 +1,9 @@
 project:
   type: website
   output-dir: _site
-  pre-render: python3 scripts/build_graph.py
+  pre-render:
+    - python3 scripts/build_graph.py
+    - python3 scripts/make_sample_panels.py   # synthetic sample data for POC desks
   render:
     - "*.qmd"
     - "posts/**/*.qmd"
@@ -9,6 +11,7 @@ project:
     - "people/**/*.qmd"
     - "sources/**/*.qmd"
     - "map/**/*.qmd"
+    - "desk/**/*.qmd"
   resources:
     - "styles/**"
 
@@ -22,6 +25,8 @@ website:
         href: index.qmd
       - text: "Notes"
         href: posts/index.qmd
+      - text: "Desk"
+        href: desk/index.qmd
       - text: "Index"
         href: map/index.qmd
       - text: "About"

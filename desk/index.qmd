@@ -1,0 +1,159 @@
+---
+pagetitle: "The Desk — Ben's Field Notes"
+description: "Live readings from each desk, updated as new data drops."
+page-layout: full
+toc: false
+---
+
+```{=html}
+<style>
+.desk-masthead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 2px solid #1C1C1E; padding-bottom: 0.55rem; margin: 0.5rem 0 0.4rem;
+}
+.desk-nameplate { font-family: 'DM Serif Display', Georgia, serif; font-size: 2.4rem; letter-spacing: -0.025em; color: #1C1C1E; line-height: 1; }
+.desk-dateline { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9A8F7A; }
+.desk-standfirst { font-family: 'DM Sans', system-ui, sans-serif; font-size: 1.02rem; color: #5A5A5A; margin: 0 0 0.5rem; max-width: 46rem; }
+
+.desk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 0.5rem; border-top: 1px solid #D8D3C8; }
+.desk-panel { padding: 1.7rem 2rem; border-bottom: 1px solid #D8D3C8; }
+.desk-panel:nth-child(odd)  { border-right: 1px solid #D8D3C8; padding-left: 0; }
+.desk-panel:nth-child(even) { padding-right: 0; }
+.desk-panel:nth-last-child(-n+2) { border-bottom: none; }
+
+.dp-kicker { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: #1C1C1E; font-weight: 500; }
+.dp-meta   { color: #9A8F7A; }
+.dp-figure { font-family: 'DM Serif Display', Georgia, serif; font-size: 3.3rem; line-height: 1; color: #1C1C1E; margin-top: 0.55rem; }
+.dp-unit   { font-size: 1.4rem; color: #6A6A6A; margin-left: 0.1rem; }
+.dp-label  { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.95rem; color: #3A3A3A; margin-top: 0.15rem; }
+.dp-spark  { margin: 1rem 0 0.45rem; }
+.dp-delta  { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.05em; color: #6A6A6A; }
+.dp-blurb  { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.92rem; line-height: 1.5; color: #5A5A5A; margin: 0.85rem 0 0.95rem; max-width: 34rem; }
+.dp-foot   { display: flex; align-items: center; gap: 0.9rem; }
+.dp-open   { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.85rem; font-weight: 500; color: #4A6FA5; text-decoration: none; }
+.dp-open:hover { color: #2E4B78; }
+.dp-open.disabled { color: #A8A8A8; pointer-events: none; }
+.dp-sample { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: #B45309; border: 1px solid #E3C9A8; border-radius: 3px; padding: 0.14rem 0.42rem; }
+
+@media (max-width: 720px) {
+  .desk-grid { grid-template-columns: 1fr; }
+  .desk-panel { border-right: none !important; padding: 1.3rem 0 !important; }
+  .desk-panel:nth-last-child(-n+2) { border-bottom: 1px solid #D8D3C8; }
+  .desk-panel:last-child { border-bottom: none; }
+}
+</style>
+```
+
+::: {.desk-masthead}
+<div class="desk-nameplate">The Desk</div>
+<div class="desk-dateline">Live readings · rebuilt on each data drop</div>
+:::
+
+<p class="desk-standfirst">The latest reading from each desk. Click into one for the full timeline — how the number got here, one release at a time.</p>
+
+```{python}
+#| echo: false
+#| output: false
+from pathlib import Path
+import pandas as pd
+
+O = Path("../analysis/outputs")
+
+def records(df, dcol, vcol):
+    df = df[[dcol, vcol]].dropna().copy()
+    df[dcol] = pd.to_datetime(df[dcol]).dt.strftime("%Y-%m-%d")
+    df = df.rename(columns={dcol: "date", vcol: "value"}).sort_values("date")
+    return df.to_dict(orient="records")
+
+# ── Bank Lending (SLOOS, real) — C&I large net tightening, quarterly ──
+sloos = pd.read_parquet(O / "sloos_dashboard.parquet")
+panel_bank = records(sloos[sloos["loan_type"] == "C&I - Large"], "survey_date", "net_pct_tightening")
+
+# ── Retail Credit (ABS-EE, real) — loan-weighted 30+ day auto delinquency, monthly ──
+abs_ee = pd.read_parquet(O / "abs_ee_dashboard.parquet")
+abs_ee["month"] = pd.to_datetime(abs_ee["filing_date"]).dt.to_period("M").dt.to_timestamp()
+abs_ee["d30_cnt"] = abs_ee["d30_rate"] / 100 * abs_ee["loans_with_status"]
+grp = abs_ee.groupby("month").agg(
+    d30_cnt=("d30_cnt", "sum"), loans=("loans_with_status", "sum"), n=("d30_cnt", "size")
+).reset_index()
+grp["value"] = 100 * grp["d30_cnt"] / grp["loans"]
+retail = grp[(grp["n"] >= 5) & (grp["month"] >= "2018-01-01")]
+panel_retail = records(retail, "month", "value")
+
+# ── Private Credit + AI (synthetic sample) ──
+panel_private = records(pd.read_parquet(O / "private_credit_sample.parquet"), "date", "value")
+panel_ai = records(pd.read_parquet(O / "ai_sample.parquet"), "date", "value")
+
+ojs_define(panel_bank=panel_bank, panel_retail=panel_retail,
+           panel_private=panel_private, panel_ai=panel_ai)
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+import { Plot } from "npm:@observablehq/plot"
+
+mkSeries = recs => recs.map(d => ({date: new Date(d.date), value: +d.value}))
+
+PANELS = [
+  {desk: "Bank Lending", meta: "SLOOS · Quarterly", real: true,
+   data: mkSeries(panel_bank), unit: "%", signed: true,
+   label: "net C&I-large tightening",
+   blurb: "How many banks tightened vs. eased lending standards — the Fed's quarterly loan-officer survey.",
+   href: "/posts/2026-06-05-bank-lending-standards/", color: "#4A6FA5"},
+
+  {desk: "Retail Credit", meta: "ABS-EE · Monthly", real: true,
+   data: mkSeries(panel_retail), unit: "%", signed: false,
+   label: "auto-loan 30+ day delinquency",
+   blurb: "Delinquency on securitized auto loans, aggregated from SEC ABS-EE filings.",
+   href: "#", color: "#B45309"},
+
+  {desk: "Private Credit", meta: "Sample · Monthly", real: false,
+   data: mkSeries(panel_private), unit: "%", signed: false,
+   label: "direct-lending non-accrual rate",
+   blurb: "Illustrative placeholder until BDC / private-credit data lands in the lake.",
+   href: "#", color: "#7C6FB5"},
+
+  {desk: "AI", meta: "Sample · Monthly", real: false,
+   data: mkSeries(panel_ai), unit: "%", signed: false,
+   label: "enterprise pilots with measurable ROI",
+   blurb: "Illustrative — the slow climb out of the productivity J-curve trough.",
+   href: "#", color: "#3A7D5E"}
+]
+
+fmt = (v, signed) => `${signed && v > 0 ? "+" : ""}${v.toLocaleString(undefined, {maximumFractionDigits: 1})}`
+fmtMonth = d => d.toLocaleString("en-US", {month: "short", year: "numeric", timeZone: "UTC"})
+
+sparkline = (data, color) => Plot.plot({
+  width: 300, height: 52, margin: 2, axis: null, x: {type: "utc"},
+  marks: [
+    Plot.areaY(data, {x: "date", y: "value", fill: color, fillOpacity: 0.09}),
+    Plot.lineY(data, {x: "date", y: "value", stroke: color, strokeWidth: 1.5}),
+    Plot.dot([data[data.length - 1]], {x: "date", y: "value", r: 3, fill: color})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="desk-grid">
+  ${PANELS.map(p => {
+    const last = p.data[p.data.length - 1];
+    const prev = p.data[p.data.length - 2];
+    const delta = last.value - prev.value;
+    const arrow = delta > 0 ? "▲" : delta < 0 ? "▼" : "▬";
+    return html`<article class="desk-panel">
+      <div class="dp-kicker">${p.desk}<span class="dp-meta"> · ${p.meta}</span></div>
+      <div class="dp-figure">${fmt(last.value, p.signed)}<span class="dp-unit">${p.unit}</span></div>
+      <div class="dp-label">${p.label}</div>
+      <div class="dp-spark">${sparkline(p.data, p.color)}</div>
+      <div class="dp-delta">${arrow} ${fmt(delta, true)} vs prior · ${fmtMonth(last.date)}</div>
+      <p class="dp-blurb">${p.blurb}</p>
+      <div class="dp-foot">
+        <a class="dp-open ${p.href === "#" ? "disabled" : ""}" href="${p.href}">${p.href === "#" ? "Timeline coming soon" : "Open desk →"}</a>
+        ${p.real ? "" : html`<span class="dp-sample">Sample data</span>`}
+      </div>
+    </article>`;
+  })}
+</div>`
+```
