@@ -26,7 +26,7 @@ toc: false
 .col-lead { flex: 1 1 0; }
 .col-side { flex: 0 0 27%; }
 .col-tape, .col-lead { border-right: 1px solid #C8C3B8; padding-right: 1.6rem; }
-.lead-chart svg, .brief-spark svg, .tape-spark svg { max-width: 100%; height: auto; }
+.lead-chart svg, .brief-chart svg, .tape-spark svg { max-width: 100%; height: auto; }
 
 /* The Tape (data rail) */
 .tape-title { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em;
@@ -66,13 +66,12 @@ toc: false
 .lead-more:hover { color: #2E4B78; }
 
 /* Side column */
-.side-brief { padding-bottom: 1.1rem; margin-bottom: 1.1rem; border-bottom: 1px solid #C8C3B8; }
+.side-brief { padding-bottom: 1.2rem; margin-bottom: 1.2rem; border-bottom: 1px solid #C8C3B8; }
+.side-brief:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: none; }
 .brief-kicker { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9A8F7A; }
-.brief-hed { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; line-height: 1.08; color: #1C1C1E; margin: 0.15rem 0 0.35rem; }
-.brief-spark { margin: 0.2rem 0 0.4rem; }
+.brief-hed { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; line-height: 1.08; color: #1C1C1E; margin: 0.15rem 0 0.4rem; }
+.brief-chart { margin: 0.4rem 0 0.55rem; }
 .brief-text { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.85rem; line-height: 1.5; color: #5A5A5A; }
-.ai-box { border: 1px solid #1C1C1E; padding: 1rem 1.1rem; }
-.ai-box .brief-hed { margin-top: 0.1rem; }
 .sample-tag { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase;
   color: #B45309; border: 1px solid #E3C9A8; border-radius: 3px; padding: 0.1rem 0.36rem; margin-left: 0.4rem; vertical-align: middle; }
 
@@ -166,15 +165,16 @@ leadChart = Plot.plot({
   ]
 })
 
-retailChart = Plot.plot({
-  width: 320, height: 108, marginLeft: 26, marginBottom: 18, marginTop: 6, marginRight: 6,
+// one shared mini-chart so both side briefs read as peers
+miniChart = (data, color) => Plot.plot({
+  width: 320, height: 108, marginLeft: 28, marginBottom: 18, marginTop: 6, marginRight: 6,
   x: {type: "utc", label: null, ticks: 4, tickFormat: "%y"},
   y: {label: null, grid: true, ticks: 3, tickFormat: d => `${d}%`},
   style: {fontFamily: "DM Mono, monospace", fontSize: "9px"},
   marks: [
-    Plot.areaY(retail, {x: "date", y: "value", fill: "#B45309", fillOpacity: 0.08}),
-    Plot.lineY(retail, {x: "date", y: "value", stroke: "#B45309", strokeWidth: 1.4}),
-    Plot.dot([last(retail)], {x: "date", y: "value", r: 2.8, fill: "#B45309"})
+    Plot.areaY(data, {x: "date", y: "value", fill: color, fillOpacity: 0.08}),
+    Plot.lineY(data, {x: "date", y: "value", stroke: color, strokeWidth: 1.4}),
+    Plot.dot([last(data)], {x: "date", y: "value", r: 2.8, fill: color})
   ]
 })
 ```
@@ -230,14 +230,14 @@ retailChart = Plot.plot({
         <div class="side-brief">
           <div class="brief-kicker">Retail Credit · ABS-EE · Monthly</div>
           <h3 class="brief-hed">Auto Borrowers, Stretched but Standing</h3>
-          <div class="brief-spark">${retailChart}</div>
+          <div class="brief-chart">${miniChart(retail, "#B45309")}</div>
           <p class="brief-text">Thirty-plus-day delinquency on securitized auto loans reads ${fmt(rCur)}%, pooled across every ABS-EE filer. Elevated and stubbornly flat — the consumer is stretched, not snapping.</p>
         </div>
 
-        <div class="ai-box">
+        <div class="side-brief">
           <div class="brief-kicker">The AI Desk<span class="sample-tag">Sample</span></div>
           <h3 class="brief-hed">The Trough, Measured</h3>
-          <div class="brief-spark">${spark(ai, "#3A7D5E", 240, 34)}</div>
+          <div class="brief-chart">${miniChart(ai, "#3A7D5E")}</div>
           <p class="brief-text">${fmt(aiCur)}% of enterprise AI pilots now show measurable P&amp;L impact, and the line is climbing. If Brynjolfsson is right, this is the boring part of the J-curve — before the payoff. Sample data, for now.</p>
           <a class="lead-more" href="/desk/j-curve/">The J-curve watch — full thesis →</a>
         </div>
