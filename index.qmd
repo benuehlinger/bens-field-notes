@@ -19,7 +19,6 @@ listing:
 ::: {.masthead}
 <div class="nameplate">Ben's Field Notes</div>
 <div class="motto">Rigorous Analysis · Questionable Conclusions · Overengineered Charts</div>
-<div class="folio">Credit · Economics · AI &nbsp;&nbsp;—&nbsp;&nbsp; No. 1 &nbsp;&nbsp;—&nbsp;&nbsp; Est. 2026</div>
 :::
 
 ::: {.standfirst}

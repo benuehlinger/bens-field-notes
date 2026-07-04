@@ -21,6 +21,7 @@ $font-family-sans-serif: 'DM Sans', system-ui, sans-serif;
 $font-family-monospace:  'DM Mono', 'Fira Mono', monospace;
 $headings-font-family:   'DM Serif Display', Georgia, serif;
 
+$font-size-root:    18.7px;     /* ~10% zoom (was 17px); grid widths scaled to match */
 $font-size-base:    1rem;       /* 16px — tighter, less magazine */
 $line-height-base:  1.6;
 $headings-line-height: 1.2;
@@ -53,14 +54,18 @@ $sidebar-bg:        #F0EBE3;
 /* Component overrides                                                      */
 /*------------------------------------------------------------------------*/
 
+/* Root font-size (the zoom) is set via $font-size-root above; the fixed grid
+   widths in _quarto.yml are scaled by the same ~10% so characters-per-line is
+   unchanged — a true zoom, not a widening of the text measure. */
+
 /* Body */
 body {
   letter-spacing: -0.01em;
 }
 
-/* Headings — editorial serif throughout (title + sub-headers), one type voice.
-   The small uppercase section *labels* (.section-head / .home-section-title) opt
-   back out to sans below, since those are labels, not prose headings. */
+/* Headings — editorial serif throughout. ONE type voice everywhere: page titles,
+   in-article sub-headers, AND the page-section headers (.section-head /
+   .home-section-title) all use DM Serif Display. No sans headings anywhere. */
 h1 {
   font-family: 'DM Serif Display', Georgia, serif;
   font-weight: 400;
@@ -122,7 +127,7 @@ h4, h5, h6 {
 main.content {
   padding-top: 2rem;
   padding-bottom: 3rem;
-  max-width: 860px;
+  max-width: 1056px;   /* 960 × 1.1, matching the ~10% zoom */
 }
 
 /* Landing hero */
@@ -153,18 +158,19 @@ main.content {
   margin-bottom: 0;
 }
 
-/* Home page section headings — small tracked label, data-forward */
+/* Home page section headings — editorial serif with a section rule (same voice
+   as in-article h2s; the rule marks it as a page-section divider) */
 h2.home-section-title {
-  font-family: 'DM Sans', system-ui, sans-serif;   /* label, not a prose heading */
-  font-size: 1.05rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-  color: #5A5A5A;
-  margin-top: 2.25rem;
-  margin-bottom: 0.75rem;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  color: #1C1C1E;
+  margin-top: 2.5rem;
+  margin-bottom: 0.9rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #D8D3C8;
+  border-bottom: 2px solid #1C1C1E;
 }
 
 /* Dashboard teaser tiles on home */

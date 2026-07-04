@@ -14,7 +14,8 @@ listing:
     sort-ui: false
   - id: stacks
     contents: "../sources/*.qmd"
-    type: default
+    type: grid
+    grid-columns: 3
     fields: [title, description]
     sort: "title"
     filter-ui: false

@@ -1,0 +1,5 @@
+# Applies to every note in posts/ — a right-hand table of contents for quick nav.
+toc: true
+toc-location: right
+toc-title: "On this page"
+toc-depth: 3

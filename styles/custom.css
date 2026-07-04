@@ -405,7 +405,7 @@ body, .navbar, pre, code, .data-note, .quarto-category {
 /* ═══════════════════════════════════════════════════════════════════════ */
 
 /* Masthead signal — a double rule under the whole navbar (nameplate = brand) */
-.navbar { border-bottom: 3px double #1C1C1E !important; }
+.navbar { border-bottom: 1px solid #D8D3C8 !important; }   /* light hairline, like main */
 .navbar .navbar-brand { font-size: 1.22rem; }
 
 /* Edition line — the under-masthead strip on the home page */
@@ -433,6 +433,7 @@ h2.home-section-title { border-bottom: 2px solid #1C1C1E; }
 .quarto-listing .listing-title {
   font-size: 1.4rem;
   line-height: 1.2;
+  margin-top: 0;            /* cancel the global h3 margin-top on listing titles */
   margin-bottom: 0.15rem;
 }
 .quarto-listing .listing-date {
@@ -475,8 +476,6 @@ main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter {
 .masthead {
   text-align: left;
   margin: 1rem 0 1.5rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 3px double #1C1C1E;   /* the single masthead separator */
 }
 .masthead .nameplate {
   font-family: 'DM Serif Display', Georgia, serif;
@@ -491,14 +490,6 @@ main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter {
   letter-spacing: 0.01em;
   color: #6A6A6A;
   margin-top: 0.4rem;
-}
-.masthead .folio {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.64rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #9A9A9A;
-  margin-top: 0.9rem;
 }
 .standfirst {
   max-width: 42rem;
@@ -515,26 +506,24 @@ main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter {
 /* dark variants */
 .quarto-dark .masthead .nameplate { color: #F0EBE0; }
 .quarto-dark .masthead .motto { color: #9A9A9A; }
-.quarto-dark .masthead { border-bottom-color: #E8E3D8; }
-.quarto-dark .masthead .folio { color: #7A7A7A; }
 .quarto-dark .standfirst p { color: #C8C3B8; }
 
 /* ═══ Index page — consistent section labels, legend, Cast, Stacks ════════ */
 
-/* Section heads — same label treatment as the home "RECENT NOTES" */
+/* Section heads — editorial serif, identical voice to the home section headers */
 h2.section-head {
-  font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 1.05rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-  color: #5A5A5A;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  color: #1C1C1E;
   margin-top: 2.75rem;
   margin-bottom: 0.9rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #1C1C1E;
 }
-.quarto-dark h2.section-head { color: #9A9A9A; border-bottom-color: #E8E3D8; }
+.quarto-dark h2.section-head { color: #F0EBE0; border-bottom-color: #E8E3D8; }
 
 /* Graph legend — crisp circles + line samples, baseline-aligned */
 .graph-legend {
@@ -560,37 +549,65 @@ h2.section-head {
 }
 .graph-legend .lg-line b.dashed { border-top-style: dashed; }
 
-/* The Thinkers — borderless contributor directory; a hairline over each entry.
-   Scales cleanly to any number of people: the grid just adds more rows. */
-#listing-cast .quarto-grid-item.card {
+/* ═══ The Thinkers & The Stacks — two parallel galleries, color-coded to the Map.
+   No full-width hairlines or separators: each entry carries a short accent tab
+   (person-purple / paper-orange). Delineation = whitespace + tab, not lines. ═══ */
+
+/* strip all Quarto card chrome on both galleries */
+#listing-cast .quarto-grid-item.card,
+#listing-stacks .quarto-grid-item.card {
   background: transparent !important;
-  border: none;
-  border-top: 1px solid #C8C3B8;
+  border: none !important;
   border-radius: 0;
   box-shadow: none;
 }
-#listing-cast .card-img-top, #listing-cast .thumbnail-image, #listing-cast .listing-item-img-placeholder { display: none !important; }
-#listing-cast .card-body { padding: 0.85rem 1.35rem 0.4rem 0; }
-#listing-cast .list > * { border-bottom: none !important; padding-top: 0 !important; padding-bottom: 0 !important; }
-#listing-cast .card-title.listing-title {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 1.15rem;
-  line-height: 1.15;
-  margin-bottom: 0.35rem;
+#listing-cast .card-img-top, #listing-cast .thumbnail-image, #listing-cast .listing-item-img-placeholder,
+#listing-stacks .card-img-top, #listing-stacks .thumbnail-image, #listing-stacks .listing-item-img-placeholder { display: none !important; }
+#listing-cast .list > *, #listing-stacks .list > * {
+  border-bottom: none !important; padding-top: 0 !important; padding-bottom: 0 !important;
 }
-#listing-cast .listing-description { font-size: 0.85rem; line-height: 1.5; color: #5A5A5A; }
-.quarto-dark #listing-cast .quarto-grid-item.card { border-top-color: #3A3A3C; }
-.quarto-dark #listing-cast .listing-description { color: #9A9A9A; }
 
-/* The Stacks — left-aligned reading list, no dead left gutter */
-#listing-stacks .quarto-post { display: block; }
-#listing-stacks .quarto-post .metadata, #listing-stacks .quarto-post .thumbnail { display: none; }
-#listing-stacks .quarto-post .body { width: 100%; max-width: none; flex: none; }
-#listing-stacks .listing-title {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 1.3rem;
-  line-height: 1.2;
-  margin-bottom: 0.2rem;
+/* breathing room between rows + right gutter within a card */
+#listing-cast .list, #listing-stacks .list { row-gap: 2.6rem; }
+#listing-cast .card-body, #listing-stacks .card-body { padding: 0 1.6rem 0 0; }
+
+/* the accent tab above each entry (color = Map legend) */
+#listing-cast .card-body::before,
+#listing-stacks .card-body::before {
+  content: ""; display: block;
+  width: 30px; height: 3px; border-radius: 2px;
+  margin-bottom: 0.9rem;
 }
-#listing-stacks .listing-description { font-size: 0.92rem; line-height: 1.55; color: #5A5A5A; }
+#listing-cast .card-body::before  { background: #7C6FB5; }   /* person */
+#listing-stacks .card-body::before { background: #B45309; }  /* paper  */
+
+/* titles — Title-Case editorial serif (override the theme h5 uppercase) */
+#listing-cast .card-title.listing-title,
+#listing-stacks .card-title.listing-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.18;
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0 0 0.4rem;
+}
+
+/* descriptions */
+#listing-cast .listing-description,
+#listing-stacks .listing-description { font-size: 0.9rem; line-height: 1.5; color: #5A5A5A; }
+#listing-stacks .listing-description p { margin: 0; }
+.quarto-dark #listing-cast .listing-description,
 .quarto-dark #listing-stacks .listing-description { color: #9A9A9A; }
+
+/* In-note TOC — Quarto's default right rail. Match the live deploy's toc-title
+   exactly (DM Sans, weight 500, 14.875px); the redesign's serif-h2 rule would
+   otherwise enlarge/embolden it. */
+nav[role="doc-toc"] > h2#toc-title {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 14.875px;
+  letter-spacing: normal;
+  text-transform: none;
+  margin-top: 0;
+  color: #1C1C1E;
+}

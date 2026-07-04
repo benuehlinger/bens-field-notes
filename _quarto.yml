@@ -57,8 +57,8 @@ format:
     fig-responsive: true
     grid:
       sidebar-width: 0px
-      body-width: 900px
-      margin-width: 200px
+      body-width: 1056px
+      margin-width: 253px
 
 execute:
   freeze: auto
