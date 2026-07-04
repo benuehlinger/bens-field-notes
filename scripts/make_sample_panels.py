@@ -42,5 +42,30 @@ pd.DataFrame({"date": ai_months, "value": np.round(ai_val, 1)}).to_parquet(
     OUT / "ai_sample.parquet", index=False
 )
 
+# ── Productivity J-curve thesis indicators (illustrative, quarterly) ──
+# Structured to mirror the real series: Census BTOS AI adoption, BEA IT/software
+# investment, BLS nonfarm output/hour, SF Fed utilization-adjusted TFP. The
+# "adjusted" line illustrates the Brynjolfsson intangibles-mismeasurement idea.
+jq = pd.date_range("2015-03-01", "2026-06-01", freq="QS")
+yrs = np.array([(d - pd.Timestamp("2015-01-01")).days / 365.25 for d in jq])
+post = np.clip(yrs - 7.5, 0, None)   # acceleration after ~mid-2022
+
+
+def _n(sig):
+    return rng.normal(0, sig, len(jq))
+
+
+jcurve = pd.DataFrame({
+    "date": jq,
+    "adoption":         np.round(4.0 + 0.12 * yrs + 1.55 * post + _n(0.2), 2),   # % of firms
+    "it_investment":    np.round(100 + 5.2 * yrs + 3.6 * post + _n(1.0), 1),     # index 2015=100
+    "productivity":     np.round(100 + 1.05 * yrs + _n(0.4), 1),                 # index 2015=100 (flat-ish)
+    "tfp":              np.round(100 + 0.42 * yrs + _n(0.4), 1),                 # index 2015=100
+})
+jcurve["productivity_adj"] = np.round(jcurve["productivity"] + 1.25 * post + _n(0.2), 1)
+jcurve.to_parquet(OUT / "jcurve_sample.parquet", index=False)
+
 print(f"✓ private_credit_sample.parquet ({len(pc_months)} months) — latest {pc_val[-1]:.2f}%")
 print(f"✓ ai_sample.parquet ({len(ai_months)} months) — latest {ai_val[-1]:.1f}%")
+print(f"✓ jcurve_sample.parquet ({len(jq)} quarters) — adoption {jcurve['adoption'].iloc[-1]:.1f}%, "
+      f"productivity idx {jcurve['productivity'].iloc[-1]:.1f}")

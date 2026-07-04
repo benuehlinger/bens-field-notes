@@ -239,6 +239,7 @@ retailChart = Plot.plot({
           <h3 class="brief-hed">The Trough, Measured</h3>
           <div class="brief-spark">${spark(ai, "#3A7D5E", 240, 34)}</div>
           <p class="brief-text">${fmt(aiCur)}% of enterprise AI pilots now show measurable P&amp;L impact, and the line is climbing. If Brynjolfsson is right, this is the boring part of the J-curve — before the payoff. Sample data, for now.</p>
+          <a class="lead-more" href="/desk/j-curve/">The J-curve watch — full thesis →</a>
         </div>
       </div>
     </div>

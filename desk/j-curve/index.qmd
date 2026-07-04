@@ -1,0 +1,171 @@
+---
+title: "The Productivity J-Curve"
+subtitle: "AI Desk · Thesis — is the payoff hiding in the measurement?"
+pagetitle: "The Productivity J-Curve — Ben's Field Notes"
+toc: false
+---
+
+```{=html}
+<style>
+main svg { max-width: 100%; height: auto; }
+.jc-lede { font-family: 'DM Sans', system-ui, sans-serif; font-size: 1.05rem; line-height: 1.6; color: #2C2C2C; max-width: 44rem; }
+.jc-links { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: #9A8F7A; margin: 0.6rem 0 0; }
+.jc-links a { color: #4A6FA5; text-decoration: none; }
+
+.jc-bet { border: 1px solid #1C1C1E; padding: 1rem 1.2rem; margin: 1.6rem 0; }
+.jc-bet .bt-lbl { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: #1C1C1E; font-weight: 500; }
+.jc-bet .bt-row { display: flex; gap: 1.6rem; margin-top: 0.5rem; flex-wrap: wrap; }
+.jc-bet .bt-cell { flex: 1 1 15rem; }
+.jc-bet .bt-cap { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.2rem; }
+.jc-bet .sup { color: #3A7D5E; } .jc-bet .ref { color: #B45309; }
+.jc-bet .bt-txt { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.9rem; line-height: 1.5; color: #2C2C2C; }
+
+.sec-kicker { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.5rem; color: #1C1C1E; border-bottom: 2px solid #1C1C1E; padding-bottom: 0.35rem; margin: 2.2rem 0 0.4rem; }
+.sec-dek { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.95rem; color: #5A5A5A; margin-bottom: 0.8rem; }
+
+.jc-panels { display: flex; gap: 0 2rem; align-items: flex-start; margin: 1rem 0 0; }
+.jc-panels > * { min-width: 0; flex: 1 1 0; }
+.jc-panels .left { border-right: 1px solid #C8C3B8; padding-right: 2rem; }
+.jc-panel figcaption { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: #1C1C1E; font-weight: 500; margin-bottom: 0.3rem; }
+.jc-legend { display: flex; gap: 1rem; font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: #6A6A6A; margin: 0.3rem 0; }
+.jc-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 0.3rem; vertical-align: middle; }
+.jc-read { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.86rem; line-height: 1.5; color: #5A5A5A; margin-top: 0.4rem; }
+
+.jc-recalc-body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.95rem; line-height: 1.6; color: #2C2C2C; max-width: 44rem; }
+.jc-verdict { border-top: 2px solid #1C1C1E; margin-top: 2rem; padding-top: 1rem; }
+.jc-verdict .v-lbl { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #B45309; }
+.jc-verdict .v-txt { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.3rem; line-height: 1.4; color: #1C1C1E; max-width: 42rem; margin: 0.3rem 0 0.9rem; }
+.editor-note { border-left: 3px solid #4A6FA5; padding: 0.55rem 0 0.55rem 1rem; background: rgba(74,111,165,0.045); }
+.en-label { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: #4A6FA5; }
+.en-empty { font-family: 'DM Sans', system-ui, sans-serif; font-style: italic; color: #9A9A9A; font-size: 0.9rem; margin-top: 0.25rem; }
+.jc-sample { font-family: 'DM Mono', monospace; font-size: 0.62rem; line-height: 1.55; letter-spacing: 0.04em; color: #7A7A7A; border-top: 1px solid #D8D3C8; margin-top: 2rem; padding-top: 0.7rem; }
+.jc-sample strong { color: #B45309; letter-spacing: 0.1em; }
+@media (max-width: 760px) { .jc-panels { flex-direction: column; gap: 1.5rem; } .jc-panels .left { border-right: none; padding-right: 0; border-bottom: 1px solid #C8C3B8; padding-bottom: 1.5rem; } }
+</style>
+```
+
+::: {.jc-lede}
+In 1987 Robert Solow quipped that you could see the computer age everywhere but in the productivity statistics. Brynjolfsson, Rock & Syverson (2018) built the escape hatch: general-purpose technologies demand years of *complementary, intangible* investment before they show up in output. Measured productivity flatlines — or dips — during the build-out, then inflects. A **J-curve**. This page is the running scoreboard for one bet: **AI is in the trough.**
+:::
+
+::: {.jc-links}
+Full argument → [The Trough Looks Like Failure](/posts/2026-07-02-the-trough-looks-like-failure/) · Sources → [Brynjolfsson](/people/erik-brynjolfsson.qmd), [the J-Curve paper](/sources/the-productivity-j-curve.qmd)
+:::
+
+```{=html}
+<div class="jc-bet">
+  <div class="bt-lbl">The bet</div>
+  <div class="bt-row">
+    <div class="bt-cell">
+      <div class="bt-cap sup">Supports the thesis</div>
+      <div class="bt-txt">Adoption and investment climb steeply for years while measured productivity stays flat or dips — then inflects up.</div>
+    </div>
+    <div class="bt-cell">
+      <div class="bt-cap ref">What would break it</div>
+      <div class="bt-txt">Productivity jumps immediately alongside adoption (no trough), or adoption and investment stall with no eventual payoff.</div>
+    </div>
+  </div>
+</div>
+```
+
+```{python}
+#| echo: false
+#| output: false
+from pathlib import Path
+import pandas as pd
+
+jc = pd.read_parquet(Path("../../analysis/outputs/jcurve_sample.parquet"))
+jc["date"] = pd.to_datetime(jc["date"]).dt.strftime("%Y-%m-%d")
+ojs_define(jc_data=jc.to_dict(orient="records"))
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+import { Plot } from "npm:@observablehq/plot"
+
+jc = jc_data.map(d => ({...d, date: new Date(d.date)}))
+last = a => a[a.length - 1]
+idx = key => jc.map(d => ({date: d.date, value: d[key] / jc[0][key] * 100}))
+raw = key => jc.map(d => ({date: d.date, value: d[key]}))
+fmtPct = v => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`
+
+twoLine = (a, b, w, h, extra = {}) => Plot.plot({
+  width: w, height: h, marginLeft: 30, marginBottom: 20, marginTop: 12, marginRight: 10,
+  x: {type: "utc", label: null, ticks: 4, tickFormat: "%y"},
+  y: {label: null, grid: true, ...(extra.y || {})},
+  style: {fontFamily: "DM Mono, monospace", fontSize: "9px"},
+  marks: [
+    ...(extra.baseline != null ? [Plot.ruleY([extra.baseline], {stroke: "#C8C3B8", strokeDasharray: "2,3"})] : []),
+    Plot.lineY(a.data, {x: "date", y: "value", stroke: a.color, strokeWidth: 1.9}),
+    Plot.lineY(b.data, {x: "date", y: "value", stroke: b.color, strokeWidth: 1.9, strokeDasharray: b.dash || null}),
+    Plot.dot([last(a.data)], {x: "date", y: "value", r: 3, fill: a.color}),
+    Plot.dot([last(b.data)], {x: "date", y: "value", r: 3, fill: b.color})
+  ]
+})
+
+inputsChart = twoLine({data: idx("adoption"), color: "#7C6FB5"}, {data: idx("it_investment"), color: "#4A6FA5"}, 380, 200)
+payoffChart = twoLine({data: raw("productivity"), color: "#3A7D5E"}, {data: raw("tfp"), color: "#9A8F7A"}, 380, 200, {baseline: 100, y: {domain: [92, 122]}})
+
+recalcData = jc.map(d => ({date: d.date, meas: d.productivity, adj: d.productivity_adj}))
+recalcChart = Plot.plot({
+  width: 660, height: 250, marginLeft: 32, marginBottom: 24, marginTop: 16, marginRight: 60,
+  x: {type: "utc", label: null, ticks: 5, tickFormat: "%Y"},
+  y: {label: null, grid: true},
+  style: {fontFamily: "DM Mono, monospace", fontSize: "10px"},
+  marks: [
+    Plot.areaY(recalcData, {x: "date", y1: "meas", y2: "adj", fill: "#3A7D5E", fillOpacity: 0.10}),
+    Plot.lineY(recalcData, {x: "date", y: "meas", stroke: "#6A6A6A", strokeWidth: 1.8}),
+    Plot.lineY(recalcData, {x: "date", y: "adj", stroke: "#3A7D5E", strokeWidth: 1.8, strokeDasharray: "3,3"}),
+    Plot.text([last(recalcData)], {x: "date", y: "adj", text: ["adjusted"], dx: 6, textAnchor: "start", fontSize: 9, fill: "#3A7D5E"}),
+    Plot.text([last(recalcData)], {x: "date", y: "meas", text: ["measured"], dx: 6, textAnchor: "start", fontSize: 9, fill: "#6A6A6A"})
+  ]
+})
+```
+
+<h2 class="sec-kicker">Inputs vs. payoff</h2>
+<p class="sec-dek">The whole thesis, in two pictures: the inputs are surging; the payoff isn't in the measured numbers — yet.</p>
+
+```{ojs}
+//| echo: false
+html`<div class="jc-panels">
+  <figure class="jc-panel left">
+    <figcaption>The inputs — surging</figcaption>
+    ${inputsChart}
+    <div class="jc-legend"><span><i style="background:#7C6FB5"></i>AI adoption</span><span><i style="background:#4A6FA5"></i>IT investment</span></div>
+    <div class="jc-read">AI adoption at <b>${last(jc).adoption.toFixed(1)}% of firms</b>, up from ~4% pre-2022. IT & software investment <b>${fmtPct(last(jc).it_investment - 100)}</b> since 2015 and accelerating. <span style="color:#9A8F7A">(indexed to 2015 = 100)</span></div>
+  </figure>
+  <figure class="jc-panel">
+    <figcaption>The payoff — not yet</figcaption>
+    ${payoffChart}
+    <div class="jc-legend"><span><i style="background:#3A7D5E"></i>Labor productivity</span><span><i style="background:#9A8F7A"></i>TFP</span></div>
+    <div class="jc-read">Output per hour <b>${fmtPct(last(jc).productivity - 100)}</b> across the whole decade (~1.1%/yr). TFP essentially <b>flat</b>. No inflection in the data. <span style="color:#9A8F7A">(indexed to 2015 = 100)</span></div>
+  </figure>
+</div>`
+```
+
+<h2 class="sec-kicker">The recalculation</h2>
+
+::: {.jc-recalc-body}
+The paradox may be partly an accounting artifact. When firms pour people and money into *building* AI capability — process redesign, data pipelines, retraining — that intangible investment is largely uncounted in output. So measured productivity **understates** what's actually being built during the trough. The dashed line adds back a rough intangibles wedge; the shaded gap is Brynjolfsson's argument in one shape: the payoff may already exist, just not where the official statistics are looking.
+:::
+
+```{ojs}
+//| echo: false
+html`<figure style="margin:1rem 0 0"><figcaption class="jc-legend"><span><i style="background:#6A6A6A"></i>Measured output/hour</span><span><i style="background:#3A7D5E"></i>Intangibles-adjusted (illustrative)</span></figcaption>${recalcChart}</figure>`
+```
+
+::: {.jc-verdict}
+<div class="v-lbl">The read · illustrative</div>
+<div class="v-txt">Inputs surging, payoff absent from the measured numbers. A textbook trough. The open question is whether the inflection is coming — or whether this general-purpose technology breaks the pattern.</div>
+<div class="editor-note">
+  <div class="en-label">Editor's note</div>
+  <div class="en-empty">No editor's note yet — this is where the quarterly take goes, updated as the data moves.</div>
+</div>
+:::
+
+```{=html}
+<div class="jc-sample">
+  <strong>Sample data — illustrative.</strong> The indicators here are synthetic, structured to mirror the real series they'll draw from: Census BTOS (AI adoption), BEA (IT &amp; software investment), BLS (nonfarm output per hour), and SF Fed (utilization-adjusted TFP). Swap in live FRED data with an API key.
+</div>
+```
