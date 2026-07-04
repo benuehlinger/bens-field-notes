@@ -1,0 +1,193 @@
+---
+title: "The Bank Lending Desk"
+subtitle: "SLOOS · Every quarter the Fed asks senior loan officers who's tightening. Scrub the timeline; read the dispatch."
+pagetitle: "Bank Lending Desk — Ben's Field Notes"
+toc: false
+---
+
+```{=html}
+<style>
+main svg { max-width: 100%; height: auto; }
+.scrub-ends { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: #9A8F7A; margin: 1.2rem 0 0.35rem; }
+.scrub-ends .mid { color: #4A6FA5; }
+input[type=range].scrubber { width: 100%; accent-color: #4A6FA5; }
+.scrub-btns { display: flex; gap: 0.6rem; margin: 0.6rem 0 0; }
+.scrub-btns button { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #4A6FA5; background: none; border: 1px solid #C8C3B8; border-radius: 3px;
+  padding: 0.3rem 0.7rem; cursor: pointer; }
+.scrub-btns button:hover { border-color: #4A6FA5; }
+
+.dispatch { border-top: 2px solid #1C1C1E; padding-top: 1rem; margin-top: 1.6rem; }
+.dsp-date { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: #B45309; }
+.dsp-head { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin: 0.25rem 0 0.7rem; }
+.dsp-num { font-family: 'DM Serif Display', Georgia, serif; font-size: 2.7rem; line-height: 1; color: #1C1C1E; }
+.dsp-num .u { font-size: 1rem; color: #6A6A6A; }
+.dsp-tag { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 3px; align-self: center; }
+.tag-tight { color: #B45309; border: 1px solid #E3C9A8; }
+.tag-ease  { color: #3A7D5E; border: 1px solid #B9D6C6; }
+.tag-watch { color: #fff; background: #B45309; }
+.dsp-narr { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.28rem; line-height: 1.42; color: #2C2C2C; max-width: 42rem; margin-bottom: 1.1rem; }
+.dsp-grid { display: flex; gap: 2rem; flex-wrap: wrap; margin: 0.9rem 0 1.3rem; }
+.dsp-cell .lbl { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: #9A8F7A; }
+.dsp-cell .v { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.5rem; color: #1C1C1E; line-height: 1.2; }
+.editor-note { border-left: 3px solid #4A6FA5; padding: 0.55rem 0 0.55rem 1rem; background: rgba(74,111,165,0.045); }
+.en-label { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: #4A6FA5; }
+.en-sample { color: #B45309; }
+.en-text { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.96rem; line-height: 1.55; color: #2C2C2C; margin-top: 0.25rem; }
+.en-empty { font-family: 'DM Sans', system-ui, sans-serif; font-style: italic; color: #9A9A9A; font-size: 0.9rem; margin-top: 0.25rem; }
+</style>
+```
+
+Every dot on the line below is one survey — one quarter of banks answering the same question. Drag
+the scrubber to walk through them; the dispatch underneath rewrites itself for whichever quarter you land on.
+
+```{python}
+#| echo: false
+#| output: false
+from pathlib import Path
+import pandas as pd
+
+sloos = pd.read_parquet(Path("../../analysis/outputs/sloos_dashboard.parquet"))
+sloos["survey_date"] = pd.to_datetime(sloos["survey_date"]).dt.strftime("%Y-%m-%d")
+ojs_define(sloos_all=sloos.to_dict(orient="records"))
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+import { Plot } from "npm:@observablehq/plot"
+
+rows = sloos_all.map(d => ({date: new Date(d.survey_date), loan_type: d.loan_type, value: +d.net_pct_tightening}))
+LOAN_TYPES = ["C&I - Large", "C&I - Small", "Consumer - Credit Card", "Consumer - Auto"]
+quarters = Array.from(new Set(rows.map(d => +d.date))).sort((a, b) => a - b).map(t => new Date(t))
+byQuarter = {
+  const m = new Map();
+  for (const q of quarters) m.set(+q, {});
+  for (const r of rows) m.get(+r.date)[r.loan_type] = r.value;
+  return m;
+}
+ci = quarters.map(q => ({date: q, value: byQuarter.get(+q)["C&I - Large"] ?? null}))
+
+fmt = (v, s = false) => v == null ? "—" : `${s && v > 0 ? "+" : ""}${(+v).toLocaleString(undefined, {maximumFractionDigits: 1})}`
+qLabel = d => `Q${Math.floor(d.getUTCMonth() / 3) + 1} ${d.getUTCFullYear()}`
+isoDate = d => d.toISOString().slice(0, 10)
+ord = n => { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+
+narrate = i => {
+  const q = ci[i], p = i > 0 ? ci[i - 1] : null;
+  if (q.value == null) return "No C&I reading was published this quarter.";
+  const dd = (p && p.value != null) ? q.value - p.value : null;
+  const dir = q.value > 0 ? "tightening" : q.value < 0 ? "easing" : "holding steady on";
+  const move = dd == null ? ""
+    : dd > 0 ? `, up ${dd.toFixed(1)} points from the prior quarter`
+    : dd < 0 ? `, down ${Math.abs(dd).toFixed(1)} points from the prior quarter`
+    : `, unchanged from the prior quarter`;
+  const watch = q.value >= 40 ? "past the +40% line that has historically preceded recessions"
+    : q.value >= 20 ? "above the +20% line that has historically been worth watching"
+    : "still short of the +20% watch line";
+  let s = 0; for (let j = i; j >= 0; j--) { if (ci[j].value > 0) s++; else break; }
+  const streak = (q.value > 0 && s > 1) ? ` It is the ${ord(s)} straight quarter of net tightening.` : "";
+  return `Banks reported a net ${fmt(q.value, true)}% ${dir} in large-firm C&I standards${move} — ${watch}.${streak}`;
+}
+
+// Demo editor's notes — placeholders in Ben's voice slot; replace with real takes.
+takes = ({
+  "2020-04-01": "The COVID quarter. The window didn't tighten so much as slam — the sharpest move this series has ever recorded. Mostly a reminder that sentiment can travel 60 points in a single survey when everyone panics at once.",
+  "2023-04-01": "The SVB aftershock shows up here as a real tightening impulse. It was real. It also faded faster than the regional-bank doom crowd wanted it to."
+})
+```
+
+## The timeline
+
+```{ojs}
+//| echo: false
+html`<div class="scrub-ends">
+  <span>${qLabel(quarters[0])}</span>
+  <span class="mid">◀ drag through time ▶</span>
+  <span>${qLabel(quarters[quarters.length - 1])}</span>
+</div>`
+```
+
+```{ojs}
+//| echo: false
+viewof qi = html`<input type="range" class="scrubber" min="0" max="${quarters.length - 1}" step="1" value="${quarters.length - 1}">`
+```
+
+```{ojs}
+//| echo: false
+{
+  const step = d => {
+    const el = viewof qi;
+    el.value = Math.max(0, Math.min(quarters.length - 1, +el.value + d));
+    el.dispatchEvent(new Event("input", {bubbles: true}));
+  };
+  const mk = (label, d) => {
+    const b = html`<button>${label}</button>`;
+    b.onclick = () => step(d);
+    return b;
+  };
+  return html`<div class="scrub-btns">${mk("◀ Prev quarter", -1)}${mk("Next quarter ▶", 1)}</div>`;
+}
+```
+
+```{ojs}
+//| echo: false
+{
+  const i = +qi;
+  const sel = ci[i];
+  return Plot.plot({
+    width: 860, height: 300, marginLeft: 34, marginBottom: 26, marginTop: 18, marginRight: 14,
+    x: {type: "utc", label: null, ticks: 6, tickFormat: "%Y"},
+    y: {label: null, grid: true, tickFormat: d => `${d}%`},
+    style: {fontFamily: "DM Mono, monospace", fontSize: "10px"},
+    marks: [
+      Plot.rect([{s: new Date("2020-02-01"), e: new Date("2020-05-01")}],
+        {x1: "s", x2: "e", y1: -20, y2: 100, fill: "#1C1C1E", fillOpacity: 0.04}),
+      Plot.ruleY([0], {stroke: "#9CA3AF", strokeDasharray: "3,3"}),
+      Plot.ruleY([20], {stroke: "#B45309", strokeDasharray: "2,4", strokeOpacity: 0.7}),
+      Plot.text([{}], {x: quarters[0], y: 20, text: ["+20% watch"], textAnchor: "start", dx: 3, dy: -5, fill: "#B45309", fontSize: 10}),
+      Plot.lineY(ci, {x: "date", y: "value", stroke: "#C8C3B8", strokeWidth: 1}),
+      Plot.lineY(ci.slice(0, i + 1), {x: "date", y: "value", stroke: "#4A6FA5", strokeWidth: 2}),
+      Plot.ruleX([sel.date], {stroke: "#1C1C1E", strokeDasharray: "2,3", strokeOpacity: 0.45}),
+      Plot.dot([sel], {x: "date", y: "value", r: 5, fill: "#4A6FA5", stroke: "#F7F6F2", strokeWidth: 1.5}),
+      Plot.text([sel], {x: "date", y: "value", text: d => fmt(d.value, true) + "%", dy: -13, fontWeight: 600, fontSize: 12, fill: "#1C1C1E"})
+    ]
+  });
+}
+```
+
+```{ojs}
+//| echo: false
+{
+  const i = +qi;
+  const q = quarters[i];
+  const v = byQuarter.get(+q)["C&I - Large"];
+  const tag = v == null ? null
+    : v >= 20 ? {t: "watch line", c: "tag-watch"}
+    : v > 0 ? {t: "net tightening", c: "tag-tight"}
+    : {t: "net easing", c: "tag-ease"};
+  const take = takes[isoDate(q)];
+
+  return html`<div class="dispatch">
+    <div class="dsp-date">Dispatch · ${qLabel(q)} · SLOOS release</div>
+    <div class="dsp-head">
+      <span class="dsp-num">${fmt(v, true)}<span class="u">%</span></span>
+      ${tag ? html`<span class="dsp-tag ${tag.c}">${tag.t}</span>` : ""}
+    </div>
+    <p class="dsp-narr">${narrate(i)}</p>
+    <div class="dsp-grid">
+      ${LOAN_TYPES.map(lt => html`<div class="dsp-cell">
+        <div class="lbl">${lt}</div>
+        <div class="v">${fmt(byQuarter.get(+q)[lt], true)}${byQuarter.get(+q)[lt] == null ? "" : "%"}</div>
+      </div>`)}
+    </div>
+    <div class="editor-note">
+      <div class="en-label">Editor's note ${take ? html`<span class="en-sample">· sample</span>` : ""}</div>
+      ${take
+        ? html`<p class="en-text">${take}</p>`
+        : html`<p class="en-empty">No editor's note for this dispatch yet — this is where the hand-written take goes.</p>`}
+    </div>
+  </div>`;
+}
+```
