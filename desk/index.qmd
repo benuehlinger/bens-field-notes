@@ -1,55 +1,96 @@
 ---
-pagetitle: "The Desk — Ben's Field Notes"
-description: "Live readings from each desk, updated as new data drops."
+pagetitle: "The Field Notes Ledger"
+description: "A data newspaper — the latest reading from each desk, with commentary."
 page-layout: full
 toc: false
 ---
 
 ```{=html}
 <style>
-.desk-masthead {
-  display: flex; justify-content: space-between; align-items: baseline;
-  border-bottom: 2px solid #1C1C1E; padding-bottom: 0.55rem; margin: 0.5rem 0 0.4rem;
-}
-.desk-nameplate { font-family: 'DM Serif Display', Georgia, serif; font-size: 2.4rem; letter-spacing: -0.025em; color: #1C1C1E; line-height: 1; }
-.desk-dateline { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9A8F7A; }
-.desk-standfirst { font-family: 'DM Sans', system-ui, sans-serif; font-size: 1.02rem; color: #5A5A5A; margin: 0 0 0.5rem; max-width: 46rem; }
+/* ── Masthead ── */
+.ledger-mast { text-align: center; margin: 0.4rem 0 0; }
+.lm-eyebrow { display: flex; justify-content: space-between; align-items: baseline;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #6A6A6A; border-bottom: 1px solid #1C1C1E; padding-bottom: 0.3rem; }
+.lm-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 4rem; line-height: 1;
+  letter-spacing: -0.02em; color: #1C1C1E; margin: 0.55rem 0 0.4rem; }
+.lm-sub { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9A8F7A;
+  border-top: 1px solid #1C1C1E; border-bottom: 1px solid #1C1C1E; padding: 0.32rem 0; }
 
-.desk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 0.5rem; border-top: 1px solid #D8D3C8; }
-.desk-panel { padding: 1.7rem 2rem; border-bottom: 1px solid #D8D3C8; }
-.desk-panel:nth-child(odd)  { border-right: 1px solid #D8D3C8; padding-left: 0; }
-.desk-panel:nth-child(even) { padding-right: 0; }
-.desk-panel:nth-last-child(-n+2) { border-bottom: none; }
+/* ── Asymmetric body: narrow tape · wide lead · medium side ── */
+/* flex (not grid) so Quarto's page-columns machinery can't hijack the tracks */
+.ledger-body { display: flex !important; align-items: flex-start; gap: 0 1.7rem; margin-top: 1.4rem; }
+.ledger-body > * { min-width: 0; }
+.col-tape { flex: 0 0 18%; }
+.col-lead { flex: 1 1 0; }
+.col-side { flex: 0 0 27%; }
+.col-tape, .col-lead { border-right: 1px solid #C8C3B8; padding-right: 1.6rem; }
+.lead-chart svg, .brief-spark svg, .tape-spark svg { max-width: 100%; height: auto; }
 
-.dp-kicker { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: #1C1C1E; font-weight: 500; }
-.dp-meta   { color: #9A8F7A; }
-.dp-figure { font-family: 'DM Serif Display', Georgia, serif; font-size: 3.3rem; line-height: 1; color: #1C1C1E; margin-top: 0.55rem; }
-.dp-unit   { font-size: 1.4rem; color: #6A6A6A; margin-left: 0.1rem; }
-.dp-label  { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.95rem; color: #3A3A3A; margin-top: 0.15rem; }
-.dp-spark  { margin: 1rem 0 0.45rem; }
-.dp-delta  { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.05em; color: #6A6A6A; }
-.dp-blurb  { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.92rem; line-height: 1.5; color: #5A5A5A; margin: 0.85rem 0 0.95rem; max-width: 34rem; }
-.dp-foot   { display: flex; align-items: center; gap: 0.9rem; }
-.dp-open   { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.85rem; font-weight: 500; color: #4A6FA5; text-decoration: none; }
-.dp-open:hover { color: #2E4B78; }
-.dp-open.disabled { color: #A8A8A8; pointer-events: none; }
-.dp-sample { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: #B45309; border: 1px solid #E3C9A8; border-radius: 3px; padding: 0.14rem 0.42rem; }
+/* The Tape (data rail) */
+.tape-title { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #1C1C1E; font-weight: 500; border-bottom: 2px solid #1C1C1E;
+  padding-bottom: 0.3rem; margin-bottom: 0.5rem; }
+.tape-row { border-bottom: 1px solid #E0DBD0; padding: 0.75rem 0; }
+.tape-row:last-child { border-bottom: none; }
+.tape-desk { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #9A8F7A; display: flex; justify-content: space-between; }
+.tape-num { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.7rem; line-height: 1; color: #1C1C1E; margin-top: 0.15rem; }
+.tape-num .u { font-size: 0.8rem; color: #6A6A6A; }
+.tape-spark { margin: 0.3rem 0 0.15rem; }
+.tape-delta { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.04em; color: #6A6A6A; }
+.smp { color: #B45309; }
 
-@media (max-width: 720px) {
-  .desk-grid { grid-template-columns: 1fr; }
-  .desk-panel { border-right: none !important; padding: 1.3rem 0 !important; }
-  .desk-panel:nth-last-child(-n+2) { border-bottom: 1px solid #D8D3C8; }
-  .desk-panel:last-child { border-bottom: none; }
+/* Lead story */
+.lead-kicker { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: #B45309; }
+.lead-hed { font-family: 'DM Serif Display', Georgia, serif; font-size: 2.7rem; line-height: 1.02;
+  letter-spacing: -0.015em; color: #1C1C1E; margin: 0.25rem 0 0.15rem; }
+.lead-byline { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #9A8F7A; margin-bottom: 0.9rem; }
+.lead-chart { margin: 0.2rem 0 0.4rem; }
+.lead-chart svg { max-width: 100%; height: auto; }
+.lead-cap { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #9A8F7A; margin-bottom: 1rem; }
+.lead-body { columns: 2; column-gap: 1.7rem; font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.92rem; line-height: 1.62; color: #2C2C2C; }
+.lead-body p { margin: 0 0 0.75rem; }
+.lead-body p.drop::first-letter { font-family: 'DM Serif Display', Georgia, serif; font-size: 3.1rem;
+  line-height: 0.78; float: left; padding: 0.28rem 0.5rem 0 0; color: #1C1C1E; }
+.pull-stat { break-inside: avoid; border-top: 2px solid #1C1C1E; border-bottom: 1px solid #1C1C1E;
+  padding: 0.5rem 0; margin: 0.2rem 0 0.7rem; }
+.ps-num { font-family: 'DM Serif Display', Georgia, serif; font-size: 2rem; line-height: 1; color: #B45309; }
+.ps-cap { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.8rem; color: #5A5A5A; margin-top: 0.15rem; }
+.lead-more { display: inline-block; margin-top: 0.6rem; font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 500; font-size: 0.9rem; color: #4A6FA5; text-decoration: none; }
+.lead-more:hover { color: #2E4B78; }
+
+/* Side column */
+.side-brief { padding-bottom: 1.1rem; margin-bottom: 1.1rem; border-bottom: 1px solid #C8C3B8; }
+.brief-kicker { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9A8F7A; }
+.brief-hed { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; line-height: 1.08; color: #1C1C1E; margin: 0.15rem 0 0.35rem; }
+.brief-spark { margin: 0.2rem 0 0.4rem; }
+.brief-text { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.85rem; line-height: 1.5; color: #5A5A5A; }
+.ai-box { border: 1px solid #1C1C1E; padding: 1rem 1.1rem; }
+.ai-box .brief-hed { margin-top: 0.1rem; }
+.sample-tag { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #B45309; border: 1px solid #E3C9A8; border-radius: 3px; padding: 0.1rem 0.36rem; margin-left: 0.4rem; vertical-align: middle; }
+
+/* Footer fine-print */
+.ledger-foot { border-top: 2px solid #1C1C1E; margin-top: 1.5rem; padding-top: 0.6rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; font-family: 'DM Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.06em; color: #7A7A7A; line-height: 1.55; }
+.ledger-foot strong { color: #1C1C1E; letter-spacing: 0.1em; }
+
+@media (max-width: 900px) {
+  .ledger-body { flex-direction: column; }
+  .col-tape, .col-lead, .col-side { flex: 1 1 auto; }
+  .col-tape, .col-lead { border-right: none; padding-right: 0; border-bottom: 1px solid #C8C3B8; padding-bottom: 1.2rem; margin-bottom: 1.2rem; }
+  .lead-body { columns: 1; }
+  .ledger-foot { grid-template-columns: 1fr; }
 }
 </style>
 ```
-
-::: {.desk-masthead}
-<div class="desk-nameplate">The Desk</div>
-<div class="desk-dateline">Live readings · rebuilt on each data drop</div>
-:::
-
-<p class="desk-standfirst">The latest reading from each desk. Click into one for the full timeline — how the number got here, one release at a time.</p>
 
 ```{python}
 #| echo: false
@@ -65,27 +106,21 @@ def records(df, dcol, vcol):
     df = df.rename(columns={dcol: "date", vcol: "value"}).sort_values("date")
     return df.to_dict(orient="records")
 
-# ── Bank Lending (SLOOS, real) — C&I large net tightening, quarterly ──
 sloos = pd.read_parquet(O / "sloos_dashboard.parquet")
 panel_bank = records(sloos[sloos["loan_type"] == "C&I - Large"], "survey_date", "net_pct_tightening")
 
-# ── Retail Credit (ABS-EE, real) — loan-weighted 30+ day auto delinquency, monthly ──
 abs_ee = pd.read_parquet(O / "abs_ee_dashboard.parquet")
 abs_ee["month"] = pd.to_datetime(abs_ee["filing_date"]).dt.to_period("M").dt.to_timestamp()
 abs_ee["d30_cnt"] = abs_ee["d30_rate"] / 100 * abs_ee["loans_with_status"]
-grp = abs_ee.groupby("month").agg(
-    d30_cnt=("d30_cnt", "sum"), loans=("loans_with_status", "sum"), n=("d30_cnt", "size")
-).reset_index()
+grp = abs_ee.groupby("month").agg(d30_cnt=("d30_cnt", "sum"), loans=("loans_with_status", "sum"), n=("d30_cnt", "size")).reset_index()
 grp["value"] = 100 * grp["d30_cnt"] / grp["loans"]
 retail = grp[(grp["n"] >= 5) & (grp["month"] >= "2018-01-01")]
 panel_retail = records(retail, "month", "value")
 
-# ── Private Credit + AI (synthetic sample) ──
 panel_private = records(pd.read_parquet(O / "private_credit_sample.parquet"), "date", "value")
 panel_ai = records(pd.read_parquet(O / "ai_sample.parquet"), "date", "value")
 
-ojs_define(panel_bank=panel_bank, panel_retail=panel_retail,
-           panel_private=panel_private, panel_ai=panel_ai)
+ojs_define(panel_bank=panel_bank, panel_retail=panel_retail, panel_private=panel_private, panel_ai=panel_ai)
 ```
 
 ```{ojs}
@@ -94,66 +129,124 @@ ojs_define(panel_bank=panel_bank, panel_retail=panel_retail,
 import { Plot } from "npm:@observablehq/plot"
 
 mkSeries = recs => recs.map(d => ({date: new Date(d.date), value: +d.value}))
+bank = mkSeries(panel_bank)
+retail = mkSeries(panel_retail)
+priv = mkSeries(panel_private)
+ai = mkSeries(panel_ai)
 
-PANELS = [
-  {desk: "Bank Lending", meta: "SLOOS · Quarterly", real: true,
-   data: mkSeries(panel_bank), unit: "%", signed: true,
-   label: "net C&I-large tightening",
-   blurb: "How many banks tightened vs. eased lending standards — the Fed's quarterly loan-officer survey.",
-   href: "/posts/2026-06-05-bank-lending-standards/", color: "#4A6FA5"},
-
-  {desk: "Retail Credit", meta: "ABS-EE · Monthly", real: true,
-   data: mkSeries(panel_retail), unit: "%", signed: false,
-   label: "auto-loan 30+ day delinquency",
-   blurb: "Delinquency on securitized auto loans, aggregated from SEC ABS-EE filings.",
-   href: "#", color: "#B45309"},
-
-  {desk: "Private Credit", meta: "Sample · Monthly", real: false,
-   data: mkSeries(panel_private), unit: "%", signed: false,
-   label: "direct-lending non-accrual rate",
-   blurb: "Illustrative placeholder until BDC / private-credit data lands in the lake.",
-   href: "#", color: "#7C6FB5"},
-
-  {desk: "AI", meta: "Sample · Monthly", real: false,
-   data: mkSeries(panel_ai), unit: "%", signed: false,
-   label: "enterprise pilots with measurable ROI",
-   blurb: "Illustrative — the slow climb out of the productivity J-curve trough.",
-   href: "#", color: "#3A7D5E"}
-]
-
-fmt = (v, signed) => `${signed && v > 0 ? "+" : ""}${v.toLocaleString(undefined, {maximumFractionDigits: 1})}`
+last = a => a[a.length - 1]
+prev = a => a[a.length - 2]
+fmt = (v, s = false) => `${s && v > 0 ? "+" : ""}${(+v).toLocaleString(undefined, {maximumFractionDigits: 1})}`
 fmtMonth = d => d.toLocaleString("en-US", {month: "short", year: "numeric", timeZone: "UTC"})
+streakUp = a => { let s = 0; for (let i = a.length - 1; i >= 0; i--) { if (a[i].value > 0) s++; else break; } return s; }
 
-sparkline = (data, color) => Plot.plot({
-  width: 300, height: 52, margin: 2, axis: null, x: {type: "utc"},
+spark = (data, color, w = 150, h = 26) => Plot.plot({
+  width: w, height: h, margin: 1, axis: null, x: {type: "utc"},
   marks: [
-    Plot.areaY(data, {x: "date", y: "value", fill: color, fillOpacity: 0.09}),
-    Plot.lineY(data, {x: "date", y: "value", stroke: color, strokeWidth: 1.5}),
-    Plot.dot([data[data.length - 1]], {x: "date", y: "value", r: 3, fill: color})
+    Plot.areaY(data, {x: "date", y: "value", fill: color, fillOpacity: 0.10}),
+    Plot.lineY(data, {x: "date", y: "value", stroke: color, strokeWidth: 1.2}),
+    Plot.dot([last(data)], {x: "date", y: "value", r: 2.4, fill: color})
+  ]
+})
+
+leadChart = Plot.plot({
+  width: 600, height: 236, marginLeft: 32, marginBottom: 22, marginTop: 14, marginRight: 10,
+  x: {type: "utc", label: null, ticks: 5, tickFormat: "%Y"},
+  y: {label: null, grid: true, tickFormat: d => `${d}%`, ticks: 5},
+  style: {fontFamily: "DM Mono, monospace", fontSize: "10px"},
+  marks: [
+    Plot.rect([{s: new Date("2020-02-01"), e: new Date("2020-05-01")}],
+      {x1: "s", x2: "e", y1: -20, y2: 100, fill: "#1C1C1E", fillOpacity: 0.04}),
+    Plot.ruleY([0], {stroke: "#9CA3AF", strokeDasharray: "3,3"}),
+    Plot.ruleY([20], {stroke: "#B45309", strokeDasharray: "2,4", strokeOpacity: 0.7}),
+    Plot.text([{}], {x: bank[0].date, y: 20, text: ["+20% watch line"], textAnchor: "start", dx: 3, dy: -5, fill: "#B45309", fontSize: 10}),
+    Plot.areaY(bank, {x: "date", y: "value", fill: "#4A6FA5", fillOpacity: 0.08}),
+    Plot.lineY(bank, {x: "date", y: "value", stroke: "#4A6FA5", strokeWidth: 1.75}),
+    Plot.dot([last(bank)], {x: "date", y: "value", r: 3.5, fill: "#4A6FA5"})
+  ]
+})
+
+retailChart = Plot.plot({
+  width: 320, height: 108, marginLeft: 26, marginBottom: 18, marginTop: 6, marginRight: 6,
+  x: {type: "utc", label: null, ticks: 4, tickFormat: "%y"},
+  y: {label: null, grid: true, ticks: 3, tickFormat: d => `${d}%`},
+  style: {fontFamily: "DM Mono, monospace", fontSize: "9px"},
+  marks: [
+    Plot.areaY(retail, {x: "date", y: "value", fill: "#B45309", fillOpacity: 0.08}),
+    Plot.lineY(retail, {x: "date", y: "value", stroke: "#B45309", strokeWidth: 1.4}),
+    Plot.dot([last(retail)], {x: "date", y: "value", r: 2.8, fill: "#B45309"})
   ]
 })
 ```
 
 ```{ojs}
 //| echo: false
-html`<div class="desk-grid">
-  ${PANELS.map(p => {
-    const last = p.data[p.data.length - 1];
-    const prev = p.data[p.data.length - 2];
-    const delta = last.value - prev.value;
-    const arrow = delta > 0 ? "▲" : delta < 0 ? "▼" : "▬";
-    return html`<article class="desk-panel">
-      <div class="dp-kicker">${p.desk}<span class="dp-meta"> · ${p.meta}</span></div>
-      <div class="dp-figure">${fmt(last.value, p.signed)}<span class="dp-unit">${p.unit}</span></div>
-      <div class="dp-label">${p.label}</div>
-      <div class="dp-spark">${sparkline(p.data, p.color)}</div>
-      <div class="dp-delta">${arrow} ${fmt(delta, true)} vs prior · ${fmtMonth(last.date)}</div>
-      <p class="dp-blurb">${p.blurb}</p>
-      <div class="dp-foot">
-        <a class="dp-open ${p.href === "#" ? "disabled" : ""}" href="${p.href}">${p.href === "#" ? "Timeline coming soon" : "Open desk →"}</a>
-        ${p.real ? "" : html`<span class="dp-sample">Sample data</span>`}
+{
+  const cur = last(bank), pv = prev(bank), delta = cur.value - pv.value, streak = streakUp(bank);
+  const rCur = last(retail).value, pcCur = last(priv).value, aiCur = last(ai).value;
+  const asOf = fmtMonth(cur.date);
+
+  const tapeRow = (desk, meta, val, unit, data, color, sample) => html`<div class="tape-row">
+    <div class="tape-desk"><span>${desk}</span><span class="${sample ? "smp" : ""}">${meta}</span></div>
+    <div class="tape-num">${val}<span class="u">${unit}</span></div>
+    <div class="tape-spark">${spark(data, color, 160, 26)}</div>
+  </div>`;
+
+  return html`<div>
+    <header class="ledger-mast">
+      <div class="lm-eyebrow"><span>Credit · Rates · AI — Four Desks</span><span>Vol. I · No. 1</span></div>
+      <div class="lm-name">The Field Notes Ledger</div>
+      <div class="lm-sub"><span>Rigorous analysis · questionable conclusions</span><span>Readings as of ${asOf}</span></div>
+    </header>
+
+    <div class="ledger-body">
+      <aside class="col-tape">
+        <div class="tape-title">The Tape</div>
+        ${tapeRow("Bank Lending", "SLOOS", fmt(cur.value, true) + "%", "", bank, "#4A6FA5", false)}
+        ${tapeRow("Retail Credit", "ABS-EE", fmt(rCur) + "%", "", retail, "#B45309", false)}
+        ${tapeRow("Private Credit", "SAMPLE", fmt(pcCur) + "%", "", priv, "#7C6FB5", true)}
+        ${tapeRow("AI", "SAMPLE", fmt(aiCur) + "%", "", ai, "#3A7D5E", true)}
+      </aside>
+
+      <main class="col-lead">
+        <div class="lead-kicker">The Bank Lending Desk · SLOOS · Quarterly</div>
+        <h2 class="lead-hed">Still Cautious, Just Quieter About It</h2>
+        <div class="lead-byline">By the Bank Lending Desk · ${asOf}</div>
+        <div class="lead-chart">${leadChart}</div>
+        <div class="lead-cap">Net % of banks tightening C&amp;I standards (large & middle-market), 2018–${cur.date.getUTCFullYear()}</div>
+        <div class="lead-body">
+          <p class="drop">Four times a year the Federal Reserve asks senior loan officers one question worth caring about — are you making it harder or easier to borrow? Net the tighteners against the easers and you get a diffusion index: crude, honest, and one of the few credit signals that leads instead of lags.</p>
+          <p>This quarter large-firm C&amp;I printed ${fmt(cur.value, true)}%, ${delta >= 0 ? "up" : "down"} ${Math.abs(delta).toFixed(1)} points from last quarter — ${streak > 1 ? `${streak} straight quarters` : "back"} on the tightening side of zero. Banks being cautious, not scared.</p>
+          <div class="pull-stat">
+            <div class="ps-num">+20%</div>
+            <div class="ps-cap">The line history says precedes trouble. We're sitting at ${fmt(cur.value, true)}.</div>
+          </div>
+          <p>Cross that line and something in the economy is usually about to break. We are nowhere near it — which is either reassuring or the calm part of the movie, depending on your disposition.</p>
+        </div>
+        <a class="lead-more" href="/desk/bank-lending/">Open the Bank Lending desk — the full timeline →</a>
+      </main>
+
+      <div class="col-side">
+        <div class="side-brief">
+          <div class="brief-kicker">Retail Credit · ABS-EE · Monthly</div>
+          <h3 class="brief-hed">Auto Borrowers, Stretched but Standing</h3>
+          <div class="brief-spark">${retailChart}</div>
+          <p class="brief-text">Thirty-plus-day delinquency on securitized auto loans reads ${fmt(rCur)}%, pooled across every ABS-EE filer. Elevated and stubbornly flat — the consumer is stretched, not snapping.</p>
+        </div>
+
+        <div class="ai-box">
+          <div class="brief-kicker">The AI Desk<span class="sample-tag">Sample</span></div>
+          <h3 class="brief-hed">The Trough, Measured</h3>
+          <div class="brief-spark">${spark(ai, "#3A7D5E", 240, 34)}</div>
+          <p class="brief-text">${fmt(aiCur)}% of enterprise AI pilots now show measurable P&amp;L impact, and the line is climbing. If Brynjolfsson is right, this is the boring part of the J-curve — before the payoff. Sample data, for now.</p>
+        </div>
       </div>
-    </article>`;
-  })}
-</div>`
+    </div>
+
+    <footer class="ledger-foot">
+      <div><strong>Private Credit Desk · Sample.</strong> Direct-lending non-accruals at ${fmt(pcCur)}% and drifting higher. Illustrative placeholder until BDC data lands in the lake.</div>
+      <div><strong>Methods.</strong> Bank Lending (SLOOS) and Retail Credit (ABS-EE) are live from the bens-data-lake pipeline. Private Credit and AI are synthetic samples — clearly marked, and not analysis.</div>
+    </footer>
+  </div>`
+}
 ```
