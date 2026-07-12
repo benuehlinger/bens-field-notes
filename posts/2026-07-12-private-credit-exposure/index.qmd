@@ -40,7 +40,22 @@ _agg = pd.read_parquet(Path("../../analysis/outputs/ndfi_aggregate_series.parque
 _latest = _panel["quarter"].max()
 _cur = _panel[_panel["quarter"] == _latest].copy()
 
-# tidy holding-company display names
+# Roll subsidiary banks up to the top-tier holding company. Many companies file
+# through several bank subs (Wells Fargo 5, Morgan Stanley 2, BNY 4), which would
+# otherwise show up as duplicate points and double-labelled banks.
+_cur["entity"] = _cur["NAMEHCR"].str.strip()
+_cur.loc[_cur["entity"] == "", "entity"] = _cur["NAME"]
+_g = _cur.groupby("entity").agg(
+    ndfi=("LNNDEPC", "sum"), tier1=("RBCT1J", "sum"),
+    assets=("ASSET", "sum"), loans=("LNLSNET", "sum"),
+    certs=("CERT", lambda s: set(s)),
+).reset_index()
+_g["ndfi_to_tier1"] = _g["ndfi"] / _g["tier1"]
+_g["ndfi_to_loans"] = _g["ndfi"] / _g["loans"]
+_g["ndfi_bn"] = _g["ndfi"] / 1e6
+_g["asset_bn"] = _g["assets"] / 1e6
+_g["example"] = _g["certs"].apply(lambda s: bool({11063, 9846} & s))
+
 _fix = {
     "Jpmorgan Chase&Co": "JPMorgan Chase", "Bank Of America Corp": "Bank of America",
     "Wells Fargo&Company": "Wells Fargo", "Goldman Sachs Group Inc The": "Goldman Sachs",
@@ -48,24 +63,21 @@ _fix = {
     "U S Bcorp": "U.S. Bancorp", "Truist Financial Corp": "Truist",
     "First Citizens Bancshares Inc": "First Citizens", "Capital One Financial Corp": "Capital One",
     "State Street Corp": "State Street", "Keycorp": "KeyCorp",
-    "Bank Of New York Mellon Corp": "BNY Mellon", "Fifth Third Bancorp": "Fifth Third",
-    "Citizens Financial Group Inc": "Citizens", "Huntington Bancshares Inc": "Huntington",
-    "M&T Bank Corp": "M&T", "Regions Financial Corp": "Regions",
-    "American Express Co": "American Express", "Northern Trust Corp": "Northern Trust",
+    "Bank Of Ny Mellon Corp The": "BNY Mellon", "Charles Schwab Corp The": "Charles Schwab",
+    "Fifth Third Bancorp": "Fifth Third", "Citizens Financial Group Inc": "Citizens",
+    "Regions Financial Corp": "Regions", "American Express Co": "American Express",
+    "Northern Trust Corp": "Northern Trust", "Morgan Stanley": "Morgan Stanley",
+    "Huntington Bancshares Inc": "Huntington", "Bank Of Montreal": "BMO",
+    "M&T Bank Corp": "M&T Bank",
 }
-_cur["label"] = _cur["NAMEHCR"].str.title().replace(_fix)
-_cur["ndfi_bn"] = _cur["LNNDEPC"] / 1e6
-_cur["tier1_bn"] = _cur["RBCT1J"] / 1e6
-_cur["asset_bn"] = _cur["ASSET"] / 1e6
-_cur["example"] = _cur["CERT"].isin([11063, 9846])  # First Citizens, Truist
+_g["label"] = _g["entity"].str.title().replace(_fix)
 
-_rank = _cur[_cur["ndfi_bn"] >= 10].sort_values("ndfi_to_tier1", ascending=False).head(18)
-
+_rank_df = _g[_g["ndfi_bn"] >= 10].sort_values("ndfi_to_tier1", ascending=False).head(18)
 ranking = [{"bank": r.label, "ratio": float(r.ndfi_to_tier1), "ndfi": float(r.ndfi_bn),
-            "example": bool(r.example)} for r in _rank.itertuples()]
+            "example": bool(r.example)} for r in _rank_df.itertuples()]
 scatter = [{"bank": r.label, "ndfi": float(r.ndfi_bn), "ratio": float(r.ndfi_to_tier1),
             "assets": float(r.asset_bn), "example": bool(r.example)}
-           for r in _cur.itertuples() if pd.notna(r.ndfi_to_tier1)]
+           for r in _g.itertuples() if pd.notna(r.ndfi_to_tier1)]
 market = [{"quarter": str(pd.Timestamp(r.quarter).date()), "total": float(r.ndfi_total_bn),
            "top10": float(r.top10_share)} for r in _agg.itertuples()]
 composition = [{"slice": "Capital-call lines", "pct": 0.85, "alll": 0.09},
@@ -77,8 +89,8 @@ mkt_total = f"${_last.ndfi_total_bn/1000:.1f} trillion"
 mkt_top10 = f"{_last.top10_share:.0%}"
 mkt_big = f"{_last.big_bank_share:.0%}"
 mkt_n = int(_last.n_reporters)
-_tfc = _cur[_cur.CERT == 9846].iloc[0]
-_fcnca = _cur[_cur.CERT == 11063].iloc[0]
+_tfc = _g[_g["certs"].apply(lambda s: 9846 in s)].iloc[0]
+_fcnca = _g[_g["certs"].apply(lambda s: 11063 in s)].iloc[0]
 
 ojs_define(ranking=ranking, scatter=scatter, market=market, composition=composition)
 ```
@@ -101,44 +113,86 @@ mkt = market.map(d => ({...d, quarter: new Date(d.quarter)}))
 mktLast = mkt[mkt.length - 1]
 
 // ── Chart 1 · the market in aggregate ──────────────────────────────────────
+mktTip = ({Quarter: d => d.quarter.toLocaleDateString("en-US",{month:"short",year:"numeric"}),
+           "NDFI drawn": d => `$${(d.total/1000).toFixed(2)}T`})
 chartMarket = Plot.plot({
-  width: 680, height: 210, marginLeft: 46, marginBottom: 24, marginTop: 16, marginRight: 60,
+  width: 700, height: 220, marginLeft: 46, marginBottom: 26, marginTop: 20, marginRight: 96,
   x: {type: "utc", label: null, tickFormat: "%b %y", ticks: 6},
-  y: {label: null, grid: true, domain: [0, 1600], tickFormat: s => `$${(s/1000).toFixed(1)}T`},
+  y: {label: null, grid: true, domain: [0, 1650], tickFormat: s => `$${(s/1000).toFixed(1)}T`},
   style: FONT,
   marks: [
-    Plot.areaY(mkt, {x: "quarter", y: "total", fill: INK, fillOpacity: 0.10}),
-    Plot.lineY(mkt, {x: "quarter", y: "total", stroke: INK, strokeWidth: 2}),
-    Plot.dot([mktLast], {x: "quarter", y: "total", r: 3.5, fill: INK}),
-    Plot.text([mktLast], {x: "quarter", y: "total", text: [`$${(mktLast.total/1000).toFixed(2)}T drawn`],
-      dx: 8, dy: -4, textAnchor: "start", fontWeight: 600, fill: INK})
+    Plot.areaY(mkt, {x: "quarter", y: "total", fill: INK, fillOpacity: 0.09}),
+    Plot.lineY(mkt, {x: "quarter", y: "total", stroke: INK, strokeWidth: 2, curve: "monotone-x"}),
+    Plot.dot(mkt, {x: "quarter", y: "total", r: 2.6, fill: INK, channels: mktTip, tip: true}),
+    Plot.dot([mktLast], {x: "quarter", y: "total", r: 4, fill: INK}),
+    Plot.text([mktLast], {x: "quarter", y: "total", text: [`$${(mktLast.total/1000).toFixed(2)}T`],
+      dx: 10, dy: 0, textAnchor: "start", fontWeight: 700, fontSize: 12, fill: INK}),
+    Plot.text([mktLast], {x: "quarter", y: "total", text: ["drawn NDFI"],
+      dx: 10, dy: 13, textAnchor: "start", fontSize: 8.5, fill: MUTE})
   ]
 })
 
-// ── Chart 2 · scale vs concentration (the centerpiece) ─────────────────────
-labelSet = new Set(["Goldman Sachs","Morgan Stanley","First Citizens","Truist","JPMorgan Chase","Wells Fargo","State Street","Capital One"])
+// ── Chart 2 · scale vs concentration (interactive; hover any bubble) ────────
+scByName = new Map(scatter.map(d => [d.bank, d]))
+scPick = names => names.map(b => scByName.get(b)).filter(d => d)
+scAbove = scPick(["Goldman Sachs"])
+scBelow = scPick(["Truist", "Capital One", "State Street"])
+scLeft  = scPick(["Wells Fargo", "Bank of America", "JPMorgan Chase"])
+scRight = scPick(["First Citizens"])
+scTipFmt = ({format: {x: false, y: false, r: false}})
+fmtAssets = v => v >= 1000 ? `$${(v/1000).toFixed(1)}T` : `$${Math.round(v)}B`
+scChan = ({Bank: "bank", "NDFI loans": d => `$${d.ndfi.toFixed(1)}B`,
+          "Share of Tier 1": d => pct0(d.ratio), "Total assets": d => fmtAssets(d.assets)})
+
 chartScatter = Plot.plot({
-  width: 680, height: 440, marginLeft: 52, marginBottom: 42, marginTop: 16, marginRight: 24,
-  x: {type: "log", label: "NDFI loans, $bn (log) →", tickFormat: "~s", grid: true},
-  y: {label: "↑ NDFI ÷ Tier 1 capital", tickFormat: pct0, grid: true, domain: [0, 2.1]},
-  r: {range: [3, 26]},
+  width: 700, height: 470,
+  marginLeft: 56, marginBottom: 48, marginTop: 18, marginRight: 26,
   style: FONT,
+  x: {type: "log", domain: [0.04, 360], ticks: [0.1, 1, 10, 100], grid: false,
+      tickFormat: d => d >= 1 ? `$${d}B` : `$${Math.round(d * 1000)}M`,
+      label: "NDFI loans (log scale) →"},
+  y: {domain: [-0.04, 2.14], tickFormat: pct0, grid: true, label: "↑ NDFI ÷ Tier 1 capital"},
+  r: {range: [3, 22], domain: [0, 4200]},
   marks: [
-    Plot.ruleY([1], {stroke: GRID, strokeDasharray: "3,3"}),
-    Plot.text([{x: 11, y: 1}], {x: "x", y: "y", text: ["NDFI = 100% of Tier 1 capital"], dy: -6,
-      textAnchor: "start", fill: MUTE, fontSize: 9}),
-    Plot.dot(scatter, {x: "ndfi", y: "ratio", r: "assets",
-      fill: d => d.example ? HI : STEEL, fillOpacity: d => d.example ? 0.9 : 0.5,
-      stroke: d => d.example ? HI : STEEL, strokeOpacity: 0.6}),
-    Plot.text(scatter.filter(d => labelSet.has(d.bank)), {x: "ndfi", y: "ratio", text: "bank",
-      dy: -12, fontSize: 9.5, fontWeight: d => d.example ? 700 : 400,
-      fill: d => d.example ? HI : "#3A3A3A"})
+    Plot.ruleY([1], {stroke: "#B4AD9E", strokeDasharray: "2,4"}),
+    Plot.text([{x: 0.045, y: 1}], {x: "x", y: "y", text: ["100% of Tier 1 capital"],
+      dy: -6, textAnchor: "start", fill: MUTE, fontSize: 8.5}),
+    Plot.dot(scatter.filter(d => !d.example), {x: "ndfi", y: "ratio", r: "assets",
+      fill: "#8CA0B4", fillOpacity: 0.42, stroke: "#61758A", strokeWidth: 0.7, strokeOpacity: 0.75,
+      channels: scChan, tip: scTipFmt}),
+    Plot.dot(scatter.filter(d => d.example), {x: "ndfi", y: "ratio", r: "assets",
+      fill: HI, fillOpacity: 0.92, stroke: "#7A3606", strokeWidth: 1,
+      channels: scChan, tip: scTipFmt}),
+    Plot.text(scAbove, {x: "ndfi", y: "ratio", text: "bank", dy: -13, textAnchor: "middle",
+      fontSize: 10, fontWeight: d => d.example ? 700 : 500, fill: d => d.example ? HI : "#2C2C2C"}),
+    Plot.text(scBelow, {x: "ndfi", y: "ratio", text: "bank", dy: 15, textAnchor: "middle",
+      fontSize: 10, fontWeight: d => d.example ? 700 : 500, fill: d => d.example ? HI : "#2C2C2C"}),
+    Plot.text(scLeft, {x: "ndfi", y: "ratio", text: "bank", dx: -13, textAnchor: "end",
+      fontSize: 10, fontWeight: 500, fill: "#2C2C2C"}),
+    Plot.text(scRight, {x: "ndfi", y: "ratio", text: "bank", dx: 13, textAnchor: "start",
+      fontSize: 10, fontWeight: 700, fill: HI})
+  ]
+})
+
+// size legend for the scatter (Plot has no built-in r legend) — same r scale
+sizeLegendData = [{x: 0.5, v: 500}, {x: 1.5, v: 2000}, {x: 2.8, v: 4000}]
+sizeLegend = Plot.plot({
+  width: 300, height: 84, marginTop: 6, marginBottom: 26, marginLeft: 8, marginRight: 8,
+  style: FONT,
+  x: {axis: null, domain: [0, 3.4]},
+  y: {axis: null, domain: [0, 1]},
+  r: {range: [3, 22], domain: [0, 4200]},
+  marks: [
+    Plot.dot(sizeLegendData, {x: "x", y: 0.5, r: "v", fill: "#8CA0B4", fillOpacity: 0.42,
+      stroke: "#61758A", strokeWidth: 0.7}),
+    Plot.text(sizeLegendData, {x: "x", y: 0.5, dy: 30, text: d => `$${(d.v/1000).toFixed(1)}T`,
+      fontSize: 8.5, fill: MUTE, textAnchor: "middle"})
   ]
 })
 
 // ── Chart 3 · the concentration ranking ────────────────────────────────────
 chartRank = Plot.plot({
-  width: 680, height: 460, marginLeft: 108, marginBottom: 34, marginTop: 10, marginRight: 44,
+  width: 700, height: 470, marginLeft: 124, marginBottom: 34, marginTop: 10, marginRight: 46,
   x: {label: "NDFI ÷ Tier 1 capital →", tickFormat: pct0, grid: true, domain: [0, 2.1]},
   y: {label: null},
   style: FONT,
@@ -151,16 +205,19 @@ chartRank = Plot.plot({
   ]
 })
 
-// ── Chart 4 · First Citizens composition ───────────────────────────────────
+// ── Chart 4 · First Citizens composition + loss-rate contrast ──────────────
 chartComp = Plot.plot({
-  width: 680, height: 84, marginLeft: 8, marginBottom: 26, marginTop: 8, marginRight: 8,
-  x: {domain: [0, 1], tickFormat: pct0, label: null},
+  width: 700, height: 70, marginLeft: 8, marginBottom: 8, marginTop: 8, marginRight: 8,
+  x: {domain: [0, 1], axis: null},
   color: {range: [INK, HI]},
   style: FONT,
   marks: [
     Plot.barX(composition, Plot.stackX({x: "pct", fill: "slice", stroke: "white", strokeWidth: 2})),
-    Plot.text(composition, Plot.stackX({x: "pct", text: d => `${d.slice} · ${pct0(d.pct)}`,
-      fill: "white", fontWeight: 600, fontSize: 10}))
+    // percentage inside every segment; slice name only where it fits (the wide one)
+    Plot.text(composition, Plot.stackX({x: "pct", text: d => pct0(d.pct),
+      fill: "white", fontWeight: 700, fontSize: 13})),
+    Plot.text(composition.filter(d => d.pct > 0.3), Plot.stackX({x: "pct", text: "slice",
+      dy: -16, fill: "white", fontWeight: 600, fontSize: 10}))
   ]
 })
 ```
@@ -229,7 +286,7 @@ picture is not what the headlines suggest.
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig">${chartScatter}<figcaption>Every bank reporting NDFI loans, Q1 2026. Horizontal = size of the book; vertical = book ÷ Tier 1 capital; bubble = total assets. Bank-level Call Report basis. <span class="ill">Real data; First Citizens and Truist in orange.</span></figcaption></figure>`
+html`<figure class="jc-fig">${chartScatter}<div class="jc-legend-r"><span class="jc-legend-lbl">Bubble = total assets</span>${sizeLegend}</div><figcaption>Every holding company reporting NDFI loans, Q1 2026. Horizontal = size of the book (log); vertical = book ÷ Tier 1 capital; bubble = total assets. <b>Hover any bubble for the bank.</b> Subsidiary banks rolled up to the holding company. <span class="ill">Real data; First Citizens &amp; Truist in orange.</span></figcaption></figure>`
 ```
 
 The megabanks (JPMorgan, Wells, Bank of America) sit far to the right — they lend the most
@@ -257,7 +314,7 @@ is what turns a scary headline into a defensible book, and the bank breaks it ou
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig">${chartComp}<figcaption>First Citizens' NDFI book by type, per its FY2025 10-K (holding-company basis). Capital-call lines are secured by the contractual commitments of a fund's limited partners — not by the fund's investments. <span class="ill">Disclosed figures.</span></figcaption></figure>`
+html`<figure class="jc-fig">${chartComp}<div class="jc-swatches"><span><i style="background:${INK}"></i>Capital-call lines — secured by LPs' commitments, allowance <b>0.09%</b></span><span><i style="background:${HI}"></i>Other NDFI / private credit — allowance <b>1.06%</b>, the bank's overall loan rate</span></div><figcaption>First Citizens' NDFI book by type, per its FY2025 10-K (holding-company basis). The <b>allowance gap — 0.09% vs 1.06%</b> — is the evidence behind its "big but safe" framing. <span class="ill">Disclosed figures.</span></figcaption></figure>`
 ```
 
 - **Capital-call lines — ~85% of the book (~$31.8B).** Secured against the contractual

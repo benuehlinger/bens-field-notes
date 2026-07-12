@@ -628,3 +628,15 @@ pre.sourceCode code span { color: #2B2B2B !important; }                 /* base 
 .sourceCode span.op, .sourceCode span.sc { color: #555555 !important; }/* operators */
 .sourceCode span.dt, .sourceCode span.va, .sourceCode span.at
                      { color: #2B2B2B !important; }                    /* datatypes / vars / attrs */
+
+/* Radius (bubble-size) legend under a scatter figure */
+.jc-legend-r { margin: 0.4rem 0 0.2rem; }
+.jc-legend-r svg, .jc-legend-r figure { font-family: 'DM Mono', monospace !important; color: #6A6A6A; margin: 0; }
+
+/* Two-swatch legend under the composition figure */
+.jc-swatches { display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; margin: 0.5rem 0 0.2rem;
+  font-family: 'DM Mono', monospace; font-size: 0.66rem; color: #5A5A5A; line-height: 1.5; }
+.jc-swatches i { display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+  margin-right: 0.4rem; vertical-align: baseline; }
+.jc-legend-lbl { display: block; font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.04em; text-transform: uppercase; color: #8A8A8A; margin-bottom: -0.2rem; }
