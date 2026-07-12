@@ -145,7 +145,7 @@ scChan = ({Bank: "bank", "NDFI loans": d => `$${d.ndfi.toFixed(1)}B`,
           "Share of Tier 1": d => pct0(d.ratio), "Total assets": d => fmtAssets(d.assets)})
 
 chartScatter = Plot.plot({
-  width: 1080, height: 560,
+  width: 1040, height: 560,
   marginLeft: 64, marginBottom: 52, marginTop: 20, marginRight: 34,
   style: FONT,
   x: {type: "log", domain: [0.04, 360], ticks: [0.1, 1, 10, 100], grid: false,
@@ -272,7 +272,6 @@ picture is not what the headlines suggest.
 
 ```{ojs}
 //| echo: false
-//| column: page
 html`<figure class="jc-fig jc-wide">${chartScatter}<div class="jc-legend-r"><span class="jc-legend-lbl">Bubble = total assets</span>${sizeLegend}</div><figcaption>Every holding company reporting NDFI loans, Q1 2026. Horizontal = size of the book (log); vertical = book ÷ Tier 1 capital; bubble = total assets. <b>Hover any bubble for the bank.</b> Subsidiary banks rolled up to the holding company. <span class="ill">Real data; First Citizens &amp; Truist in orange.</span></figcaption></figure>`
 ```
 

@@ -641,8 +641,9 @@ pre.sourceCode code span { color: #2B2B2B !important; }                 /* base 
 .jc-legend-lbl { display: block; font-family: 'DM Mono', monospace; font-size: 0.62rem;
   letter-spacing: 0.04em; text-transform: uppercase; color: #8A8A8A; margin-bottom: -0.2rem; }
 
-/* ── Wide chart: let a .column-page figure use the full width nicely ────────── */
-.jc-fig.jc-wide { max-width: 100%; }
+/* ── Chart figures: center the plot in the column so narrower charts don't
+   hug the left with a dead gap on the right. The wide scatter fills anyway. ── */
+.jc-fig > svg { display: block; margin-inline: auto; max-width: 100%; height: auto; }
 .jc-fig.jc-wide svg { max-width: 100%; height: auto; }
 
 /* ── Composition component (First Citizens NDFI book) ──────────────────────── */
