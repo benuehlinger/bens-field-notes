@@ -47,7 +47,7 @@ format:
     toc-depth: 3
     code-fold: true
     code-tools: false
-    highlight-style: github-dark
+    highlight-style: github
     fig-responsive: true
     grid:
       sidebar-width: 0px
