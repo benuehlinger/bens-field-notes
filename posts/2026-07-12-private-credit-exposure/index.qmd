@@ -278,6 +278,42 @@ it lends** (across) against **how large that book is relative to its Tier 1 capi
 the metric that actually matters for solvency. The two are *not* the same axis, and the
 picture is not what the headlines suggest.
 
+**Show the work.** Here is the whole computation, worked on one bank. I'll use Morgan Stanley,
+because it files through *two* separate bank subsidiaries — a common wrinkle you have to handle
+or you'll double-count. Start with the raw Call Report rows (dollar figures shown in $bn):
+
+```{python}
+#| echo: true
+#| code-fold: false
+# Every bank subsidiary files its own Call Report. Morgan Stanley has two.
+ms = _cur.loc[_cur["NAMEHCR"].str.contains("MORGAN STANLEY"),
+              ["NAME", "LNNDEPC", "RBCT1J"]].copy()
+ms[["LNNDEPC", "RBCT1J"]] = (ms[["LNNDEPC", "RBCT1J"]] / 1e6).round(1)  # $000s → $bn
+ms
+```
+
+Roll the subsidiaries up to the holding company — sum each line — so the firm is one point,
+not two:
+
+```{python}
+#| echo: true
+#| code-fold: false
+ms_total = ms[["LNNDEPC", "RBCT1J"]].sum()
+ms_total
+```
+
+Then the concentration metric is a single division: NDFI loans over Tier 1 capital.
+
+```{python}
+#| echo: true
+#| code-fold: false
+round(ms_total["LNNDEPC"] / ms_total["RBCT1J"], 2)   # NDFI ÷ Tier 1
+```
+
+That **138%** is one bubble — Morgan Stanley's dot on the chart below. Run the same three steps
+across all `{python} mkt_n` reporting banks and you have the whole picture: NDFI dollars on the
+horizontal, NDFI-over-Tier-1 on the vertical, total assets as the bubble size.
+
 ```{ojs}
 //| echo: false
 html`<figure class="jc-fig jc-wide">
