@@ -107,7 +107,7 @@ HI = "#B45309"
 GRID = "#C8C3B8"
 MUTE = "#8A8A8A"
 pct0 = v => `${(v*100).toFixed(0)}%`
-FONT = ({fontFamily: "DM Mono, monospace", fontSize: "10px"})
+FONT = ({fontFamily: "DM Sans, system-ui, sans-serif", fontSize: "12px", background: "transparent"})
 
 mkt = market.map(d => ({...d, quarter: new Date(d.quarter)}))
 mktLast = mkt[mkt.length - 1]
@@ -145,14 +145,14 @@ scChan = ({Bank: "bank", "NDFI loans": d => `$${d.ndfi.toFixed(1)}B`,
           "Share of Tier 1": d => pct0(d.ratio), "Total assets": d => fmtAssets(d.assets)})
 
 chartScatter = Plot.plot({
-  width: 700, height: 470,
-  marginLeft: 56, marginBottom: 48, marginTop: 18, marginRight: 26,
+  width: 1080, height: 560,
+  marginLeft: 64, marginBottom: 52, marginTop: 20, marginRight: 34,
   style: FONT,
   x: {type: "log", domain: [0.04, 360], ticks: [0.1, 1, 10, 100], grid: false,
       tickFormat: d => d >= 1 ? `$${d}B` : `$${Math.round(d * 1000)}M`,
-      label: "NDFI loans (log scale) →"},
+      label: "NDFI loans, $ (log scale) →"},
   y: {domain: [-0.04, 2.14], tickFormat: pct0, grid: true, label: "↑ NDFI ÷ Tier 1 capital"},
-  r: {range: [3, 22], domain: [0, 4200]},
+  r: {range: [4, 30], domain: [0, 4200]},
   marks: [
     Plot.ruleY([1], {stroke: "#B4AD9E", strokeDasharray: "2,4"}),
     Plot.text([{x: 0.045, y: 1}], {x: "x", y: "y", text: ["100% of Tier 1 capital"],
@@ -205,21 +205,7 @@ chartRank = Plot.plot({
   ]
 })
 
-// ── Chart 4 · First Citizens composition + loss-rate contrast ──────────────
-chartComp = Plot.plot({
-  width: 700, height: 70, marginLeft: 8, marginBottom: 8, marginTop: 8, marginRight: 8,
-  x: {domain: [0, 1], axis: null},
-  color: {range: [INK, HI]},
-  style: FONT,
-  marks: [
-    Plot.barX(composition, Plot.stackX({x: "pct", fill: "slice", stroke: "white", strokeWidth: 2})),
-    // percentage inside every segment; slice name only where it fits (the wide one)
-    Plot.text(composition, Plot.stackX({x: "pct", text: d => pct0(d.pct),
-      fill: "white", fontWeight: 700, fontSize: 13})),
-    Plot.text(composition.filter(d => d.pct > 0.3), Plot.stackX({x: "pct", text: "slice",
-      dy: -16, fill: "white", fontWeight: 600, fontSize: 10}))
-  ]
-})
+// ── Chart 4 · First Citizens composition — built as HTML below (see render cell)
 ```
 
 ---
@@ -286,7 +272,8 @@ picture is not what the headlines suggest.
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig">${chartScatter}<div class="jc-legend-r"><span class="jc-legend-lbl">Bubble = total assets</span>${sizeLegend}</div><figcaption>Every holding company reporting NDFI loans, Q1 2026. Horizontal = size of the book (log); vertical = book ÷ Tier 1 capital; bubble = total assets. <b>Hover any bubble for the bank.</b> Subsidiary banks rolled up to the holding company. <span class="ill">Real data; First Citizens &amp; Truist in orange.</span></figcaption></figure>`
+//| column: page
+html`<figure class="jc-fig jc-wide">${chartScatter}<div class="jc-legend-r"><span class="jc-legend-lbl">Bubble = total assets</span>${sizeLegend}</div><figcaption>Every holding company reporting NDFI loans, Q1 2026. Horizontal = size of the book (log); vertical = book ÷ Tier 1 capital; bubble = total assets. <b>Hover any bubble for the bank.</b> Subsidiary banks rolled up to the holding company. <span class="ill">Real data; First Citizens &amp; Truist in orange.</span></figcaption></figure>`
 ```
 
 The megabanks (JPMorgan, Wells, Bank of America) sit far to the right — they lend the most
@@ -314,7 +301,27 @@ is what turns a scary headline into a defensible book, and the bank breaks it ou
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig">${chartComp}<div class="jc-swatches"><span><i style="background:${INK}"></i>Capital-call lines — secured by LPs' commitments, allowance <b>0.09%</b></span><span><i style="background:${HI}"></i>Other NDFI / private credit — allowance <b>1.06%</b>, the bank's overall loan rate</span></div><figcaption>First Citizens' NDFI book by type, per its FY2025 10-K (holding-company basis). The <b>allowance gap — 0.09% vs 1.06%</b> — is the evidence behind its "big but safe" framing. <span class="ill">Disclosed figures.</span></figcaption></figure>`
+html`<figure class="jc-fig comp">
+  <div class="comp-bar">
+    <div class="comp-seg" style="width:85%;background:${INK}">85%</div>
+    <div class="comp-seg" style="width:15%;background:${HI}">15%</div>
+  </div>
+  <div class="comp-cards">
+    <div class="comp-card">
+      <div class="comp-share" style="color:${INK}">85%</div>
+      <div class="comp-name">Capital-call lines</div>
+      <div class="comp-desc">Secured by the contractual capital commitments of a fund's limited partners — pensions, endowments, sovereign wealth — <em>not</em> by the fund's investments. Structurally the safest slice.</div>
+      <div class="comp-alll">Allowance for losses<b style="color:${INK}">0.09%</b></div>
+    </div>
+    <div class="comp-card comp-card--risk">
+      <div class="comp-share" style="color:${HI}">15%</div>
+      <div class="comp-name">Other NDFI / private credit</div>
+      <div class="comp-desc">Traditional private-credit and NAV-based lending, where any real valuation risk in the book actually lives.</div>
+      <div class="comp-alll">Allowance for losses<b style="color:${HI}">1.06%</b></div>
+    </div>
+  </div>
+  <figcaption>First Citizens' NDFI book by type, per its FY2025 10-K. The <b>12× allowance gap</b> between the two slices is the evidence behind its "big but safe" framing. <span class="ill">Disclosed figures; holding-company basis.</span></figcaption>
+</figure>`
 ```
 
 - **Capital-call lines — ~85% of the book (~$31.8B).** Secured against the contractual

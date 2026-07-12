@@ -640,3 +640,34 @@ pre.sourceCode code span { color: #2B2B2B !important; }                 /* base 
   margin-right: 0.4rem; vertical-align: baseline; }
 .jc-legend-lbl { display: block; font-family: 'DM Mono', monospace; font-size: 0.62rem;
   letter-spacing: 0.04em; text-transform: uppercase; color: #8A8A8A; margin-bottom: -0.2rem; }
+
+/* ── Wide chart: let a .column-page figure use the full width nicely ────────── */
+.jc-fig.jc-wide { max-width: 100%; }
+.jc-fig.jc-wide svg { max-width: 100%; height: auto; }
+
+/* ── Composition component (First Citizens NDFI book) ──────────────────────── */
+figure.comp { margin: 2rem 0; }
+.comp-bar { display: flex; height: 46px; border-radius: 5px; overflow: hidden; gap: 2px; }
+.comp-seg { display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Sans', system-ui, sans-serif; font-weight: 700; font-size: 1rem; color: white; }
+.comp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+.comp-card { border: 1px solid #DDD8CD; border-top: 3px solid #4A6FA5;
+  border-radius: 6px; padding: 1.1rem 1.25rem; background: #FAF9F5; }
+.comp-card--risk { border-top-color: #B45309; }
+.comp-share { font-family: 'DM Serif Display', Georgia, serif; font-size: 2.4rem; line-height: 1;
+  letter-spacing: -0.02em; }
+.comp-name { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 600; font-size: 1rem;
+  color: #1C1C1E; margin: 0.35rem 0 0.5rem; }
+.comp-desc { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.86rem; line-height: 1.5;
+  color: #5A5A5A; }
+.comp-alll { display: flex; align-items: baseline; justify-content: space-between;
+  font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #8A8A8A; margin-top: 0.9rem;
+  padding-top: 0.6rem; border-top: 1px solid #E4E0D6; }
+.comp-alll b { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.5rem; font-weight: 400;
+  letter-spacing: -0.01em; text-transform: none; }
+
+.quarto-dark .comp-card { background: #242426; border-color: #3A3A3C; }
+.quarto-dark .comp-name { color: #F0EBE0; }
+.quarto-dark .comp-desc { color: #B8B3A8; }
+.quarto-dark .comp-alll { border-top-color: #3A3A3C; }
