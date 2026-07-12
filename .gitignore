@@ -48,3 +48,6 @@ drafts/*
 /.quarto/
 **/*.quarto_ipynb
 **/*.quarto_ipynb_*
+
+# Personal throwaway notebooks (keep the shared explorers)
+analysis/notebooks/*-scratch.ipynb
