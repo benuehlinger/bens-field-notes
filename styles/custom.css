@@ -450,10 +450,10 @@ h2.home-section-title { border-bottom: 2px solid #1C1C1E; }
   text-transform: uppercase;
   background: none !important;
   border: none !important;
-  color: #B45309 !important;
+  color: #5A5A5A !important;
   padding: 0 0.7rem 0 0 !important;
 }
-.quarto-listing .listing-category:hover { color: #8A3F06 !important; background: none !important; }
+.quarto-listing .listing-category:hover { color: #4A6FA5 !important; background: none !important; }
 
 /* Drop cap — first paragraph of an essay (badge → prose); skips source bylines */
 main p:has(> .type-badge) + p:not(:has(> strong:first-child))::first-letter {
