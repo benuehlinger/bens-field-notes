@@ -34,6 +34,10 @@ analysis/outputs/*
 !analysis/outputs/lake_coverage.parquet
 !analysis/outputs/sloos_dashboard.parquet
 !analysis/outputs/abs_ee_dashboard.parquet
+# Private-credit-exposure article (real FDIC Call Report data)
+!analysis/outputs/call_report_ndfi_panel.parquet
+!analysis/outputs/ndfi_aggregate_series.parquet
+!analysis/outputs/ndfi_bank_ranking.parquet
 
 # Local notebook drafts — ignore everything except the committed skeleton + README
 drafts/*

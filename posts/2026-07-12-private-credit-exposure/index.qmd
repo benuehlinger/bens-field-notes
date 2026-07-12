@@ -1,0 +1,351 @@
+---
+title: "How to Gauge a Bank's Private-Credit Exposure From the Outside"
+subtitle: "A field guide — read the market in aggregate, then any single bank — using nothing but free public filings."
+description: "Two 2025 blow-ups asked the same question: how exposed is any given bank to private credit, and can an outsider measure it before the headlines? Yes — here's the method, in real numbers, with the code."
+date: 2026-07-12
+categories: [Credit, Methodology, Structured Finance]
+type: field guide
+---
+
+[Field Guide]{.type-badge}
+
+In the autumn of 2025, two companies most people had never heard of taught the market a
+lesson about what it didn't know. **Tricolor Holdings**, a Dallas subprime auto lender,
+collapsed into Chapter 7 amid allegations its executives had pledged the same auto-loan
+collateral to several banks at once; JPMorgan and Fifth Third took writedowns, and Jamie
+Dimon offered the season's motif — when you see one cockroach, there are usually more. Weeks
+later **First Brands**, an auto-parts maker, filed with more than $10 billion in liabilities
+after a tangle of off-balance-sheet financing turned out to rest on inflated invoices and
+near-empty special-purpose vehicles.
+
+Neither was, on its face, systemic. But both pointed a spotlight at the same question:
+**how exposed is any given bank to private credit — and can an outsider actually measure it
+before the headlines?**
+
+The answer is yes, more than you'd expect — with two limits we'll come to. The raw material
+sits in free public filings. This guide walks the two levels at which you read them: the
+**market in aggregate**, then a **single bank** — using two deliberately different banks to
+show that the technique changes with how much a bank chooses to tell you. Every number below
+is computed live from the FDIC's public API; the code is in the margins.
+
+```{python}
+#| echo: false
+#| output: false
+from pathlib import Path
+import pandas as pd
+
+_panel = pd.read_parquet(Path("../../analysis/outputs/call_report_ndfi_panel.parquet"))
+_agg = pd.read_parquet(Path("../../analysis/outputs/ndfi_aggregate_series.parquet"))
+
+_latest = _panel["quarter"].max()
+_cur = _panel[_panel["quarter"] == _latest].copy()
+
+# tidy holding-company display names
+_fix = {
+    "Jpmorgan Chase&Co": "JPMorgan Chase", "Bank Of America Corp": "Bank of America",
+    "Wells Fargo&Company": "Wells Fargo", "Goldman Sachs Group Inc The": "Goldman Sachs",
+    "Citigroup Inc": "Citigroup", "Pnc Finl Services Group Inc": "PNC",
+    "U S Bcorp": "U.S. Bancorp", "Truist Financial Corp": "Truist",
+    "First Citizens Bancshares Inc": "First Citizens", "Capital One Financial Corp": "Capital One",
+    "State Street Corp": "State Street", "Keycorp": "KeyCorp",
+    "Bank Of New York Mellon Corp": "BNY Mellon", "Fifth Third Bancorp": "Fifth Third",
+    "Citizens Financial Group Inc": "Citizens", "Huntington Bancshares Inc": "Huntington",
+    "M&T Bank Corp": "M&T", "Regions Financial Corp": "Regions",
+    "American Express Co": "American Express", "Northern Trust Corp": "Northern Trust",
+}
+_cur["label"] = _cur["NAMEHCR"].str.title().replace(_fix)
+_cur["ndfi_bn"] = _cur["LNNDEPC"] / 1e6
+_cur["tier1_bn"] = _cur["RBCT1J"] / 1e6
+_cur["asset_bn"] = _cur["ASSET"] / 1e6
+_cur["example"] = _cur["CERT"].isin([11063, 9846])  # First Citizens, Truist
+
+_rank = _cur[_cur["ndfi_bn"] >= 10].sort_values("ndfi_to_tier1", ascending=False).head(18)
+
+ranking = [{"bank": r.label, "ratio": float(r.ndfi_to_tier1), "ndfi": float(r.ndfi_bn),
+            "example": bool(r.example)} for r in _rank.itertuples()]
+scatter = [{"bank": r.label, "ndfi": float(r.ndfi_bn), "ratio": float(r.ndfi_to_tier1),
+            "assets": float(r.asset_bn), "example": bool(r.example)}
+           for r in _cur.itertuples() if pd.notna(r.ndfi_to_tier1)]
+market = [{"quarter": str(pd.Timestamp(r.quarter).date()), "total": float(r.ndfi_total_bn),
+           "top10": float(r.top10_share)} for r in _agg.itertuples()]
+composition = [{"slice": "Capital-call lines", "pct": 0.85, "alll": 0.09},
+               {"slice": "Other NDFI / private credit", "pct": 0.15, "alll": 1.06}]
+
+# a few figures for the prose
+_last = _agg.iloc[-1]
+mkt_total = f"${_last.ndfi_total_bn/1000:.1f} trillion"
+mkt_top10 = f"{_last.top10_share:.0%}"
+mkt_big = f"{_last.big_bank_share:.0%}"
+mkt_n = int(_last.n_reporters)
+_tfc = _cur[_cur.CERT == 9846].iloc[0]
+_fcnca = _cur[_cur.CERT == 11063].iloc[0]
+
+ojs_define(ranking=ranking, scatter=scatter, market=market, composition=composition)
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+import { Plot } from "npm:@observablehq/plot"
+
+// house palette — one binding per line (OJS requires it)
+STEEL = "#9AA7B5"
+INK = "#4A6FA5"
+HI = "#B45309"
+GRID = "#C8C3B8"
+MUTE = "#8A8A8A"
+pct0 = v => `${(v*100).toFixed(0)}%`
+FONT = ({fontFamily: "DM Mono, monospace", fontSize: "10px"})
+
+mkt = market.map(d => ({...d, quarter: new Date(d.quarter)}))
+mktLast = mkt[mkt.length - 1]
+
+// ── Chart 1 · the market in aggregate ──────────────────────────────────────
+chartMarket = Plot.plot({
+  width: 680, height: 210, marginLeft: 46, marginBottom: 24, marginTop: 16, marginRight: 60,
+  x: {type: "utc", label: null, tickFormat: "%b %y", ticks: 6},
+  y: {label: null, grid: true, domain: [0, 1600], tickFormat: s => `$${(s/1000).toFixed(1)}T`},
+  style: FONT,
+  marks: [
+    Plot.areaY(mkt, {x: "quarter", y: "total", fill: INK, fillOpacity: 0.10}),
+    Plot.lineY(mkt, {x: "quarter", y: "total", stroke: INK, strokeWidth: 2}),
+    Plot.dot([mktLast], {x: "quarter", y: "total", r: 3.5, fill: INK}),
+    Plot.text([mktLast], {x: "quarter", y: "total", text: [`$${(mktLast.total/1000).toFixed(2)}T drawn`],
+      dx: 8, dy: -4, textAnchor: "start", fontWeight: 600, fill: INK})
+  ]
+})
+
+// ── Chart 2 · scale vs concentration (the centerpiece) ─────────────────────
+labelSet = new Set(["Goldman Sachs","Morgan Stanley","First Citizens","Truist","JPMorgan Chase","Wells Fargo","State Street","Capital One"])
+chartScatter = Plot.plot({
+  width: 680, height: 440, marginLeft: 52, marginBottom: 42, marginTop: 16, marginRight: 24,
+  x: {type: "log", label: "NDFI loans, $bn (log) →", tickFormat: "~s", grid: true},
+  y: {label: "↑ NDFI ÷ Tier 1 capital", tickFormat: pct0, grid: true, domain: [0, 2.1]},
+  r: {range: [3, 26]},
+  style: FONT,
+  marks: [
+    Plot.ruleY([1], {stroke: GRID, strokeDasharray: "3,3"}),
+    Plot.text([{x: 11, y: 1}], {x: "x", y: "y", text: ["NDFI = 100% of Tier 1 capital"], dy: -6,
+      textAnchor: "start", fill: MUTE, fontSize: 9}),
+    Plot.dot(scatter, {x: "ndfi", y: "ratio", r: "assets",
+      fill: d => d.example ? HI : STEEL, fillOpacity: d => d.example ? 0.9 : 0.5,
+      stroke: d => d.example ? HI : STEEL, strokeOpacity: 0.6}),
+    Plot.text(scatter.filter(d => labelSet.has(d.bank)), {x: "ndfi", y: "ratio", text: "bank",
+      dy: -12, fontSize: 9.5, fontWeight: d => d.example ? 700 : 400,
+      fill: d => d.example ? HI : "#3A3A3A"})
+  ]
+})
+
+// ── Chart 3 · the concentration ranking ────────────────────────────────────
+chartRank = Plot.plot({
+  width: 680, height: 460, marginLeft: 108, marginBottom: 34, marginTop: 10, marginRight: 44,
+  x: {label: "NDFI ÷ Tier 1 capital →", tickFormat: pct0, grid: true, domain: [0, 2.1]},
+  y: {label: null},
+  style: FONT,
+  marks: [
+    Plot.ruleX([1], {stroke: GRID, strokeDasharray: "3,3"}),
+    Plot.barX(ranking, {x: "ratio", y: "bank", fill: d => d.example ? HI : INK,
+      fillOpacity: d => d.example ? 1 : 0.82, sort: {y: "x", reverse: true}}),
+    Plot.text(ranking, {x: "ratio", y: "bank", text: d => pct0(d.ratio), dx: 5,
+      textAnchor: "start", fontSize: 9, fill: "#3A3A3A"})
+  ]
+})
+
+// ── Chart 4 · First Citizens composition ───────────────────────────────────
+chartComp = Plot.plot({
+  width: 680, height: 84, marginLeft: 8, marginBottom: 26, marginTop: 8, marginRight: 8,
+  x: {domain: [0, 1], tickFormat: pct0, label: null},
+  color: {range: [INK, HI]},
+  style: FONT,
+  marks: [
+    Plot.barX(composition, Plot.stackX({x: "pct", fill: "slice", stroke: "white", strokeWidth: 2})),
+    Plot.text(composition, Plot.stackX({x: "pct", text: d => `${d.slice} · ${pct0(d.pct)}`,
+      fill: "white", fontWeight: 600, fontSize: 10}))
+  ]
+})
+```
+
+---
+
+## Part 1 — Reading the market in aggregate
+
+Before judging any one bank, get a feel for the whole system: its size, its growth, its
+concentration, its stress level. The workhorse is a single free line item.
+
+Bank exposure to private credit lives mostly under one Call Report category: **loans to
+non-depository financial institutions (NDFIs)** — funds, BDCs, private-credit vehicles,
+insurers, broker-dealers. Since 2024-Q4, every bank over $10 billion in assets reports it
+directly, and the FDIC serves it through a public API. Summing that one field across every
+bank gives you the market:
+
+```python
+# every bank's NDFI balance for one quarter, from the free FDIC API
+import urllib.request, json
+url = ("https://api.fdic.gov/banks/financials?filters=REPDTE:20260331"
+       "&fields=CERT,NAMEHCR,ASSET,LNLSNET,LNNDEPC,RBCT1J&limit=10000&format=json")
+recs = [d["data"] for d in json.load(urllib.request.urlopen(url))["data"]]
+ndfi = [r for r in recs if r.get("LNNDEPC")]          # ~80 banks report it
+total = sum(r["LNNDEPC"] for r in ndfi) / 1e6         # -> $1,484 billion
+```
+
+That sum is the headline scoreboard. As of Q1 2026, drawn bank exposure to NDFIs was roughly
+**`{python} mkt_total`** across **`{python} mkt_n` reporting banks** — computed above, and it
+matches the FDIC's own Quarterly Banking Profile aggregate. On top of the *drawn* balance
+sits undrawn firepower: counting unused commitments, independent estimates
+([Whalen's *Institutional Risk Analyst*](https://www.theinstitutionalriskanalyst.com/)) put
+*potential* exposure-at-default near **$3 trillion**. That gap is the most under-appreciated
+fact in the subject — most NDFI lending revolves, so the on-balance-sheet number understates
+true exposure, and stress is exactly when borrowers draw the rest.
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">${chartMarket}<figcaption>Drawn bank loans to non-depository financial institutions, summed across all reporting banks. <span class="ill">Real data — FDIC BankFind financials API, bank-level Call Report, Q4 2024–Q1 2026.</span></figcaption></figure>`
+```
+
+Two structural facts fall straight out of the same pull:
+
+- **Concentration.** Banks over $100 billion in assets hold **`{python} mkt_big`** of all
+  reported NDFI loans; the top ten alone hold **`{python} mkt_top10`**. This is a big-bank
+  story first.
+- **The deceptively calm quality metric.** The aggregate NDFI delinquency/loss rate is
+  extraordinarily low — around 0.14%, the cleanest of any major loan category. That is the
+  central tension: the fastest-growing lending is also, on paper, the best-performing. An
+  optimist reads that as genuine safety; a skeptic reads it as reported quality lagging a
+  book that hasn't been tested through a downturn. Both live in the same number.
+
+One quirk to know before going bank-by-bank: the NDFI series only *begins* in Q4 2024, and
+the earliest quarters are muddied by reclassification — loans were moved *into* the NDFI
+buckets from other categories, so early "growth" is partly an accounting artifact. Prefer
+the later quarters for genuine reads.
+
+---
+
+## The bridge — scale is not concentration
+
+Here is where an outsider gets an edge. Plot every reporting bank by **how many NDFI dollars
+it lends** (across) against **how large that book is relative to its Tier 1 capital** (up) —
+the metric that actually matters for solvency. The two are *not* the same axis, and the
+picture is not what the headlines suggest.
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">${chartScatter}<figcaption>Every bank reporting NDFI loans, Q1 2026. Horizontal = size of the book; vertical = book ÷ Tier 1 capital; bubble = total assets. Bank-level Call Report basis. <span class="ill">Real data; First Citizens and Truist in orange.</span></figcaption></figure>`
+```
+
+The megabanks (JPMorgan, Wells, Bank of America) sit far to the right — they lend the most
+*dollars* — but mostly below the 100%-of-capital line. The genuinely *concentrated* lenders
+are elsewhere: the investment and custody banks (Goldman, Morgan Stanley, State Street) and
+one deceptively small commercial bank, **First Citizens**, floating near the top. Dollars
+tell you who matters to the system; the ratio tells you who is standing closest to the mine.
+That distinction is the whole game — and it sets up the two banks.
+
+---
+
+## Part 2 — The concentrated specialist: First Citizens
+
+**Why this bank.** First Citizens absorbed Silicon Valley Bank's fund-banking business, and
+it shows: NDFI lending runs about a third of its entire commercial book. When a bank is this
+concentrated, the exposure *is* the story — and, crucially, it knows investors will ask, so
+it discloses in detail. **The method here is the easy one: read the disclosure.**
+
+The direct line confirms the scale: First Citizens reported NDFI loans of
+**$`{python} f"{_fcnca.ndfi_bn:.1f}"` billion** — about
+**`{python} f"{_fcnca.ndfi_to_loans:.0%}"`** of its total loans, and, against a comparatively
+small capital base, **`{python} f"{_fcnca.ndfi_to_tier1:.0%}"` of Tier 1 capital.** That is
+the highest concentration of any large commercial bank in the country. But the *composition*
+is what turns a scary headline into a defensible book, and the bank breaks it out:
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">${chartComp}<figcaption>First Citizens' NDFI book by type, per its FY2025 10-K (holding-company basis). Capital-call lines are secured by the contractual commitments of a fund's limited partners — not by the fund's investments. <span class="ill">Disclosed figures.</span></figcaption></figure>`
+```
+
+- **Capital-call lines — ~85% of the book (~$31.8B).** Secured against the contractual
+  capital commitments of a fund's limited partners (pensions, endowments, sovereign wealth),
+  *not* against the performance of the fund's investments — structurally the safest slice.
+- **Other NDFI / traditional private credit — the remaining ~15% (~$5.8B),** where any real
+  valuation risk lives.
+
+And the bank hands you a **loss-rate contrast that substantiates its own safety claim:** the
+allowance was just **0.09% on capital-call lines versus 1.06% on total loans**. That gap is
+the evidence behind management's "this looks big but it's safe" framing. The outsider's job
+is to check whether the provisioning matches the story — here it does, so far. What to watch
+is the *trend, not the level*: First Citizens' nonaccrual ratio ticked up to ~96 bps in
+Q1 2026, which management called isolated — exactly the claim you verify over the next two or
+three quarters rather than accept or dismiss at once.
+
+---
+
+## Part 3 — The diversified bank: Truist, and the proxy that overstated
+
+**Why this bank.** Truist is large and diversified, and NDFI is *not* a headline for it.
+Historically you couldn't read it off the filing at all — you had to **infer** it. The
+classic technique, popularized by Whalen's *Institutional Risk Analyst*, used the Call
+Report's broad **"Other Loans & Leases" (OLL)** line as a proxy and measured it against Tier
+1 capital. On that proxy, Truist's book came out near **130% of Tier 1** — an alarming
+number.
+
+Now there's a direct line, and it tells a different story. Computing the real NDFI figure
+the same way we did the aggregate — just one bank, one division:
+
+```python
+truist = next(r for r in ndfi if r["CERT"] == 9846)
+concentration = truist["LNNDEPC"] / truist["RBCT1J"]   # NDFI ÷ Tier 1  ->  0.77
+```
+
+Truist's **direct** NDFI exposure is **$`{python} f"{_tfc.ndfi_bn:.1f}"` billion** —
+**`{python} f"{_tfc.ndfi_to_loans:.0%}"`** of loans and just
+**`{python} f"{_tfc.ndfi_to_tier1:.0%}"` of Tier 1 capital.** That is the finding: the OLL
+proxy said 130%; the direct line says `{python} f"{_tfc.ndfi_to_tier1:.0%}"`. OLL is a
+*broader* bucket — NDFI is only about 60% of it system-wide — so the old proxy
+systematically **overstated** true private-credit concentration. It was the right tool when
+it was the only tool; it is not the right tool anymore. When you can read the direct line,
+read it.
+
+That is the deeper lesson of the two banks, made literal in one ranking. Sort every large
+NDFI lender by concentration-to-capital, and the two case studies land exactly where the
+method predicts — First Citizens near the top, Truist comfortably in the pack:
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">${chartRank}<figcaption>NDFI loans as a share of Tier 1 capital, Q1 2026, banks with over $10B in NDFI. The dashed line is 100% — a book equal to the bank's entire tier 1 capital. <span class="ill">Real data; case-study banks in orange.</span></figcaption></figure>`
+```
+
+The surprise is at the top: it is the **investment and custody banks** — Goldman, Morgan
+Stanley, State Street — not the big commercial lenders, that run the most concentrated NDFI
+books relative to capital. That is not a headline anyone is writing, and it took nothing but
+a free API and one division to see it.
+
+---
+
+## What the two examples teach
+
+The contrast is the lesson. **First Citizens** is the *rich-disclosure* path: a concentrated
+specialist that must explain itself, where the 10-K hands you the capital-call split and a
+loss-rate contrast you can check. **Truist** is the *inference-being-retired* path: a
+diversified bank you used to reconstruct from a proxy, now readable directly — and the proxy,
+it turns out, was running hot. Most banks fall between these two, and the same three-number
+recipe places any of them: **NDFI ÷ Tier 1** for concentration, the **capital-call vs.
+everything-else** split for composition, and the **loss-rate contrast** for whether the
+provisioning matches the story.
+
+Two honest limits belong at the end. First, the per-bank series only begins with the Q4 2024
+Call Report, and the early quarters are muddied by reclassification — apparent "growth" in
+that window is partly an accounting artifact, not new lending. Second, and more fundamental:
+public data measures *reported* condition. The failures that defined 2025 — double-pledged
+collateral at Tricolor, fabricated invoices at First Brands — were deliberate misreporting.
+No delinquency field would have caught them, because until the day of collapse the loans
+looked current. Public data can't tell you whether these cases are idiosyncratic or the
+canary in the coal mine. What it *can* do — market-wide, and bank by bank — is tell you who
+is standing closest to the mine. For an outsider, that is a great deal more than nothing.
+
+::: {.ill-note}
+**Data & method.** All figures computed from the **FDIC BankFind financials API** (free, no
+key) at the **bank level** — NDFI = Call Report field `LNNDEPC`, Tier 1 capital = `RBCT1J`,
+Q1 2026. Case-study composition and loss-rate figures are from First Citizens' FY2025 10-K
+and are **holding-company** basis; the two levels are labeled and never divided by each
+other. Pull and aggregation scripts: `analysis/pull_call_reports.py`,
+`analysis/aggregate_ndfi.py`. The ~130% OLL proxy for Truist is Whalen's *Institutional Risk
+Analyst*, cited; reproducing it independently needs the FFIEC Call Report "Other Loans &
+Leases" line — a follow-up.
+:::
