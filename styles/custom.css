@@ -611,3 +611,20 @@ nav[role="doc-toc"] > h2#toc-title {
   margin-top: 0;
   color: #1C1C1E;
 }
+
+/* ── Code blocks — force legible dark tokens on the warm paper background ──────
+   The bundled highlight themes assume a white or dark canvas; on the #EDEAE2
+   code background several token classes wash out to near-invisible. Pin the
+   whole token palette to dark, high-contrast colors that read on light paper. */
+pre.sourceCode code span { color: #2B2B2B !important; }                 /* base / identifiers */
+.sourceCode span.co { color: #7A7568 !important; font-style: italic; } /* comments */
+.sourceCode span.st, .sourceCode span.vs, .sourceCode span.ss,
+.sourceCode span.ch  { color: #216E39 !important; }                    /* strings */
+.sourceCode span.kw, .sourceCode span.cf, .sourceCode span.im,
+.sourceCode span.pp  { color: #9C275E !important; font-weight: 600; }  /* keywords / imports */
+.sourceCode span.dv, .sourceCode span.fl, .sourceCode span.bn,
+.sourceCode span.cn  { color: #1F5FAE !important; }                    /* numbers / constants */
+.sourceCode span.fu, .sourceCode span.bu { color: #6A3FB5 !important; }/* functions / builtins */
+.sourceCode span.op, .sourceCode span.sc { color: #555555 !important; }/* operators */
+.sourceCode span.dt, .sourceCode span.va, .sourceCode span.at
+                     { color: #2B2B2B !important; }                    /* datatypes / vars / attrs */
