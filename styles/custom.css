@@ -668,8 +668,11 @@ pre.sourceCode code span { color: #2B2B2B !important; }                 /* base 
 .quarto-dark .chart-sub { color: #B8B3A8; }
 .quarto-dark .jc-fig figcaption { color: #8A8A8A; border-top-color: #3A3A3C; }
 
-/* ── Page zoom: default the article a touch smaller (≈ one Ctrl-minus) ─────── */
-main.content { zoom: 0.9; }
+/* ── Page density: shrink the type ~10% for the "one Ctrl-minus" feel WITHOUT
+   CSS zoom. `zoom` scales the SVG visually but Plot computes tooltip pointer
+   coords in unzoomed space, so hover hit-testing drifts off. Reducing the root
+   font-size gives the denser look and keeps chart pointers exactly 1:1. ─────── */
+html { font-size: 90%; }
 
 /* ── Composition component (First Citizens NDFI book) ──────────────────────── */
 figure.comp { margin: 2rem 0; }
