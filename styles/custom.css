@@ -643,8 +643,33 @@ pre.sourceCode code span { color: #2B2B2B !important; }                 /* base 
 
 /* ── Chart figures: center the plot in the column so narrower charts don't
    hug the left with a dead gap on the right. The wide scatter fills anyway. ── */
+.jc-fig { margin: 2.5rem 0; }
 .jc-fig > svg { display: block; margin-inline: auto; max-width: 100%; height: auto; }
 .jc-fig.jc-wide svg { max-width: 100%; height: auto; }
+
+/* Title block above a chart */
+.chart-head { margin: 0 0 1rem; }
+.chart-kicker { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #B45309; margin-bottom: 0.4rem; }
+.chart-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.5rem; line-height: 1.15;
+  color: #1C1C1E; letter-spacing: -0.01em; }
+.chart-sub { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.92rem; line-height: 1.5;
+  color: #5A5A5A; margin-top: 0.4rem; max-width: 52rem; }
+
+/* Source / attribution line below a chart */
+.jc-fig figcaption { font-family: 'DM Mono', monospace; font-size: 0.66rem; line-height: 1.6;
+  letter-spacing: 0.01em; color: #7A7A7A; margin-top: 0.7rem; padding-top: 0.55rem;
+  border-top: 1px solid #E4E0D6; }
+.jc-fig figcaption b { color: #4A4A4A; font-weight: 600; }
+.jc-fig figcaption code { background: none; font-size: 0.9em; color: #6A6A6A; }
+.jc-fig .ill { color: #9A8F7A; }
+
+.quarto-dark .chart-title { color: #F0EBE0; }
+.quarto-dark .chart-sub { color: #B8B3A8; }
+.quarto-dark .jc-fig figcaption { color: #8A8A8A; border-top-color: #3A3A3C; }
+
+/* ── Page zoom: default the article a touch smaller (≈ one Ctrl-minus) ─────── */
+main.content { zoom: 0.9; }
 
 /* ── Composition component (First Citizens NDFI book) ──────────────────────── */
 figure.comp { margin: 2rem 0; }

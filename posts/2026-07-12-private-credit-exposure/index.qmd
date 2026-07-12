@@ -116,7 +116,7 @@ mktLast = mkt[mkt.length - 1]
 mktTip = ({Quarter: d => d.quarter.toLocaleDateString("en-US",{month:"short",year:"numeric"}),
            "NDFI drawn": d => `$${(d.total/1000).toFixed(2)}T`})
 chartMarket = Plot.plot({
-  width: 700, height: 220, marginLeft: 46, marginBottom: 26, marginTop: 20, marginRight: 96,
+  width: 1040, height: 300, marginLeft: 52, marginBottom: 28, marginTop: 22, marginRight: 104,
   x: {type: "utc", label: null, tickFormat: "%b %y", ticks: 6},
   y: {label: null, grid: true, domain: [0, 1650], tickFormat: s => `$${(s/1000).toFixed(1)}T`},
   style: FONT,
@@ -192,7 +192,7 @@ sizeLegend = Plot.plot({
 
 // ── Chart 3 · the concentration ranking ────────────────────────────────────
 chartRank = Plot.plot({
-  width: 700, height: 470, marginLeft: 124, marginBottom: 34, marginTop: 10, marginRight: 46,
+  width: 1040, height: 500, marginLeft: 130, marginBottom: 36, marginTop: 12, marginRight: 54,
   x: {label: "NDFI ÷ Tier 1 capital →", tickFormat: pct0, grid: true, domain: [0, 2.1]},
   y: {label: null},
   style: FONT,
@@ -242,7 +242,15 @@ true exposure, and stress is exactly when borrowers draw the rest.
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig">${chartMarket}<figcaption>Drawn bank loans to non-depository financial institutions, summed across all reporting banks. <span class="ill">Real data — FDIC BankFind financials API, bank-level Call Report, Q4 2024–Q1 2026.</span></figcaption></figure>`
+html`<figure class="jc-fig">
+  <div class="chart-head">
+    <div class="chart-kicker">Figure 1 · The market</div>
+    <div class="chart-title">Bank lending to private credit: $1.5 trillion and climbing</div>
+    <div class="chart-sub">Drawn loans to non-depository financial institutions (NDFIs), summed across all reporting banks.</div>
+  </div>
+  ${chartMarket}
+  <figcaption><b>Source:</b> FDIC BankFind financials API, bank-level Call Report (field <code>LNNDEPC</code>), Q4 2024–Q1 2026. <span class="ill">Real data, computed by the author.</span></figcaption>
+</figure>`
 ```
 
 Two structural facts fall straight out of the same pull:
@@ -272,7 +280,16 @@ picture is not what the headlines suggest.
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig jc-wide">${chartScatter}<div class="jc-legend-r"><span class="jc-legend-lbl">Bubble = total assets</span>${sizeLegend}</div><figcaption>Every holding company reporting NDFI loans, Q1 2026. Horizontal = size of the book (log); vertical = book ÷ Tier 1 capital; bubble = total assets. <b>Hover any bubble for the bank.</b> Subsidiary banks rolled up to the holding company. <span class="ill">Real data; First Citizens &amp; Truist in orange.</span></figcaption></figure>`
+html`<figure class="jc-fig jc-wide">
+  <div class="chart-head">
+    <div class="chart-kicker">Figure 2 · Scale vs. concentration</div>
+    <div class="chart-title">The biggest lenders aren't the most exposed</div>
+    <div class="chart-sub">Every holding company reporting NDFI loans, Q1 2026. Horizontal: size of the book. Vertical: book ÷ Tier 1 capital. Bubble: total assets. <b>Hover any bubble for the bank.</b></div>
+  </div>
+  ${chartScatter}
+  <div class="jc-legend-r"><span class="jc-legend-lbl">Bubble = total assets</span>${sizeLegend}</div>
+  <figcaption><b>Source:</b> FDIC BankFind financials API, bank-level Call Report; subsidiary banks rolled up to the holding company. <span class="ill">Real data; First Citizens &amp; Truist highlighted in orange.</span></figcaption>
+</figure>`
 ```
 
 The megabanks (JPMorgan, Wells, Bank of America) sit far to the right — they lend the most
@@ -301,6 +318,11 @@ is what turns a scary headline into a defensible book, and the bank breaks it ou
 ```{ojs}
 //| echo: false
 html`<figure class="jc-fig comp">
+  <div class="chart-head">
+    <div class="chart-kicker">Figure 3 · First Citizens</div>
+    <div class="chart-title">Most of the book is the safe kind of exposure</div>
+    <div class="chart-sub">The NDFI book split by type, with the loss allowance the bank holds against each.</div>
+  </div>
   <div class="comp-bar">
     <div class="comp-seg" style="width:85%;background:${INK}">85%</div>
     <div class="comp-seg" style="width:15%;background:${HI}">15%</div>
@@ -319,7 +341,7 @@ html`<figure class="jc-fig comp">
       <div class="comp-alll">Allowance for losses<b style="color:${HI}">1.06%</b></div>
     </div>
   </div>
-  <figcaption>First Citizens' NDFI book by type, per its FY2025 10-K. The <b>12× allowance gap</b> between the two slices is the evidence behind its "big but safe" framing. <span class="ill">Disclosed figures; holding-company basis.</span></figcaption>
+  <figcaption>The <b>12× allowance gap</b> between the two slices is the evidence behind the bank's "big but safe" framing. <b>Source:</b> First Citizens FY2025 10-K, MD&A. <span class="ill">Disclosed figures; holding-company basis.</span></figcaption>
 </figure>`
 ```
 
@@ -371,7 +393,15 @@ method predicts — First Citizens near the top, Truist comfortably in the pack:
 
 ```{ojs}
 //| echo: false
-html`<figure class="jc-fig">${chartRank}<figcaption>NDFI loans as a share of Tier 1 capital, Q1 2026, banks with over $10B in NDFI. The dashed line is 100% — a book equal to the bank's entire tier 1 capital. <span class="ill">Real data; case-study banks in orange.</span></figcaption></figure>`
+html`<figure class="jc-fig">
+  <div class="chart-head">
+    <div class="chart-kicker">Figure 4 · The ranking</div>
+    <div class="chart-title">Who's most exposed, measured against capital</div>
+    <div class="chart-sub">NDFI loans as a share of Tier 1 capital, Q1 2026. Banks with over $10B in NDFI. The dashed line is 100% — a book equal to the bank's entire Tier 1 capital.</div>
+  </div>
+  ${chartRank}
+  <figcaption><b>Source:</b> FDIC BankFind financials API, bank-level Call Report; holding-company rollup. <span class="ill">Real data; case-study banks in orange.</span></figcaption>
+</figure>`
 ```
 
 The surprise is at the top: it is the **investment and custody banks** — Goldman, Morgan
