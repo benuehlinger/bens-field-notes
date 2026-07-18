@@ -700,3 +700,42 @@ figure.comp { margin: 2rem 0; }
 .quarto-dark .comp-name { color: #F0EBE0; }
 .quarto-dark .comp-desc { color: #B8B3A8; }
 .quarto-dark .comp-alll { border-top-color: #3A3A3C; }
+
+/* ── Two-layer lead-in visuals (Options A/B) ──────────────────────────────── */
+/* Option A — the chain flow */
+.layer-flow { display: flex; align-items: stretch; gap: 0; margin: 1rem 0 0; flex-wrap: wrap; }
+.lf-node { flex: 0 0 auto; min-width: 118px; border: 1px solid #1C1C1E; border-radius: 6px;
+  background: #FAF9F5; padding: 0.8rem 1rem; text-align: center; display: flex;
+  flex-direction: column; justify-content: center; }
+.lf-node b { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.02rem; color: #1C1C1E; line-height: 1.1; }
+.lf-node span { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: #8A8A8A; margin-top: 0.25rem; }
+.lf-link { flex: 1 1 150px; min-width: 150px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 0 0.5rem; }
+.lf-tag { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.1em;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 0.3rem; }
+.lf-arrow { height: 3px; width: 100%; position: relative; }
+.lf-arrow::after { content: ""; position: absolute; right: -1px; top: -4.5px;
+  border-left: 8px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.lf-deal { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 600; font-size: 0.82rem;
+  color: #2C2C2C; margin-top: 0.4rem; text-align: center; }
+.lf-sub { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: #8A8A8A; text-align: center; margin-top: 0.18rem; }
+
+/* Option B — instrument cards */
+.layer-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0 0; }
+.lc-card { border: 1px solid #DDD8CD; border-top: 3px solid; border-radius: 6px;
+  background: #FAF9F5; padding: 1rem 1.15rem; }
+.lc-head { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.12rem; line-height: 1.1; }
+.lc-badge { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #8A8A8A; margin: 0.3rem 0 0.75rem; }
+.lc-card ul { list-style: none; padding: 0; margin: 0; }
+.lc-card li { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem;
+  padding: 0.34rem 0; border-bottom: 1px solid #EDEAE2; font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.84rem; }
+.lc-card li:last-of-type { border-bottom: none; }
+.lc-card li b { color: #2C2C2C; font-weight: 600; }
+.lc-card li span { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #9A8F7A; text-align: right; }
+.lc-foot { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.76rem; color: #7A7A7A;
+  margin-top: 0.75rem; font-style: italic; }
+
+.quarto-dark .lf-node, .quarto-dark .lc-card { background: #242426; border-color: #3A3A3C; }
+.quarto-dark .lf-node b, .quarto-dark .lc-card li b { color: #F0EBE0; }
+.quarto-dark .lc-card li { border-bottom-color: #3A3A3C; }

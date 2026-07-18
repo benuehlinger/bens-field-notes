@@ -210,6 +210,121 @@ chartRank = Plot.plot({
 
 ---
 
+## First, the shape of the market
+
+Private credit is a chain: **banks lend to the funds, and the funds lend to companies.** The
+two links carry completely different debt — Layer 1 is *revolving credit lines*, Layer 2 is
+*bespoke term loans* — and this article measures only the first. Three ways to picture it
+below; we'll keep whichever reads best.
+
+```{ojs}
+//| echo: false
+//| output: false
+// deterministic "bespoke cloud" for Option C (stable across reloads)
+cloud = Array.from({length: 46}, (_, i) => ({
+  x: 4.7 + ((i * 2.7) % 5.1),
+  y: 0.9 + ((i * 1.9) % 8.2),
+  r: 3 + (i % 5) * 1.5
+}))
+grid1 = Array.from({length: 4}, (_, i) => ({x: 1.4, y: 2.4 + i * 1.75}))
+layerAsym = Plot.plot({
+  width: 700, height: 280, marginTop: 16, marginBottom: 28, marginLeft: 12, marginRight: 12,
+  style: FONT,
+  x: {domain: [0, 10], axis: null},
+  y: {domain: [0, 10], axis: null},
+  marks: [
+    Plot.ruleX([3.95], {stroke: GRID, strokeDasharray: "3,4"}),
+    Plot.rect(grid1, {x1: d => d.x - 0.42, x2: d => d.x + 0.42, y1: d => d.y - 0.42, y2: d => d.y + 0.42, fill: INK, fillOpacity: 0.82}),
+    Plot.dot(cloud, {x: "x", y: "y", r: "r", fill: HI, fillOpacity: 0.36, stroke: HI, strokeOpacity: 0.5}),
+    Plot.text([{x: 1.4, y: 9.3}], {text: ["LAYER 1"], fill: INK, fontWeight: 700, fontSize: 11}),
+    Plot.text([{x: 1.4, y: 0.2}], {text: ["4 revolving types · standardized"], fill: MUTE, fontSize: 8.5}),
+    Plot.text([{x: 7.0, y: 9.3}], {text: ["LAYER 2"], fill: HI, fontWeight: 700, fontSize: 11}),
+    Plot.text([{x: 7.0, y: 0.2}], {text: ["endless bespoke term structures"], fill: MUTE, fontSize: 8.5})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">
+  <div class="chart-head">
+    <div class="chart-kicker">Option A · The chain</div>
+    <div class="chart-title">Banks lend to the funds; the funds lend to companies</div>
+    <div class="chart-sub">Two layers, two very different kinds of debt. This article measures Layer 1.</div>
+  </div>
+  <div class="layer-flow">
+    <div class="lf-node"><b>Banks</b><span>JPMorgan · Goldman</span></div>
+    <div class="lf-link">
+      <div class="lf-tag" style="color:${INK}">Layer 1 — measured here</div>
+      <div class="lf-arrow" style="background:${INK};color:${INK}"></div>
+      <div class="lf-deal">revolving credit lines</div>
+      <div class="lf-sub">subscription · NAV · warehouse · back-leverage</div>
+    </div>
+    <div class="lf-node"><b>Private-credit funds</b><span>Apollo · Ares · Blue Owl</span></div>
+    <div class="lf-link">
+      <div class="lf-tag" style="color:${HI}">Layer 2 — the sequel</div>
+      <div class="lf-arrow" style="background:${HI};color:${HI}"></div>
+      <div class="lf-deal">term loans, bespoke</div>
+      <div class="lf-sub">unitranche · 1st/2nd lien · mezz · PIK · ABL</div>
+    </div>
+    <div class="lf-node"><b>End companies</b><span>mid-market, PE-backed</span></div>
+  </div>
+  <figcaption><b>Layer 1</b> revolves — a promise to lend, drawn over time — which is what the NDFI line captures. <b>Layer 2</b> is fully-funded term debt in endless bespoke shapes. <span class="ill">The two don't cleanly join — which is the blind spot.</span></figcaption>
+</figure>`
+```
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">
+  <div class="chart-head">
+    <div class="chart-kicker">Option B · The instruments</div>
+    <div class="chart-title">The same money, two kinds of loan</div>
+    <div class="chart-sub">What each layer's debt actually looks like.</div>
+  </div>
+  <div class="layer-cards">
+    <div class="lc-card" style="border-top-color:${INK}">
+      <div class="lc-head" style="color:${INK}">Layer 1 · Bank → Fund</div>
+      <div class="lc-badge">Revolving · standardized</div>
+      <ul>
+        <li><b>Subscription / capital-call</b><span>secured by LP commitments</span></li>
+        <li><b>NAV facility</b><span>secured by the portfolio</span></li>
+        <li><b>Warehouse line</b><span>assets pre-securitization</span></li>
+        <li><b>Back-leverage</b><span>margin on the loan book</span></li>
+      </ul>
+      <div class="lc-foot">A short menu. Drawn-vs-committed is the whole story.</div>
+    </div>
+    <div class="lc-card" style="border-top-color:${HI}">
+      <div class="lc-head" style="color:${HI}">Layer 2 · Fund → Company</div>
+      <div class="lc-badge">Term · bespoke</div>
+      <ul>
+        <li><b>Unitranche</b><span>1st+2nd lien blended</span></li>
+        <li><b>First-lien senior secured</b><span>term</span></li>
+        <li><b>Second lien / mezzanine</b><span>term</span></li>
+        <li><b>PIK / PIK-toggle</b><span>term</span></li>
+        <li><b>Delayed-draw · ABL · revolver</b><span>term / revolving</span></li>
+      </ul>
+      <div class="lc-foot">Building blocks → endless negotiated combinations.</div>
+    </div>
+  </div>
+  <figcaption>Layer 1 is a handful of revolving facility types; Layer 2 is a small instrument menu that combines into effectively unlimited bespoke deals. <span class="ill">Same borrowers, different debt.</span></figcaption>
+</figure>`
+```
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">
+  <div class="chart-head">
+    <div class="chart-kicker">Option C · The asymmetry</div>
+    <div class="chart-title">Few standardized pipes → endless bespoke deals</div>
+    <div class="chart-sub">A picture of the density difference between the two layers.</div>
+  </div>
+  ${layerAsym}
+  <figcaption>Left: Layer 1 — a few uniform, revolving facility types. Right: Layer 2 — the same handful of instruments negotiated into countless one-off structures. <span class="ill">The bespoke sprawl is why it's opaque.</span></figcaption>
+</figure>`
+```
+
+---
+
 ## Part 1 — Reading the market in aggregate
 
 Before judging any one bank, get a feel for the whole system: its size, its growth, its
