@@ -25,8 +25,10 @@ before the headlines?**
 The answer is yes, more than you'd expect — with two limits we'll come to. The raw material
 sits in free public filings. This guide walks the two levels at which you read them: the
 **market in aggregate**, then a **single bank** — using two deliberately different banks to
-show that the technique changes with how much a bank chooses to tell you. Every number below
-is computed live from the FDIC's public API; the code is in the margins.
+show that the technique changes with how much a bank chooses to tell you. The market-wide and
+per-bank concentration numbers are computed live from the FDIC's public API; where a bank
+discloses more than the regulator requires — like First Citizens' composition — we read it
+straight from the 10-K, flagged as such. The code is in the margins.
 
 ```{python}
 #| echo: false
