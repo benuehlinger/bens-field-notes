@@ -51,3 +51,4 @@ drafts/*
 
 # Personal throwaway notebooks (keep the shared explorers)
 analysis/notebooks/*-scratch.ipynb
+!analysis/outputs/jcurve_sample.parquet

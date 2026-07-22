@@ -1,0 +1,165 @@
+---
+title: "The Trough Looks Like Failure"
+subtitle: "AI's productivity payoff is hiding in the measurement — the same place electricity's hid for forty years."
+description: "Why the 95% 'failure' rate of enterprise AI pilots looks exactly like the bottom of a productivity J-curve, read through David's dynamo, Brynjolfsson's model, and Citadel's tokenomics."
+date: 2026-07-02
+categories: [AI, Economics]
+type: thesis
+bibliography: ../../references.bib
+---
+
+[Thesis]{.type-badge}
+
+In 1987, Robert Solow wrote the most-quoted sentence in
+productivity economics: you could see the computer age everywhere but in the productivity
+statistics [@solow1987]. Thirty-eight years later, an MIT team reported that **95% of
+enterprise AI pilots** show no measurable return [@mit2025]. Both times the consensus
+reached for the same verdict — overhyped. Both times, it was staring at the *trough of a
+J-curve* and calling it a cliff.
+
+::: {.tape}
+**95%** — enterprise generative-AI pilots with no measurable P&L impact<br>
+`MIT Project NANDA · 2025`
+:::
+
+Paul David caught this rhyme a century back [@david1990].
+Electricity arrived in the 1880s. Factories electrified fast — and then productivity
+*didn't move for forty years*. The reason wasn't the dynamo. It was that firms first bolted
+electric motors onto the old steam-era layout: one big motor still turning a maze of line
+shafts and belts. The gains only came once they tore the shafts out and rebuilt around the
+*unit drive* — a motor on every machine, the floor plan freed, the single-story plant.
+Reorganization, not electrification, was the productivity event. And reorganization takes a
+generation.
+
+Brynjolfsson, Rock and Syverson turned that history into a
+model [@brs2018]. A general-purpose technology demands enormous *intangible* investment —
+new processes, business models, retrained people — that the national accounts simply don't
+count. So while a firm builds that hidden capital, its measured output is too low and its
+productivity looks worse than reality. Later, when the intangibles pay off, output rises
+against costs that were expensed years ago, and productivity looks *better* than reality.
+Plot the gap and you get a J:
+
+::: {.pull-source}
+"…this leads to an underestimation of productivity growth in the early years of a new GPT,
+and… later, when the benefits of intangible investments are harvested, productivity growth
+will be overestimated."
+
+[— Brynjolfsson, Rock & Syverson, 2018]{.attribution}
+:::
+
+```{python}
+#| echo: false
+#| output: false
+from pathlib import Path
+import pandas as pd
+
+_jc = pd.read_parquet(Path("../../analysis/outputs/jcurve_sample.parquet"))
+_jc["date"] = pd.to_datetime(_jc["date"]).dt.strftime("%Y-%m-%d")
+ojs_define(jc_data=_jc.to_dict(orient="records"))
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+import { Plot } from "npm:@observablehq/plot"
+jc = jc_data.map(d => ({...d, date: new Date(d.date)}))
+jcLast = jc[jc.length - 1]
+jcIdx = key => jc.map(d => ({date: d.date, value: d[key] / jc[0][key] * 100}))
+jcRaw = key => jc.map(d => ({date: d.date, value: d[key]}))
+jcPct = v => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`
+
+jcTwoLine = (a, b, w, h, extra = {}) => Plot.plot({
+  width: w, height: h, marginLeft: 30, marginBottom: 20, marginTop: 12, marginRight: 10,
+  x: {type: "utc", label: null, ticks: 4, tickFormat: "%y"},
+  y: {label: null, grid: true, ...(extra.y || {})},
+  style: {fontFamily: "DM Mono, monospace", fontSize: "9px"},
+  marks: [
+    ...(extra.baseline != null ? [Plot.ruleY([extra.baseline], {stroke: "#C8C3B8", strokeDasharray: "2,3"})] : []),
+    Plot.lineY(a.data, {x: "date", y: "value", stroke: a.color, strokeWidth: 1.9}),
+    Plot.lineY(b.data, {x: "date", y: "value", stroke: b.color, strokeWidth: 1.9}),
+    Plot.dot([a.data[a.data.length - 1]], {x: "date", y: "value", r: 3, fill: a.color}),
+    Plot.dot([b.data[b.data.length - 1]], {x: "date", y: "value", r: 3, fill: b.color})
+  ]
+})
+
+jcInputs = jcTwoLine({data: jcIdx("adoption"), color: "#7C6FB5"}, {data: jcIdx("it_investment"), color: "#4A6FA5"}, 360, 190)
+jcPayoff = jcTwoLine({data: jcRaw("productivity"), color: "#3A7D5E"}, {data: jcRaw("tfp"), color: "#9A8F7A"}, 360, 190, {baseline: 100, y: {domain: [92, 122]}})
+
+jcRecalcData = jc.map(d => ({date: d.date, meas: d.productivity, adj: d.productivity_adj}))
+jcRecalc = Plot.plot({
+  width: 680, height: 240, marginLeft: 32, marginBottom: 24, marginTop: 14, marginRight: 64,
+  x: {type: "utc", label: null, ticks: 5, tickFormat: "%Y"},
+  y: {label: null, grid: true},
+  style: {fontFamily: "DM Mono, monospace", fontSize: "10px"},
+  marks: [
+    Plot.areaY(jcRecalcData, {x: "date", y1: "meas", y2: "adj", fill: "#3A7D5E", fillOpacity: 0.10}),
+    Plot.lineY(jcRecalcData, {x: "date", y: "meas", stroke: "#6A6A6A", strokeWidth: 1.8}),
+    Plot.lineY(jcRecalcData, {x: "date", y: "adj", stroke: "#3A7D5E", strokeWidth: 1.8, strokeDasharray: "3,3"}),
+    Plot.text([jcRecalcData[jcRecalcData.length - 1]], {x: "date", y: "adj", text: ["adjusted"], dx: 6, textAnchor: "start", fontSize: 9, fill: "#3A7D5E"}),
+    Plot.text([jcRecalcData[jcRecalcData.length - 1]], {x: "date", y: "meas", text: ["measured"], dx: 6, textAnchor: "start", fontSize: 9, fill: "#6A6A6A"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<figure class="jc-fig">${jcRecalc}<figcaption>Measured output per hour against an intangibles-adjusted estimate. The shaded gap — output the national accounts miss while the hidden capital is still being built — is the J. <span class="ill">Illustrative sample data.</span></figcaption></figure>`
+```
+
+Which brings us to the present, and to a productivity theorist from an unlikely address:
+Citadel Securities. Its *Tokenomics* note [@citadel2026] describes AI as rationed by
+physical inputs — compute, power, cooling — bifurcating into a frontier only deep balance
+sheets can afford and a cheap "good-enough" tier for everyone else. Strip the AI vocabulary
+and it is textbook GPT diffusion: the concentrated, capital-hungry early phase, exactly
+where David's dynamo sat in 1900. The 95% of pilots that "fail" are firms that bought the
+model and bolted it onto the old workflow. **Group drive, not unit drive.**
+
+None of this proves AI will pay off. It says the current disappointment is *uninformative* —
+which is precisely what the bottom of a J-curve looks like from inside.
+
+*What would prove me wrong:* if total factor productivity in the most AI-exposed industries
+shows no J — no dip, no recovery — five years out, the reorganization-lag story is dead, and
+the skeptics were right that this one is different. It's a measurable bet, and the data
+(BLS total factor productivity by industry) will settle it. I intend to keep score.
+
+## The scoreboard
+
+The bet, made watchable. Inputs on one side, payoff on the other. If it's a J-curve,
+the first pair races ahead while the second stays pinned to the floor — until the
+reorganization finally pays.
+
+```{ojs}
+//| echo: false
+html`<div class="jc-panels">
+  <figure class="left">
+    <div class="jc-cap">The inputs — surging</div>
+    ${jcInputs}
+    <div class="jc-legend"><span><i style="background:#7C6FB5"></i>AI adoption</span><span><i style="background:#4A6FA5"></i>IT investment</span></div>
+    <div class="jc-read">Adoption near <b>${jcLast.adoption.toFixed(1)}% of firms</b>; IT &amp; software investment <b>${jcPct(jcLast.it_investment - 100)}</b> since 2015, and accelerating. <span style="color:#9A8F7A">(2015 = 100)</span></div>
+  </figure>
+  <figure>
+    <div class="jc-cap">The payoff — not yet</div>
+    ${jcPayoff}
+    <div class="jc-legend"><span><i style="background:#3A7D5E"></i>Labor productivity</span><span><i style="background:#9A8F7A"></i>TFP</span></div>
+    <div class="jc-read">Output per hour <b>${jcPct(jcLast.productivity - 100)}</b> across the decade (~1.1%/yr); TFP essentially flat. No inflection yet. <span style="color:#9A8F7A">(2015 = 100)</span></div>
+  </figure>
+</div>`
+```
+
+::: {.ill-note}
+**Illustrative sample data**, structured to mirror the real series this will draw from — Census BTOS (AI adoption), BEA (IT &amp; software investment), BLS (output per hour), SF Fed (utilization-adjusted TFP). Live data drops in with a FRED key, and the score keeps itself from there.
+:::
+
+::: {.connection}
+**Builds toward** — Tokenomics as GPT Diffusion: Equity Is a Condition, Not a Property *(forthcoming)*<br>
+**Uses data** — BEA intangible investment · BLS total factor productivity (NAICS)
+:::
+
+## Sources
+
+::: {#refs}
+:::
+
+::: {.cast}
+**Cast** — Robert Solow · Paul David · Erik Brynjolfsson
+:::

@@ -739,3 +739,12 @@ figure.comp { margin: 2rem 0; }
 .quarto-dark .lf-node, .quarto-dark .lc-card { background: #242426; border-color: #3A3A3C; }
 .quarto-dark .lf-node b, .quarto-dark .lc-card li b { color: #F0EBE0; }
 .quarto-dark .lc-card li { border-bottom-color: #3A3A3C; }
+
+/* J-curve "scoreboard" panels (from the Trough Looks Like Failure post) */
+.jc-panels { display: flex; gap: 0 2rem; align-items: flex-start; margin: 1.5rem 0; }
+.jc-panels > * { flex: 1 1 0; min-width: 0; margin: 0; }
+.jc-panels .left { border-right: 1px solid #C8C3B8; padding-right: 2rem; }
+.jc-cap { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.13em; text-transform: uppercase; color: #1C1C1E; font-weight: 500; margin-bottom: 0.3rem; }
+.jc-legend { display: flex; gap: 1rem; font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.05em; text-transform: uppercase; color: #6A6A6A; margin: 0.3rem 0; }
+.jc-legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.3rem; vertical-align: middle; }
+.jc-read { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.88rem; line-height: 1.5; color: #5A5A5A; margin-top: 0.35rem; }
