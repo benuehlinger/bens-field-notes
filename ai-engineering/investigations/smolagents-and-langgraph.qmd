@@ -1,11 +1,11 @@
 ---
-title: "Who’s actually running the agent?"
-subtitle: "smolagents, LangGraph, and where T3 Code fits"
+title: "smolagents vs LangGraph"
+subtitle: "Who’s running the agent—and where does T3 Code fit?"
 description: "Opening questions for a hands-on investigation of agent execution, control, and the tools we use to build."
 toc: true
 ---
 
-[AI engineering](../index.qmd) / Investigations
+[AI engineering](../index.qmd) / Currently learning
 
 ::: {.inquiry-status}
 Opening inquiry · No experiment run yet

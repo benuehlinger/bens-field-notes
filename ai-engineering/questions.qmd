@@ -20,7 +20,7 @@ Understand the tradeoff between a model choosing its next action and a workflow 
 <ul class="annotated-sources"><li><div><a href="https://developers.openai.com/api/docs/guides/agents" class="" target="_blank" rel="noopener noreferrer">Choose an agent runtime</a><small>official guide</small></div><p>Compares Responses, Agents SDK and managed Agents API.</p></li><li><div><a href="https://www.anthropic.com/engineering" class="" target="_blank" rel="noopener noreferrer">Anthropic Engineering</a><small>blog</small></div><p>Detailed accounts of building, evaluating, and deploying agent systems.</p></li><li><div><a href="https://github.com/huggingface/smolagents" class="" target="_blank" rel="noopener noreferrer">Hugging Face smolagents</a><small>project</small></div><p>A relatively compact agent library useful for reading an execution loop end to end.</p></li><li><div><a href="https://github.com/langchain-ai/langgraph" class="" target="_blank" rel="noopener noreferrer">LangGraph</a><small>project</small></div><p>Useful for learning persistent agent workflows and control over state transitions.</p></li></ul>
 ```
 
-[Follow the investigation](investigations/smolagents-and-langgraph.qmd).
+[What I’m learning](investigations/smolagents-and-langgraph.qmd).
 
 ## How do I know the system improved? {#evaluation}
 

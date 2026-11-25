@@ -20,7 +20,7 @@ Experiments will begin in VS Code notebooks, one question and one block at a tim
 The story should follow what the work reveals. Code, intermediate outputs, diagrams and
 interpretation belong together when they help someone understand the result.
 
-The first investigation asks how [smolagents, LangGraph and T3 Code relate](ai-engineering/investigations/smolagents-and-langgraph.qmd).
+I’m currently learning how [smolagents, LangGraph and T3 Code relate](ai-engineering/investigations/smolagents-and-langgraph.qmd).
 It is an opening inquiry; no comparison has been run yet.
 
 ## Sources and evidence

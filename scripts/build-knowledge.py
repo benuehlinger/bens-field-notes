@@ -79,24 +79,49 @@ def matches_area(area, record):
 def source_atlas():
     kinds = [('official', 'Docs', 'docs'), ('course', 'Courses', 'courses'),
              ('project', 'Projects', 'projects'), ('community', 'Communities', 'people'),
-             ('publication', 'Publications', 'research'), ('research', 'Research', 'research')]
-    counts = [(a, {kind: sum(matches_area(a, s) and s['source_type'] == kind for s in SOURCES)
-                    for kind, _, _ in kinds}) for a in AREAS]
-    maximum = max(sum(c.values()) for _, c in counts)
-    view = '<figure class="atlas" aria-label="Source coverage by AI engineering topic">'
-    view += '<div class="atlas-head"><p>Where the source collection can take you.<br>Select a topic or segment to explore it.</p><div class="atlas-legend">'
-    view += ''.join(f'<span><i style="background:var(--{color})"></i>{name}</span>' for _, name, color in kinds)
-    view += '</div></div>'
-    for a, values in counts:
-        total = sum(values.values())
-        view += f'<div class="atlas-row">{anchor(a["name"], "library.html?topic=" + a["tag"], "atlas-label")}<div class="atlas-bar" style="width:{total / maximum * 100:.3f}%">'
+             ('publication', 'Publications', 'publications'), ('research', 'Research', 'research')]
+    topics = []
+    for a in AREAS:
+        records = [s for s in SOURCES if matches_area(a, s)]
+        curated = [source(key)['id'] for key in a['sources']]
+        records.sort(key=lambda s: (s['id'] not in curated,
+                                  curated.index(s['id']) if s['id'] in curated else 0))
+        topics.append(dict(id=a['tag'], title=a['name'], description=a['point'],
+                           question=a['checkpoint'], connection=a['connection'],
+                           guide=f'topics/{a["slug"]}.html',
+                           sources=[s['id'] for s in records]))
+    dataset = dict(topics=topics,
+                   kinds=[dict(id=key, label=label, color=color) for key, label, color in kinds],
+                   sources={s['id']: {key: s[key] for key in ['name', 'url', 'why', 'source_type']}
+                            for s in SOURCES})
+    maximum = ((max(len(t['sources']) for t in topics) + 9) // 10) * 10
+    view = '<section class="atlas atlas-explorer" id="source-atlas" aria-labelledby="atlas-title">'
+    view += '<div class="atlas-heading"><div><h2 id="atlas-title">Follow your curiosity.</h2><p>Explore twelve areas of AI engineering. Select a topic or a source type.</p></div>'
+    view += f'<a href="library.html" class="atlas-library">All {len(SOURCES)} sources <span aria-hidden="true">↗</span></a></div>'
+    view += '<div class="atlas-legend" aria-label="Filter the chart by source type" hidden><button type="button" data-atlas-kind="all" aria-pressed="true">All sources</button>'
+    for kind, label, color in kinds:
+        view += f'<button type="button" data-atlas-kind="{kind}" aria-pressed="false"><i style="background:var(--{color})" aria-hidden="true"></i>{label}</button>'
+    view += '</div><div class="atlas-layout"><div class="atlas-plot">'
+    view += '<div class="atlas-axis" aria-hidden="true"><span>Topic</span><div class="atlas-ticks">'
+    view += ''.join(f'<span style="left:{i * 25}%">{maximum * i // 4}</span>' for i in range(5))
+    view += '</div><span>Refs</span></div>'
+    for a, topic in zip(AREAS, topics):
+        records = [BY_ID[key] for key in topic['sources']]
+        total = len(records)
+        view += f'<div class="atlas-row" data-atlas-row="{a["tag"]}">'
+        view += f'<a href="{topic["guide"]}" class="atlas-label" data-atlas-topic="{a["tag"]}">{esc(a["name"])}</a>'
+        view += '<div class="atlas-track"><div class="atlas-grid" aria-hidden="true">' + ''.join(f'<i style="left:{i * 25}%"></i>' for i in range(5)) + '</div>'
+        view += f'<div class="atlas-bar" style="width:{total / maximum * 100:.3f}%">'
         for kind, label, color in kinds:
-            count = values[kind]
+            count = sum(s['source_type'] == kind for s in records)
             if count:
                 desc = f'{a["name"]}: {count} {label.lower()}'
-                view += f'<a class="atlas-segment" href="library.html?topic={a["tag"]}&amp;type={kind}" style="flex:{count};background:var(--{color})" aria-label="{esc(desc)}" title="{esc(desc)}"></a>'
-        view += f'</div><span class="atlas-total">{total}</span></div>'
-    view += '<figcaption>Source: the 127-entry collection, checked 25 November 2026. Topic membership combines subject tags and editorial links; sources can appear in several rows. Bar length shows available references, not quality or learning progress.</figcaption></figure>'
+                view += f'<a class="atlas-segment" href="library.html?topic={a["tag"]}&amp;type={kind}" data-atlas-segment="{a["tag"]}" data-kind="{kind}" style="flex:{count};background:var(--{color})" aria-label="{esc(desc)}" title="{esc(desc)}"></a>'
+        view += f'</div></div><span class="atlas-total">{total}</span></div>'
+    view += '<div class="atlas-readout" id="atlas-readout" role="status" aria-live="polite">Select a topic, or a color within it.</div></div>'
+    view += '<div class="atlas-detail" id="atlas-detail" role="region" aria-label="Selected topic" hidden></div></div>'
+    view += f'<div class="atlas-caption"><span>{len(SOURCES)} sources · Checked 25 Nov 2026</span><span>A source can belong to several topics. Counts describe this collection, not progress or quality.</span></div>'
+    view += '<script type="application/json" id="atlas-data">' + json.dumps(dataset, ensure_ascii=False).replace('</', '<\\/') + '</script></section>'
     return view
 
 
@@ -116,36 +141,23 @@ def generate_learn():
         ('Measure and improve', 'What failed, and which change would help?', ['evals', 'adaptation']),
         ('Make it useful', 'How does it become a dependable part of someone’s work?', ['multimodal', 'production', 'security', 'product'])
     ]
-    fieldmap = '<div class="field-map">'
+    fieldmap = '<details class="guide-index"><summary><span>Browse the field guides</span><small>Twelve subjects, with ideas and experiments to explore</small></summary><div class="field-map">'
     for label, question, tags in groups:
         fieldmap += f'<section class="field-column"><h3>{label}</h3><p>{question}</p><ul>'
         for tag in tags:
             a = BY_TAG[tag]
             fieldmap += f'<li>{anchor(a["name"], "topics/" + a["slug"] + ".html")}<span>{esc(a["point"])}</span></li>'
         fieldmap += '</ul></section>'
-    fieldmap += '</div>'
+    fieldmap += '</div></details>'
     questions = '<div class="question-grid">'
     for q in QUESTIONS:
         url = q.get('investigation', 'questions.qmd#' + q['id']).replace('.qmd', '.html')
         questions += f'<article><h3>{anchor(q["title"], url)}</h3><p>{esc(q["description"])}</p></article>'
     questions += '</div>'
-    body = raw(modes('learn')) + '''
-The field is easier to understand when the pieces have a job. Start with a question,
-follow the connections, and use a small experiment to make the ideas tangible.
-
-## A map of the field
-''' + raw(fieldmap) + '''
-::: {.connection-note}
-[Evaluation](topics/evaluation.qmd) asks whether a change helped.
-[Security](topics/security.qmd) sets boundaries on what the system may do.
-[Product engineering](topics/product-and-field-engineering.qmd) defines whose problem it solves.
-These concerns run through the whole map.
-:::
-
-## Explore the source coverage
-''' + raw(source_atlas()) + '''
-## Start with a question
+    body = raw(modes('learn')) + raw(source_atlas()) + '''
+## Questions worth following
 ''' + raw(questions) + '''
+''' + raw(fieldmap) + '''
 ## Find a way into the material
 
 - **Build with OpenAI:** start with the [official quickstart](https://developers.openai.com/api/docs/quickstart), then one structured output and one tool.
@@ -155,7 +167,7 @@ These concerns run through the whole map.
 
 [Browse courses and lessons](library.html?type=course) or [explore all sources](library.qmd).
 '''
-    write('ai-engineering/index.qmd', 'AI engineering', 'Learn the ideas by putting them to work.', body)
+    write('ai-engineering/index.qmd', 'AI engineering', 'A working understanding, one question at a time.', body)
 
 
 def generate_topics():
@@ -189,7 +201,7 @@ the experiment and the explanation can change together.
         body += '**Related areas:** ' + ' · '.join(f'[{BY_TAG[t]["name"]}](topics/{BY_TAG[t]["slug"]}.qmd)' for t in q['areas']) + '\n\n'
         body += raw(source_list(q['sources']))
         if q.get('investigation'):
-            body += f'\n[Follow the investigation]({q["investigation"]}).\n'
+            body += f'\n[What I’m learning]({q["investigation"]}).\n'
     write('ai-engineering/questions.qmd', 'Questions worth following', 'Let the question shape the experiment.', body, toc=True)
 
 

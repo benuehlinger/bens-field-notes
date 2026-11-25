@@ -20,7 +20,7 @@ website:
     left:
       - text: AI engineering
         href: ai-engineering/index.qmd
-      - text: Investigations
+      - text: Currently learning
         href: ai-engineering/investigations/smolagents-and-langgraph.qmd
       - text: Sources
         href: ai-engineering/library.qmd
@@ -56,6 +56,7 @@ format:
     fig-responsive: true
     include-after-body:
       - text: '<script src="/assets/knowledge.js" defer></script>'
+      - text: '<script src="/assets/atlas.js" defer></script>'
     grid:
       sidebar-width: 0px
       body-width: 1180px
