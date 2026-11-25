@@ -21,19 +21,10 @@ jobs:
         with:
           version: "1.9.37"
 
-      - name: Install notebook Python dependencies
-        run: python3 -m pip install --quiet -r requirements-notebooks.txt
-
       - name: Render site
         run: |
-          if [ -n "${R2_BASE_URL:-}" ]; then
-            quarto render -P "r2-base-url:${R2_BASE_URL}"
-          else
-            quarto render
-          fi
-        env:
-          # Optional — add as a GitHub Actions secret if you use this workflow
-          R2_BASE_URL: ${{ secrets.R2_BASE_URL }}
+          rm -rf _site
+          quarto render
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1

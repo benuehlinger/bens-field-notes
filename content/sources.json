@@ -1,0 +1,3049 @@
+{
+  "checked": "2026-11-25",
+  "sources": [
+    {
+      "id": "oai-quickstart",
+      "name": "Developer quickstart",
+      "url": "https://developers.openai.com/api/docs/quickstart",
+      "kind": "official guide",
+      "topics": [
+        "Responses",
+        "API clients"
+      ],
+      "why": "First authenticated request and SDK installation.",
+      "how_to_use": "Build one server-side Responses endpoint.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-responses",
+      "name": "Migrate to Responses",
+      "url": "https://developers.openai.com/api/docs/guides/migrate-to-responses",
+      "kind": "official guide",
+      "topics": [
+        "Responses",
+        "migration",
+        "state"
+      ],
+      "why": "Current API direction and output-item model.",
+      "how_to_use": "Port one request and tool loop; compare behavior.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Assistants shut down August 26, 2026; Chat Completions remains supported.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-python",
+      "name": "OpenAI Python API client",
+      "url": "https://github.com/openai/openai-python",
+      "kind": "official repository",
+      "topics": [
+        "API",
+        "API client",
+        "OpenAI",
+        "Python",
+        "retries",
+        "streaming",
+        "structured output"
+      ],
+      "why": "Canonical Python client types, errors and request IDs.",
+      "how_to_use": "Use OpenAI or AsyncOpenAI for direct API calls.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Package openai; distinct from openai-agents and openai-codex.\nCurrent policy limits pull requests to repository collaborators, including docs/examples. Outsiders should submit issues, not prepare PRs. Code is free; live API calls can cost money.",
+      "aliases": [
+        "project-openai-python"
+      ],
+      "entry_url": "https://github.com/openai/openai-python/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Reproduce a real SDK problem with a small sanitized script, exact version, expected behavior, and root-cause analysis; submit an issue.",
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "oai-node",
+      "name": "OpenAI JavaScript / TypeScript API client",
+      "url": "https://github.com/openai/openai-node",
+      "kind": "official repository",
+      "topics": [
+        "JavaScript",
+        "TypeScript",
+        "API client"
+      ],
+      "why": "Canonical JavaScript client and error-handling reference.",
+      "how_to_use": "Use the openai package for Responses; keep API keys server-side.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-prompting",
+      "name": "Prompt engineering",
+      "url": "https://developers.openai.com/api/docs/guides/prompt-engineering",
+      "kind": "official guide",
+      "topics": [
+        "prompting",
+        "instructions",
+        "context",
+        "examples"
+      ],
+      "why": "Message roles, clear instructions and relevant context.",
+      "how_to_use": "Version prompts in code and compare on a fixed dataset.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Hosted reusable prompt objects shut down November 30, 2026.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-reasoning",
+      "name": "Reasoning models",
+      "url": "https://developers.openai.com/api/docs/guides/reasoning",
+      "kind": "official guide",
+      "topics": [
+        "reasoning",
+        "model selection",
+        "effort",
+        "state"
+      ],
+      "why": "Reasoning controls and preservation of context across calls.",
+      "how_to_use": "Compare effort against quality, latency and total token cost.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Controls depend on the model and endpoint.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-structured",
+      "name": "Structured model outputs",
+      "url": "https://developers.openai.com/api/docs/guides/structured-outputs",
+      "kind": "official guide",
+      "topics": [
+        "JSON Schema",
+        "Pydantic",
+        "Zod",
+        "structured outputs"
+      ],
+      "why": "Turns machine-readable output into a schema contract.",
+      "how_to_use": "Build typed extraction and handle refusals, incomplete responses and business validation.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Schema adherence does not imply factual accuracy.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-functions",
+      "name": "Function calling",
+      "url": "https://developers.openai.com/api/docs/guides/function-calling",
+      "kind": "official guide",
+      "topics": [
+        "tools",
+        "function calling",
+        "schemas",
+        "agent loops"
+      ],
+      "why": "Explains definitions, tool calls, call IDs and returned outputs.",
+      "how_to_use": "Implement a read-only lookup loop; enforce authorization before write tools.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Tool calling on current GPT-6.2 models requires Responses.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-conversation",
+      "name": "Conversation state",
+      "url": "https://developers.openai.com/api/docs/guides/conversation-state",
+      "kind": "official guide",
+      "topics": [
+        "state",
+        "history",
+        "Conversations",
+        "response chaining"
+      ],
+      "why": "Compares manual history, response chaining and durable conversations.",
+      "how_to_use": "Choose one state owner; test restarts and cross-user isolation.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-compaction",
+      "name": "Compaction",
+      "url": "https://developers.openai.com/api/docs/guides/compaction",
+      "kind": "official guide",
+      "topics": [
+        "context",
+        "state",
+        "compaction",
+        "cost"
+      ],
+      "why": "Reduces long-running context while continuing a task.",
+      "how_to_use": "Replay long tasks and test preservation of constraints and identifiers.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Compaction items are opaque; preserve documented output-item order.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-retrieval",
+      "name": "Retrieval",
+      "url": "https://developers.openai.com/api/docs/guides/retrieval",
+      "kind": "official guide",
+      "topics": [
+        "retrieval",
+        "semantic search",
+        "vector stores",
+        "RAG"
+      ],
+      "why": "Separates vector-store search from answer generation.",
+      "how_to_use": "Measure relevant-hit recall over approved documents before answer quality.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "RAG means retrieval-augmented generation.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-file-search",
+      "name": "File search",
+      "url": "https://developers.openai.com/api/docs/guides/tools-file-search",
+      "kind": "official guide",
+      "topics": [
+        "retrieval",
+        "hosted tools",
+        "citations"
+      ],
+      "why": "Model-invoked semantic and keyword search in Responses.",
+      "how_to_use": "Build cited answers and inspect the retrieved evidence.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Hosted file search differs from direct vector-store retrieval.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-mcp",
+      "name": "MCP servers",
+      "url": "https://developers.openai.com/api/docs/guides/tools-connectors-mcp",
+      "kind": "official guide",
+      "topics": [
+        "MCP",
+        "OAuth",
+        "approvals",
+        "tools",
+        "security"
+      ],
+      "why": "Connects remote tool services to Responses with approval controls.",
+      "how_to_use": "Expose one read-only tool and verify allowlists, auth and data flow.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "MCP means Model Context Protocol. Built-in connectors are legacy; Secure MCP Tunnel is documented for private servers.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-agents",
+      "name": "Choose an agent runtime",
+      "url": "https://developers.openai.com/api/docs/guides/agents",
+      "kind": "official guide",
+      "topics": [
+        "agents",
+        "architecture",
+        "runtimes",
+        "state"
+      ],
+      "why": "Compares Responses, Agents SDK and managed Agents API.",
+      "how_to_use": "Choose by who owns the loop, execution environment and state.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-agents-python",
+      "name": "Agents SDK for Python",
+      "url": "https://github.com/openai/openai-agents-python",
+      "kind": "official repository",
+      "topics": [
+        "OpenAI",
+        "Python",
+        "agents",
+        "guardrails",
+        "handoffs",
+        "sessions",
+        "tools",
+        "tracing"
+      ],
+      "why": "Application-run agent loop and workflow primitives.",
+      "how_to_use": "Start with one agent, one tool, sessions and traces.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Install openai-agents; different purpose from the openai API client.\nCurrent policy limits pull requests to collaborators, including docs/examples. Outsiders are directed to issues. Live model calls and some services can cost money.",
+      "aliases": [
+        "project-openai-agents"
+      ],
+      "entry_url": "https://github.com/openai/openai-agents-python/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Submit a reproducible issue about a real tool, handoff, or tracing discrepancy, with exact versions and sanitized inputs.",
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "oai-agents-js",
+      "name": "Agents SDK for JavaScript / TypeScript",
+      "url": "https://github.com/openai/openai-agents-js",
+      "kind": "official repository",
+      "topics": [
+        "agents",
+        "TypeScript",
+        "Realtime",
+        "sessions",
+        "tracing",
+        "sandbox"
+      ],
+      "why": "Application-run text, sandbox and realtime agent patterns.",
+      "how_to_use": "Use @openai/agents for a bounded workflow before adding handoffs.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Browser realtime uses a short-lived client token created by your server.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-eval-practice",
+      "name": "Evaluation best practices",
+      "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+      "kind": "official guide",
+      "topics": [
+        "evals",
+        "datasets",
+        "metrics",
+        "human calibration"
+      ],
+      "why": "Task-specific evaluation principles despite legacy product references.",
+      "how_to_use": "Design representative cases and calibrate automated judges against human review.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Use methodology; hosted Evals shuts down November 30, 2026.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-improvement-loop",
+      "name": "Agent improvement loop with traces, evals and Codex",
+      "url": "https://developers.openai.com/cookbook/examples/agents_sdk/agent_improvement_loop",
+      "kind": "official cookbook",
+      "topics": [
+        "evals",
+        "tracing",
+        "Promptfoo",
+        "Codex",
+        "agent improvement"
+      ],
+      "why": "Connects traces, feedback, regression tests and concrete harness changes.",
+      "how_to_use": "Adapt synthetic data and review recommendations before changing behavior.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Example uses third-party Promptfoo and HALO, not additional OpenAI SDKs.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-production",
+      "name": "Production best practices",
+      "url": "https://developers.openai.com/api/docs/guides/production-best-practices",
+      "kind": "official guide",
+      "topics": [
+        "production",
+        "secrets",
+        "deployment",
+        "scaling"
+      ],
+      "why": "Moves a prototype toward an operated API service.",
+      "how_to_use": "Make a deployment checklist for secrets, limits, monitoring and rollback.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-data",
+      "name": "Data controls",
+      "url": "https://developers.openai.com/api/docs/guides/your-data",
+      "kind": "official guide",
+      "topics": [
+        "privacy",
+        "retention",
+        "ZDR",
+        "application state"
+      ],
+      "why": "Distinguishes training use, abuse logs and endpoint application state.",
+      "how_to_use": "Map each endpoint and tool to retention and deletion behavior.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "No training by default does not mean zero retention; special controls require eligibility and endpoint checks.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-safety",
+      "name": "Safety best practices",
+      "url": "https://developers.openai.com/api/docs/guides/safety-best-practices",
+      "kind": "official guide",
+      "topics": [
+        "security",
+        "prompt injection",
+        "red teaming",
+        "moderation"
+      ],
+      "why": "Introduces adversarial testing and safeguards.",
+      "how_to_use": "Add malicious documents and unauthorized tool requests to evals.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Enforce authorization in code; instructions and moderation are only layers.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-rate-limits",
+      "name": "Rate limits",
+      "url": "https://developers.openai.com/api/docs/guides/rate-limits",
+      "kind": "official guide",
+      "topics": [
+        "rate limits",
+        "retries",
+        "concurrency",
+        "production"
+      ],
+      "why": "Explains request/token limits and mitigation patterns.",
+      "how_to_use": "Test bounded queues, 429 recovery and retry budgets.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Actual limits depend on project, organization, model and tier.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-latency",
+      "name": "Latency optimization",
+      "url": "https://developers.openai.com/api/docs/guides/latency-optimization",
+      "kind": "official guide",
+      "topics": [
+        "latency",
+        "streaming",
+        "measurement",
+        "architecture"
+      ],
+      "why": "Separates first-token timing from full user wait.",
+      "how_to_use": "Measure p50/p95 over retrieval, model calls, tools, retries and rendering.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-cache",
+      "name": "Prompt caching",
+      "url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+      "kind": "official guide",
+      "topics": [
+        "cost",
+        "latency",
+        "cache",
+        "context"
+      ],
+      "why": "Explains unchanged-prefix reuse and cache behavior.",
+      "how_to_use": "Keep a stable prefix and measure cached tokens plus actual cost.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Persistent conversations do not guarantee hits; cache-write pricing varies by model.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-pricing",
+      "name": "API pricing",
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "kind": "official reference",
+      "topics": [
+        "cost",
+        "pricing",
+        "tokens",
+        "tools"
+      ],
+      "why": "Canonical changing reference for model/tool charges.",
+      "how_to_use": "Estimate cost per successful task including reasoning, tools and storage.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-realtime",
+      "name": "Realtime API quickstart",
+      "url": "https://developers.openai.com/api/docs/guides/realtime",
+      "kind": "official guide",
+      "topics": [
+        "Realtime",
+        "voice",
+        "WebRTC",
+        "WebSocket",
+        "multimodal"
+      ],
+      "why": "Entry point for conversational speech-to-speech agents.",
+      "how_to_use": "Build browser voice with one read-only tool; test interruptions.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Guide distinguishes Realtime from GPT-Live and chained pipelines.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-vision",
+      "name": "Images and vision",
+      "url": "https://developers.openai.com/api/docs/guides/images-vision",
+      "kind": "official guide",
+      "topics": [
+        "vision",
+        "multimodal",
+        "image inputs",
+        "images"
+      ],
+      "why": "Separates image analysis from generation and editing.",
+      "how_to_use": "Extract typed screenshot fields and test small text and ambiguity.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Supported modalities and cost depend on model and endpoint.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-plugins",
+      "name": "Plugins: successor documentation to Apps SDK",
+      "url": "https://developers.openai.com/plugins",
+      "kind": "official documentation index",
+      "topics": [
+        "Apps SDK",
+        "plugins",
+        "MCP",
+        "ChatGPT UI",
+        "skills"
+      ],
+      "why": "Current map for ChatGPT/Codex integrations with tools and optional UI.",
+      "how_to_use": "Follow server quickstart, authentication, testing and security pages.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Directly opening /apps-sdk redirected here. Index labels window.openai APIs legacy.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-codex-sdk",
+      "name": "Codex SDK",
+      "url": "https://learn.chatgpt.com/docs/codex-sdk",
+      "kind": "official guide",
+      "topics": [
+        "Codex",
+        "SDK",
+        "coding automation",
+        "CI",
+        "Python",
+        "TypeScript"
+      ],
+      "why": "Programmatically controls Codex threads for engineering workflows.",
+      "how_to_use": "Automate a bounded repository task with explicit sandbox and reviewable output.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Old developers.openai.com/codex/sdk redirects here. TypeScript @openai/codex-sdk; stable Python openai-codex. App server serves custom clients.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-deprecations",
+      "name": "API deprecations",
+      "url": "https://developers.openai.com/api/docs/deprecations",
+      "kind": "official lifecycle reference",
+      "topics": [
+        "API lifecycle",
+        "deprecations",
+        "migration"
+      ],
+      "why": "Authoritative shutdown timelines prevent adopting retired interfaces.",
+      "how_to_use": "Review before selecting a tutorial/model and before production upgrades.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "November 30: Evals, prompt objects, Agent Builder. December 15: eligible fine-tuning job creation.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-changelog",
+      "name": "API changelog",
+      "url": "https://developers.openai.com/api/docs/changelog",
+      "kind": "official changelog",
+      "topics": [
+        "API lifecycle",
+        "models",
+        "new features"
+      ],
+      "why": "Dated changes that can invalidate older recipes.",
+      "how_to_use": "Check monthly and before migrations; create relevant regression cases.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "keep-up"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-fine-tuning",
+      "name": "Supervised fine-tuning — legacy platform",
+      "url": "https://developers.openai.com/api/docs/guides/supervised-fine-tuning",
+      "kind": "official legacy guide",
+      "topics": [
+        "fine-tuning",
+        "training data",
+        "holdout evaluation"
+      ],
+      "why": "Teaches supervised adaptation data and evaluation contracts.",
+      "how_to_use": "Study conceptually; use only for an eligible existing deployment.",
+      "priority": "watch",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Closed to new users. Eligible job creation ends December 15, 2026; inference ends with base-model shutdown.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-distillation",
+      "name": "Model distillation to fine-tune a model — archived",
+      "url": "https://developers.openai.com/cookbook/examples/leveraging_model_distillation_to_fine-tune_a_model",
+      "kind": "official archived cookbook",
+      "topics": [
+        "distillation",
+        "teacher-student",
+        "synthetic data",
+        "cost"
+      ],
+      "why": "Concrete teacher-output-to-student-training example and comparison method.",
+      "how_to_use": "Read concepts and data-quality tradeoffs; do not adopt archived code as a new platform path.",
+      "priority": "watch",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Explicitly archived; old models/APIs and a winding-down fine-tuning platform.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-agents-api",
+      "name": "Agents API quickstart",
+      "url": "https://developers.openai.com/api/docs/guides/agents-api/quickstart",
+      "kind": "official beta guide",
+      "topics": [
+        "Agents API",
+        "managed harness",
+        "sandbox",
+        "sessions",
+        "streaming"
+      ],
+      "why": "Distinct managed Codex harness, persistent session and execution environment.",
+      "how_to_use": "Try a synthetic coding task after comparing state/environment ownership with SDKs.",
+      "priority": "watch",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Beta: agents=v1 header and project API permissions; not Agents SDK.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "oai-eval-migration",
+      "name": "Moving from OpenAI Evals to Promptfoo",
+      "url": "https://developers.openai.com/cookbook/examples/evaluation/moving-from-openai-evals-to-promptfoo",
+      "kind": "official cookbook",
+      "topics": [
+        "evals",
+        "Promptfoo",
+        "CI",
+        "migration"
+      ],
+      "why": "Official path away from the retiring hosted Evals product.",
+      "how_to_use": "Recreate cases and assertions in versioned config; revalidate judges and baselines.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Recreated runs are separate; migrated scores need not match historical scores.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "hugging-face-hub",
+      "name": "Hugging Face Hub",
+      "url": "https://huggingface.co/",
+      "kind": "research",
+      "topics": [
+        "models",
+        "datasets",
+        "open source",
+        "demos"
+      ],
+      "why": "The working directory of open models, datasets, demos, and their maintainers.",
+      "how_to_use": "Follow relevant organizations; read model cards, licenses, limitations, and linked repositories before trying a model.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Discovery and hosting are broadly free; compute and enterprise offerings can cost money.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "hf-papers",
+      "name": "Hugging Face Daily Papers",
+      "url": "https://huggingface.co/papers",
+      "kind": "research",
+      "topics": [
+        "papers",
+        "research discovery",
+        "trending"
+      ],
+      "why": "A community-curated front door to new research and linked implementations.",
+      "how_to_use": "Skim titles; choose one relevant paper weekly and trace its claims to the paper, code, and model card.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "arxiv-ai",
+      "name": "arXiv cs.AI recent submissions",
+      "url": "https://arxiv.org/list/cs.AI/recent",
+      "kind": "research",
+      "topics": [
+        "papers",
+        "preprints",
+        "research"
+      ],
+      "why": "Direct access to new AI preprints without waiting for news coverage.",
+      "how_to_use": "Search specific questions and follow authors; inspect experimental setup and related work.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "note": "Preprints are not automatically peer reviewed. Also use cs.CL and cs.LG for language modeling and machine learning.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "openreview",
+      "name": "OpenReview",
+      "url": "https://openreview.net/",
+      "kind": "research",
+      "topics": [
+        "papers",
+        "peer review",
+        "conferences"
+      ],
+      "why": "Conference papers with reviews, author responses, and acceptance context where venues make them public.",
+      "how_to_use": "Read reviews alongside the paper to find weaknesses, disputed claims, and useful reproduction questions.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "hn",
+      "name": "Hacker News",
+      "url": "https://news.ycombinator.com/",
+      "kind": "forum",
+      "topics": [
+        "industry signal",
+        "tools",
+        "engineering"
+      ],
+      "why": "A useful place to discover tools, failure stories, and skeptical engineering discussion.",
+      "how_to_use": "Follow the original link, then scan comments for reproducible objections and practical experience.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Comments are opinion and anecdote, not authoritative documentation.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "show-hn",
+      "name": "Show HN",
+      "url": "https://news.ycombinator.com/show",
+      "kind": "forum",
+      "topics": [
+        "projects",
+        "demos",
+        "developer tools"
+      ],
+      "why": "A stream of tools and prototypes posted by their builders.",
+      "how_to_use": "Try one relevant demo; inspect its repository and ask what pain it solves.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "ask-hn",
+      "name": "Ask HN",
+      "url": "https://news.ycombinator.com/ask",
+      "kind": "forum",
+      "topics": [
+        "practitioner questions",
+        "workflows",
+        "industry"
+      ],
+      "why": "Questions expose what practitioners struggle with and how they approach tradeoffs.",
+      "how_to_use": "Search for your current engineering problem; validate suggested approaches with current documentation.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "research"
+    },
+    {
+      "id": "hf-blog",
+      "name": "Hugging Face Blog",
+      "url": "https://huggingface.co/blog",
+      "kind": "blog",
+      "topics": [
+        "open models",
+        "fine-tuning",
+        "inference",
+        "multimodal"
+      ],
+      "why": "Practical releases and explanations from Hugging Face and its wider community.",
+      "how_to_use": "Use tagged tutorials to reproduce an experiment; check authorship, software versions, and linked code.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "The index mixes Hugging Face team posts and community submissions.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "anthropic-engineering",
+      "name": "Anthropic Engineering",
+      "url": "https://www.anthropic.com/engineering",
+      "kind": "blog",
+      "topics": [
+        "agents",
+        "evaluation",
+        "context",
+        "production"
+      ],
+      "why": "Detailed accounts of building, evaluating, and deploying agent systems.",
+      "how_to_use": "Read alongside your own agent design; test one pattern against your task-specific evaluation set.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "First-party engineering experience; provider claims still need independent testing.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "deepmind-blog",
+      "name": "Google DeepMind Blog",
+      "url": "https://deepmind.google/blog/",
+      "kind": "blog",
+      "topics": [
+        "research",
+        "models",
+        "multimodal",
+        "robotics"
+      ],
+      "why": "Research and model announcements with links into the underlying work.",
+      "how_to_use": "Use announcements to find technical reports, papers, evaluation details, and official implementation links.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "meta-ai-blog",
+      "name": "AI at Meta Blog",
+      "url": "https://ai.meta.com/blog/",
+      "kind": "blog",
+      "topics": [
+        "research",
+        "open models",
+        "vision",
+        "multimodal"
+      ],
+      "why": "First-party access to Meta AI releases and research directions.",
+      "how_to_use": "Trace announcements to release artifacts and licenses; compare reported results with your own workload.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "microsoft-research",
+      "name": "Microsoft Research Blog",
+      "url": "https://www.microsoft.com/en-us/research/blog/",
+      "kind": "blog",
+      "topics": [
+        "agents",
+        "evaluation",
+        "systems",
+        "security"
+      ],
+      "why": "Research explanations covering AI systems, agent evaluation, and security.",
+      "how_to_use": "Follow relevant project links into papers and code, then reproduce small experiments.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "bair-blog",
+      "name": "Berkeley AI Research Blog",
+      "url": "https://bair.berkeley.edu/blog/",
+      "kind": "blog",
+      "topics": [
+        "research",
+        "agents",
+        "robotics",
+        "systems"
+      ],
+      "why": "Researcher-written explanations of work from Berkeley AI Research.",
+      "how_to_use": "Read an explanation before the paper; use figures and project links to understand assumptions.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "google-research",
+      "name": "Google Research Blog",
+      "url": "https://research.google/blog/",
+      "kind": "blog",
+      "topics": [
+        "research",
+        "retrieval",
+        "data",
+        "systems"
+      ],
+      "why": "Direct explanations of Google research across machine learning and systems.",
+      "how_to_use": "Find papers and datasets behind a claim; prioritize posts tied to the problem you are building.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "nvidia-blog",
+      "name": "NVIDIA Technical Blog",
+      "url": "https://developer.nvidia.com/blog/",
+      "kind": "blog",
+      "topics": [
+        "GPUs",
+        "inference",
+        "optimization",
+        "deployment"
+      ],
+      "why": "Implementation-focused material on GPU workloads and serving performance.",
+      "how_to_use": "Read when profiling a real bottleneck; check hardware assumptions before applying an optimization.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "simon-willison",
+      "name": "Simon Willison's Weblog",
+      "url": "https://simonwillison.net/",
+      "kind": "blog",
+      "topics": [
+        "LLM applications",
+        "coding agents",
+        "security",
+        "experiments"
+      ],
+      "why": "Hands-on model experiments, annotated releases, practical tools, and prompt-injection coverage.",
+      "how_to_use": "Use the LLM and coding-agent tags; reproduce a small experiment and follow original documentation.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "latent-space",
+      "name": "Latent Space",
+      "url": "https://latent.space/",
+      "kind": "newsletter",
+      "topics": [
+        "AI engineering",
+        "industry signal",
+        "agents",
+        "infrastructure"
+      ],
+      "why": "An AI engineering publication with builder interviews, analysis, and news discovery.",
+      "how_to_use": "Choose one deep interview or writeup weekly; follow technical claims back to source artifacts.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "the-batch",
+      "name": "The Batch — DeepLearning.AI",
+      "url": "https://www.deeplearning.ai/the-batch/",
+      "kind": "newsletter",
+      "topics": [
+        "AI news",
+        "research discovery",
+        "applications"
+      ],
+      "why": "A broad weekly digest for noticing research, product, and industry developments.",
+      "how_to_use": "Skim weekly and open only items that change your current project or learning plan.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "official-index",
+      "note": "Main page returned 403; first-party community announcement confirms newsletter: https://community.deeplearning.ai/t/stay-ahead-in-ai-subscribe-to-the-batch-today/892522",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "import-ai",
+      "name": "Import AI — Jack Clark",
+      "url": "https://jack-clark.net/",
+      "kind": "newsletter",
+      "topics": [
+        "research discovery",
+        "capabilities",
+        "policy",
+        "safety"
+      ],
+      "why": "Research summaries connecting technical developments to larger capability and policy questions.",
+      "how_to_use": "Pick one paper from an issue and check the original evidence before adopting the interpretation.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "ahead-of-ai",
+      "name": "Ahead of AI — Sebastian Raschka",
+      "url": "https://magazine.sebastianraschka.com/",
+      "kind": "newsletter",
+      "topics": [
+        "LLMs",
+        "training",
+        "research explanations"
+      ],
+      "why": "Technically oriented explanations of machine learning research and language models.",
+      "how_to_use": "Use deep dives to choose a paper or implementation to study, rather than collecting headlines.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "chip-huyen",
+      "name": "Chip Huyen's Blog",
+      "url": "https://huyenchip.com/blog/",
+      "kind": "blog",
+      "topics": [
+        "AI applications",
+        "systems design",
+        "agents",
+        "production"
+      ],
+      "why": "Useful frameworks for system design, production applications, and model tradeoffs.",
+      "how_to_use": "Start with application pitfalls and production posts; turn each lesson into a project design decision.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Treat older tool-specific details as historical; the listed blog archive currently ends in January 2025.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "eugene-yan",
+      "name": "Eugene Yan",
+      "url": "https://eugeneyan.com/",
+      "kind": "blog",
+      "topics": [
+        "evaluation",
+        "retrieval",
+        "recommendations",
+        "production"
+      ],
+      "why": "Practical essays and prototypes about reliable AI products, search, and evaluation.",
+      "how_to_use": "Use the Start Here themes; compare a proposed technique with a simple baseline.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "hamel-husain",
+      "name": "Hamel Husain's Blog",
+      "url": "https://hamel.dev/",
+      "kind": "blog",
+      "topics": [
+        "evaluation",
+        "error analysis",
+        "product quality"
+      ],
+      "why": "Concrete guidance on looking at data, debugging failures, and measuring AI products.",
+      "how_to_use": "Read the evals guide, inspect real failures, and build an evaluation set from them.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "lilian-weng",
+      "name": "Lil'Log — Lilian Weng",
+      "url": "https://lilianweng.github.io/",
+      "kind": "blog",
+      "topics": [
+        "research surveys",
+        "agents",
+        "reinforcement learning",
+        "training"
+      ],
+      "why": "Long-form technical surveys with references that help connect research concepts.",
+      "how_to_use": "Use as a map of a topic; read the cited papers supporting the technique you intend to use.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "interconnects",
+      "name": "Interconnects — Nathan Lambert",
+      "url": "https://www.interconnects.ai/",
+      "kind": "newsletter",
+      "topics": [
+        "post-training",
+        "open models",
+        "research commentary"
+      ],
+      "why": "Research-informed commentary on model development, post-training, and the open-model ecosystem.",
+      "how_to_use": "Read when a model or training release matters to you; separate analysis from measured results.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "karpathy-course",
+      "name": "Andrej Karpathy — Neural Networks: Zero to Hero",
+      "url": "https://karpathy.ai/zero-to-hero.html",
+      "kind": "course",
+      "topics": [
+        "neural networks",
+        "backpropagation",
+        "PyTorch",
+        "transformers"
+      ],
+      "why": "Build neural networks and language models from scratch, starting with micrograd.",
+      "how_to_use": "Code along from micrograd through makemore before GPT and tokenization.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Official prerequisites: solid Python programming and introductory math. First micrograd video is 2h25m; implementation takes additional time.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "3b1b-lessons",
+      "name": "3Blue1Brown — Neural Network Lessons",
+      "url": "https://www.3blue1brown.com/?topic=neural-networks",
+      "kind": "course",
+      "topics": [
+        "math intuition",
+        "neural networks",
+        "transformers"
+      ],
+      "why": "Visual explanations that make neural-network and transformer mechanics easier to picture.",
+      "how_to_use": "Watch before implementing a concept, then explain the mechanism in your own words.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "karpathy-youtube",
+      "name": "Andrej Karpathy — YouTube",
+      "url": "https://www.youtube.com/@AndrejKarpathy",
+      "kind": "youtube",
+      "topics": [
+        "LLMs",
+        "from scratch",
+        "tokenization"
+      ],
+      "why": "Long-form explanations and coding demonstrations from the creator of Zero to Hero.",
+      "how_to_use": "Use the course index for sequence; use newer standalone videos for broad orientation.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "3b1b-youtube",
+      "name": "3Blue1Brown — YouTube",
+      "url": "https://www.youtube.com/@3blue1brown",
+      "kind": "youtube",
+      "topics": [
+        "linear algebra",
+        "calculus",
+        "neural networks"
+      ],
+      "why": "Visual mathematics for the concepts underlying machine learning.",
+      "how_to_use": "Use targeted lessons whenever matrix operations, gradients, or attention feel abstract.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "statquest",
+      "name": "StatQuest with Josh Starmer",
+      "url": "https://www.youtube.com/@statquest",
+      "kind": "youtube",
+      "topics": [
+        "statistics",
+        "machine learning",
+        "neural networks"
+      ],
+      "why": "Plain explanations of statistical and machine-learning mechanisms with worked examples.",
+      "how_to_use": "Patch one missing concept at a time; pair each video with a small calculation or notebook.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Creator's video index also verified at https://statquest.org/.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "ai-engineer-youtube",
+      "name": "AI Engineer — YouTube",
+      "url": "https://www.youtube.com/@aiDotEngineer",
+      "kind": "youtube",
+      "topics": [
+        "agents",
+        "evaluation",
+        "production",
+        "infrastructure"
+      ],
+      "why": "Conference talks and workshops from practitioners building AI systems.",
+      "how_to_use": "Choose detailed case studies and workshops; look for architecture, measurements, and failure modes.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Official conference index with linked talks: https://ai.engineer/.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "yannic-kilcher",
+      "name": "Yannic Kilcher — YouTube",
+      "url": "https://www.youtube.com/@YannicKilcher",
+      "kind": "youtube",
+      "topics": [
+        "paper walkthroughs",
+        "research",
+        "commentary"
+      ],
+      "why": "Long-form paper discussion useful for seeing how a technical reader questions research.",
+      "how_to_use": "Read the abstract first, watch selectively, then check the paper's experiments yourself.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "note": "Channel URL opened; YouTube exposed limited page text, so recent upload cadence was not verified.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "hf-youtube",
+      "name": "Hugging Face — YouTube",
+      "url": "https://www.youtube.com/@huggingface",
+      "kind": "youtube",
+      "topics": [
+        "open models",
+        "tutorials",
+        "agents",
+        "multimodal"
+      ],
+      "why": "Video demonstrations from the Hugging Face ecosystem.",
+      "how_to_use": "Use demonstrations beside the relevant library docs and course exercises.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "note": "Channel URL opened; YouTube exposed limited page text, so recent upload cadence was not verified.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "two-minute-papers",
+      "name": "Two Minute Papers — YouTube",
+      "url": "https://www.youtube.com/@TwoMinutePapers",
+      "kind": "youtube",
+      "topics": [
+        "research discovery",
+        "vision",
+        "graphics",
+        "generative models"
+      ],
+      "why": "Short visual introductions to research results and compelling demonstrations.",
+      "how_to_use": "Use to discover ideas, then read the linked paper before drawing technical conclusions.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "stanford-cs336",
+      "name": "Stanford CS336 — Language Modeling from Scratch",
+      "url": "https://cs336.stanford.edu/",
+      "kind": "course",
+      "topics": [
+        "pretraining",
+        "data",
+        "transformers",
+        "systems",
+        "evaluation"
+      ],
+      "why": "A detailed path through data preparation, model implementation, training, and evaluation.",
+      "how_to_use": "Take after basic deep learning; implement assignments rather than only watching lectures.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "Official prerequisites include proficient Python, deep learning, and systems optimization. The 2025 archive links here for the latest offering.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "stanford-cs224n",
+      "name": "Stanford CS224N — NLP with Deep Learning",
+      "url": "https://web.stanford.edu/class/cs224n/",
+      "kind": "course",
+      "topics": [
+        "NLP",
+        "neural networks",
+        "transformers",
+        "language models"
+      ],
+      "why": "A university foundation in neural language processing and its research context.",
+      "how_to_use": "Use posted materials and the official Spring 2024 YouTube playlist for public self-study.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "Winter 2026 lecture recordings require enrollment; older public playlists are linked on the course page.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-llm-course",
+      "name": "Hugging Face LLM Course",
+      "url": "https://huggingface.co/learn/llm-course/chapter1/1",
+      "kind": "course",
+      "topics": [
+        "transformers",
+        "datasets",
+        "tokenization",
+        "fine-tuning",
+        "reasoning"
+      ],
+      "why": "A practical introduction to the Hugging Face libraries and language-model workflow.",
+      "how_to_use": "Work through code and exercises, then adapt a pretrained model to your own small dataset.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-agents-course",
+      "name": "Hugging Face Agents Course",
+      "url": "https://huggingface.co/learn/agents-course/unit0/introduction",
+      "kind": "course",
+      "topics": [
+        "agents",
+        "tools",
+        "agentic RAG",
+        "evaluation"
+      ],
+      "why": "Builds agent concepts into framework exercises and a final tested agent project.",
+      "how_to_use": "Complete the fundamentals, build a small tool-using agent, and inspect its failures.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Official prerequisites: basic Python and basic knowledge of LLMs.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-mcp-course",
+      "name": "Hugging Face MCP Course",
+      "url": "https://huggingface.co/learn/mcp-course/unit0/introduction",
+      "kind": "course",
+      "topics": [
+        "MCP",
+        "tool integration",
+        "agents"
+      ],
+      "why": "A practical course on the Model Context Protocol, developed with Anthropic.",
+      "how_to_use": "Build the end-to-end example; use the protocol's official specification for implementation details.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "fsdl-llm",
+      "name": "Full Stack Deep Learning — LLM Bootcamp",
+      "url": "https://fullstackdeeplearning.com/llm-bootcamp/",
+      "kind": "course",
+      "topics": [
+        "LLM applications",
+        "retrieval",
+        "UX",
+        "LLMOps"
+      ],
+      "why": "Connects foundations, augmented language models, application UX, and operations.",
+      "how_to_use": "Use lectures for application design, then rebuild a small version with current APIs.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Spring 2023 material: durable concepts, but code and API details can be dated.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "made-with-ml",
+      "name": "Made With ML",
+      "url": "https://madewithml.com/",
+      "kind": "course",
+      "topics": [
+        "MLOps",
+        "data",
+        "training",
+        "testing",
+        "deployment"
+      ],
+      "why": "A coherent production-ML workflow spanning data, development, evaluation, serving, and monitoring.",
+      "how_to_use": "Build through the course project and use it as a template for engineering discipline.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "llm-zoomcamp",
+      "name": "DataTalks.Club — LLM Zoomcamp",
+      "url": "https://github.com/DataTalksClub/llm-zoomcamp",
+      "kind": "course",
+      "topics": [
+        "RAG",
+        "search",
+        "evaluation",
+        "monitoring",
+        "project"
+      ],
+      "why": "A project-based course for building question-answering systems over a knowledge base.",
+      "how_to_use": "Use the repository's self-study materials and complete the end-to-end project.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "note": "Repository describes a 10-week course; check the repository for current live-cohort availability.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "fastai",
+      "name": "fast.ai — Practical Deep Learning for Coders",
+      "url": "https://course.fast.ai/",
+      "kind": "course",
+      "topics": [
+        "deep learning",
+        "PyTorch",
+        "deployment",
+        "vision",
+        "NLP"
+      ],
+      "why": "A practical route from coding experience into training and deploying useful models.",
+      "how_to_use": "Train and deploy a small model early; return to foundations as the lessons introduce them.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "dlai-catalog",
+      "name": "DeepLearning.AI — Course Catalog",
+      "url": "https://www.deeplearning.ai/courses",
+      "kind": "course",
+      "topics": [
+        "prompting",
+        "RAG",
+        "agents",
+        "evaluation",
+        "inference"
+      ],
+      "why": "A broad catalog of focused courses taught with researchers and tool-building teams.",
+      "how_to_use": "Pick the course that fills a project gap; avoid treating every new course as required.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "official-index",
+      "note": "Catalog directly returned 403 but first-party search index is readable. Membership details: https://info.deeplearning.ai/knowledge-base/types-of-memberships",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "d2l",
+      "name": "Dive into Deep Learning",
+      "url": "https://d2l.ai/",
+      "kind": "course",
+      "topics": [
+        "math",
+        "deep learning",
+        "attention",
+        "implementation"
+      ],
+      "why": "An interactive textbook with executable notebooks linking mathematical foundations to implementations.",
+      "how_to_use": "Use targeted chapters and run the code; keep notes on tensor shapes and training behavior.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "mlsysbook",
+      "name": "Machine Learning Systems",
+      "url": "https://mlsysbook.ai/",
+      "kind": "course",
+      "topics": [
+        "AI systems",
+        "hardware",
+        "deployment",
+        "scaling"
+      ],
+      "why": "An open textbook and learning ecosystem connecting models to real system constraints.",
+      "how_to_use": "Read relevant system chapters while measuring your own application bottlenecks.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "Volume II is labeled preview; Volumes III and IV are labeled in preparation.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "rlhfbook",
+      "name": "Nathan Lambert — RLHF Book and Course",
+      "url": "https://rlhfbook.com/",
+      "kind": "course",
+      "topics": [
+        "post-training",
+        "RLHF",
+        "reward models",
+        "distillation",
+        "evaluation"
+      ],
+      "why": "An author-maintained introduction to post-training with code, a course, and references.",
+      "how_to_use": "Study after model-training basics; run a small example before attempting a full training pipeline.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "Official abstract assumes some quantitative background. The web book is available; physical copies are separate.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "berkeley-agents",
+      "name": "Berkeley CS194/294-196 — LLM Agents",
+      "url": "https://rdi.berkeley.edu/llm-agents/f24",
+      "kind": "course",
+      "topics": [
+        "reasoning",
+        "planning",
+        "tools",
+        "RAG",
+        "safety",
+        "agents"
+      ],
+      "why": "Researcher lectures connect agent foundations, infrastructure, applications, evaluation, and risk.",
+      "how_to_use": "Choose lectures relevant to your project and read the associated primary papers.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "Fall 2024 archive, useful for foundations rather than current framework syntax.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "stanford-cs329s",
+      "name": "Stanford CS329S — Machine Learning Systems Design",
+      "url": "https://stanford-cs329s.github.io/",
+      "kind": "course",
+      "topics": [
+        "systems design",
+        "data",
+        "monitoring",
+        "deployment"
+      ],
+      "why": "A system-level view of developing reliable, scalable machine-learning applications.",
+      "how_to_use": "Apply its tradeoffs to a project design review and identify missing production feedback loops.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "2022-era course materials. Official background: programming, ML algorithms, an ML framework, and probability familiarity.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "raschka-from-scratch",
+      "name": "Sebastian Raschka — LLMs from Scratch",
+      "url": "https://github.com/rasbt/LLMs-from-scratch",
+      "kind": "course",
+      "topics": [
+        "PyTorch",
+        "tokenization",
+        "attention",
+        "pretraining",
+        "fine-tuning"
+      ],
+      "why": "A maintained chapter-by-chapter codebase for implementing a GPT-like language model.",
+      "how_to_use": "Run chapters in order and modify one component to test your understanding.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "note": "Free code companion; the published book is a separate product.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "evals-course",
+      "name": "Hamel Husain and Shreya Shankar — AI Evals for Engineers and PMs",
+      "url": "https://maven.com/parlance-labs/evals",
+      "kind": "course",
+      "topics": [
+        "evaluation",
+        "error analysis",
+        "product quality"
+      ],
+      "why": "A focused paid course on building evaluation practices for AI products.",
+      "how_to_use": "Read Hamel's free evals guide first; consider the course when you need structured practice.",
+      "priority": "deepen",
+      "access": "paid",
+      "verification": "opened",
+      "note": "Check the live page for price and dates; no cohort availability is assumed.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "latent-video",
+      "name": "Latent Space — Video and Podcast Archive",
+      "url": "https://latent.space/youtube/",
+      "kind": "podcast",
+      "topics": [
+        "builder interviews",
+        "agents",
+        "infrastructure",
+        "production"
+      ],
+      "why": "Long conversations expose the decisions and constraints behind AI products and infrastructure.",
+      "how_to_use": "Choose builders working on your problem; extract one hypothesis to test in your project.",
+      "priority": "watch",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "hf-context-course",
+      "name": "Hugging Face Context Course",
+      "url": "https://huggingface.co/learn/context-course/unit0/introduction",
+      "kind": "course",
+      "topics": [
+        "context engineering",
+        "skills",
+        "MCP",
+        "plugins",
+        "hooks",
+        "coding agents"
+      ],
+      "why": "Connects the extension mechanisms you already use with the context an agent needs to work well.",
+      "how_to_use": "Build a small skill or read-only MCP connection and inspect how the agent discovers and uses it.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Material is public; exercises can require accounts, API usage or compute.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-smol-course",
+      "name": "Hugging Face smol-course — post-training",
+      "url": "https://huggingface.co/learn/smol-course/unit0/1",
+      "kind": "course",
+      "topics": [
+        "fine-tuning",
+        "preference alignment",
+        "vision language models",
+        "evaluation"
+      ],
+      "why": "A compact open-model route into instruction tuning, preference alignment and evaluation.",
+      "how_to_use": "Use a small permitted dataset and compare the tuned model with its untouched baseline.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Material is public; exercises can require accounts, API usage or compute.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-audio-course",
+      "name": "Hugging Face Audio Course",
+      "url": "https://huggingface.co/learn/audio-course/chapter0/introduction",
+      "kind": "course",
+      "topics": [
+        "audio",
+        "speech",
+        "transformers"
+      ],
+      "why": "A modality-specific route into working with audio models.",
+      "how_to_use": "Inspect data and failure cases before comparing a speech task across models.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Material is public; exercises can require accounts, API usage or compute.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-diffusion-course",
+      "name": "Hugging Face Diffusion Models Course",
+      "url": "https://huggingface.co/learn/diffusion-course/unit0/1",
+      "kind": "course",
+      "topics": [
+        "diffusion",
+        "image generation",
+        "generative models"
+      ],
+      "why": "A deeper branch for understanding and using diffusion models.",
+      "how_to_use": "Work through a small example when image generation becomes relevant to your project.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Material is public; exercises can require accounts, API usage or compute.",
+      "aliases": [],
+      "modes": [
+        "learn"
+      ],
+      "source_type": "course"
+    },
+    {
+      "id": "hf-cookbook",
+      "name": "Hugging Face Open-Source AI Cookbook",
+      "url": "https://huggingface.co/learn/cookbook/index",
+      "kind": "blog",
+      "topics": [
+        "open models",
+        "notebooks",
+        "applications",
+        "experiments"
+      ],
+      "why": "Runnable community recipes make a useful bridge from a concept to an experiment.",
+      "how_to_use": "Choose one notebook, read its assumptions and dependencies, then adapt one small part.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "note": "Material is public; exercises can require accounts, API usage or compute.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "publication"
+    },
+    {
+      "id": "community-openai",
+      "name": "OpenAI Developer Community",
+      "url": "https://community.openai.com/",
+      "kind": "community",
+      "topics": [
+        "OpenAI",
+        "API",
+        "agents",
+        "debugging"
+      ],
+      "why": "Direct place to compare API behavior, read announcements, and learn from concrete developer questions.",
+      "how_to_use": "Read the guidelines, search the API category for your problem, then follow one technical thread.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://community.openai.com/guidelines",
+      "first_contribution": "Answer a question you reproduced yourself, including SDK version, a small example, and the relevant official documentation.",
+      "note": "Community replies are not equivalent to official API guarantees; verify technical claims against documentation.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-huggingface",
+      "name": "Hugging Face Forums and Discord",
+      "url": "https://discuss.huggingface.co/",
+      "kind": "community",
+      "topics": [
+        "open models",
+        "datasets",
+        "fine-tuning",
+        "community"
+      ],
+      "why": "A broad technical community spanning datasets, Transformers, the Hub, and training.",
+      "how_to_use": "Start with one library category; use https://huggingface.co/join/discord for the official Discord route if live discussion suits you.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://discuss.huggingface.co/guidelines",
+      "first_contribution": "Reproduce one unanswered loading or tokenization question and explain the fix with a tiny runnable example.",
+      "note": "Official Discord invite resolves, but its JavaScript-only contents and actual channel activity were not inspected.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-hf-spaces",
+      "name": "Hugging Face Spaces",
+      "url": "https://huggingface.co/spaces",
+      "kind": "community",
+      "topics": [
+        "demos",
+        "deployment",
+        "open models",
+        "portfolio"
+      ],
+      "why": "A public place to inspect working ML demos and publish a reproducible learning project.",
+      "how_to_use": "Read Spaces Overview, inspect a demo’s files, and build a small model or evaluation demo with explicit limitations.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "entry_url": "https://huggingface.co/docs/hub/spaces-overview",
+      "first_contribution": "Publish a tiny searchable-document or model-comparison demo with examples, a useful README, and a reproducible configuration.",
+      "note": "Public directory includes community-authored content of varying quality. Free and paid hosting options differ; inspect hardware pricing before running a demo.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-aaif",
+      "name": "AAIF User Community",
+      "url": "https://aaif.live/",
+      "kind": "community",
+      "topics": [
+        "MCP",
+        "standards",
+        "agents",
+        "events"
+      ],
+      "why": "An official community and events route around interoperable agent systems.",
+      "how_to_use": "Use its current event listing to find a technical meetup and bring one concrete interoperability question.",
+      "priority": "deepen",
+      "access": "mixed",
+      "verification": "opened",
+      "entry_url": "https://aaif.live/",
+      "first_contribution": "After attending, publish a small runnable interoperability example or useful reproduction in the relevant project’s contribution channel.",
+      "note": "The researched MLOps Community URL https://mlops.community/ redirected to https://aaif.io/ during checking. Do not infer an unchanged Slack or membership policy; this entry links the current AAIF community page directly.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-datatalks",
+      "name": "DataTalks.Club",
+      "url": "https://datatalks.club/",
+      "kind": "community",
+      "topics": [
+        "MLOps",
+        "LLM engineering",
+        "data engineering",
+        "courses"
+      ],
+      "why": "Connects practical courses, projects, Slack discussion, and production-oriented talks.",
+      "how_to_use": "Join the official Slack route and follow the discussion for the course or project you are actually doing.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "entry_url": "https://datatalks.club/slack.html",
+      "first_contribution": "Complete a small course project, document one failure and its fix, then help another learner reproduce it.",
+      "note": "Free community courses and events coexist with separate Academy or partner offerings; check each offering rather than assuming all are free.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-eleuther",
+      "name": "EleutherAI",
+      "url": "https://github.com/EleutherAI",
+      "kind": "community",
+      "topics": [
+        "evaluation",
+        "interpretability",
+        "open research",
+        "training"
+      ],
+      "why": "A route from application engineering into open model research and reproducible evaluation.",
+      "how_to_use": "Use the official Discord linked by lm-evaluation-harness; its README identifies #lm-thunderdome for harness development and #release-discussion for release support.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://discord.com/invite/eleutherai",
+      "first_contribution": "Run an existing small evaluation and bring a precise dataset, configuration, or scoring discrepancy with reproducible evidence.",
+      "note": "eleuther.ai could not be opened by the research tool. The GitHub organization and Discord invite linked from its official harness were verified; Discord contents were not inspected.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-mlcollective",
+      "name": "ML Collective",
+      "url": "https://mlcollective.org/",
+      "kind": "community",
+      "topics": [
+        "research",
+        "reading groups",
+        "collaboration",
+        "mentorship"
+      ],
+      "why": "A free research community with reading groups, research jams, and ways to seek feedback on work.",
+      "how_to_use": "Read the welcome wiki, attend a relevant session, and prepare a short description of a real experiment.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://mlcollective.org/wiki/",
+      "first_contribution": "Share a small replication with an explicit research question and ask for feedback at a research jam.",
+      "note": "Research community rather than an application-framework support channel; access to compute is not guaranteed by membership.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-aiengineer",
+      "name": "AI Engineer",
+      "url": "https://ai.engineer/",
+      "kind": "community",
+      "topics": [
+        "AI engineering",
+        "events",
+        "production systems",
+        "talks"
+      ],
+      "why": "A cross-company view of engineering practices through talks and workshops.",
+      "how_to_use": "Use the official site’s Top Talks and previous-conference links, choose one implementation talk, then reproduce its central technique.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "entry_url": "https://ai.engineer/",
+      "first_contribution": "Turn a talk into a minimal reproducible demo with measured behavior; later propose a technical meetup demo when an appropriate call is available.",
+      "note": "Recordings are advertised as free; in-person conference attendance can be paid. Check live event pages for current dates and eligibility.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "community-latentspace",
+      "name": "Latent Space Community",
+      "url": "https://latent.space/p/community/",
+      "kind": "community",
+      "topics": [
+        "AI engineering",
+        "paper club",
+        "events",
+        "builders"
+      ],
+      "why": "Combines practitioner discussion with a paper club and local events.",
+      "how_to_use": "Follow the official community page to Discord or the linked Luma calendar; use the calendar to confirm the next paper-club session.",
+      "priority": "start",
+      "access": "mixed",
+      "verification": "opened",
+      "entry_url": "https://latent.space/p/community/",
+      "first_contribution": "Read one paper before a session and share a concrete reproduction question or a small implementation showing where its method helps.",
+      "note": "The community page includes historical event dates and an older recurring schedule; do not treat those as a verified current session. Publication has free and paid membership options.",
+      "aliases": [],
+      "modes": [
+        "keep-up",
+        "get-involved"
+      ],
+      "source_type": "community"
+    },
+    {
+      "id": "project-mcp-python",
+      "name": "MCP Python SDK",
+      "url": "https://github.com/modelcontextprotocol/python-sdk",
+      "kind": "project",
+      "topics": [
+        "MCP",
+        "tools",
+        "protocols",
+        "Python"
+      ],
+      "why": "Teaches the boundary between agent clients, tool servers, transport, and typed contracts.",
+      "how_to_use": "Build one tiny server/client pair, then read the contribution guide before choosing a bounded fix.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/modelcontextprotocol/python-sdk/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Reproduce a real input-schema or transport edge case and propose a targeted test and fix after checking existing issues.",
+      "note": "The current README points to v2 documentation and a migration guide; match installed versions to documentation.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-mcp-inspector",
+      "name": "MCP Inspector",
+      "url": "https://github.com/modelcontextprotocol/inspector",
+      "kind": "project",
+      "topics": [
+        "MCP",
+        "debugging",
+        "testing",
+        "developer tools"
+      ],
+      "why": "Makes protocol and server behavior easier to inspect and test.",
+      "how_to_use": "Use it with your own tiny MCP server, deliberately trigger a malformed response, and read the contributor guide.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/modelcontextprotocol/inspector/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Improve a reproducible validation error or add a targeted regression test for a server-response edge case.",
+      "note": "Choose a concrete problem you observed; no claim is made that a specific beginner issue is currently available.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-transformers",
+      "name": "Hugging Face Transformers",
+      "url": "https://github.com/huggingface/transformers",
+      "kind": "project",
+      "topics": [
+        "open models",
+        "tokenization",
+        "inference",
+        "training"
+      ],
+      "why": "A major source for understanding the full path from model configuration and tokenization to inference.",
+      "how_to_use": "Read the contribution rules and work only on an eligible issue or a standalone fix carrying reproducible evidence.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/huggingface/transformers/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Fix a genuinely broken documented workflow with a small script that fails on main and passes after the change, or choose an eligible contributions-welcome issue.",
+      "note": "Current rules restrict which issues can receive PRs. Existing issues must be triaged/eligible; a single typo is too small, and mechanical or bulk wording changes need an issue first. No eligible issue availability was asserted.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-datasets",
+      "name": "Hugging Face Datasets",
+      "url": "https://github.com/huggingface/datasets",
+      "kind": "project",
+      "topics": [
+        "data pipelines",
+        "datasets",
+        "streaming",
+        "reproducibility"
+      ],
+      "why": "Data preparation and dataset behavior are central AI engineering skills beyond model APIs.",
+      "how_to_use": "Use a tiny local dataset to explore map, filtering, splitting, and streaming, then follow the contribution guide.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/huggingface/datasets/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Create a tiny fixture reproducing a real schema, streaming, or serialization bug, then offer a bounded test/fix.",
+      "note": "Avoid starting with giant datasets or unnecessary downloads; reproductions should be small and shareable.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-peft",
+      "name": "Hugging Face PEFT",
+      "url": "https://github.com/huggingface/peft",
+      "kind": "project",
+      "topics": [
+        "fine-tuning",
+        "LoRA",
+        "adapters",
+        "efficiency"
+      ],
+      "why": "Teaches adapter-based fine-tuning and the practical tradeoffs around model adaptation.",
+      "how_to_use": "Read the actual developer contribution guide; discuss an issue and obtain the required maintainer approval before writing a PR.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://huggingface.co/docs/peft/developer_guides/contributing",
+      "first_contribution": "Reproduce an adapter-loading or configuration discrepancy on a small model and propose a targeted test in an issue.",
+      "note": "Current policy requires an issue and explicit /peft-triage approved approval, including assignment where stated. Do not submit a competing or unapproved PR; top-level CONTRIBUTING.md is only a pointer.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-trl",
+      "name": "Hugging Face TRL",
+      "url": "https://github.com/huggingface/trl",
+      "kind": "project",
+      "topics": [
+        "post-training",
+        "fine-tuning",
+        "reinforcement learning",
+        "evaluation"
+      ],
+      "why": "Provides a path into supervised fine-tuning and preference/reward-based training.",
+      "how_to_use": "Start with one small documented training example and understand its data format and metrics before changing trainers.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/huggingface/trl/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Reproduce a real data-format or configuration problem in a small example and improve its validation or explanation with evidence.",
+      "note": "Current guide says fully AI-generated PRs from first-time contributors will not be reviewed; reports should describe genuine user impact. Training may require paid hardware.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-smolagents",
+      "name": "Hugging Face smolagents",
+      "url": "https://github.com/huggingface/smolagents",
+      "kind": "project",
+      "topics": [
+        "agents",
+        "tools",
+        "code execution",
+        "open models"
+      ],
+      "why": "A relatively compact agent library useful for reading an execution loop end to end.",
+      "how_to_use": "Implement a tiny tool and inspect a complete agent trace; follow the contribution guide for a focused change.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/huggingface/smolagents/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Add a minimal reproduction and test for an observed tool-schema or agent-output handling problem.",
+      "note": "Library is free; model-provider calls or hardware may cost money. Agent code execution needs a deliberately bounded development setup.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-vllm",
+      "name": "vLLM",
+      "url": "https://github.com/vllm-project/vllm",
+      "kind": "project",
+      "topics": [
+        "serving",
+        "inference",
+        "batching",
+        "GPU"
+      ],
+      "why": "A production-serving codebase for learning throughput, memory use, and model-serving tradeoffs.",
+      "how_to_use": "Use the official contribution guide to choose a docs, test, or bounded feature task appropriate to available hardware.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://docs.vllm.ai/en/latest/contributing/index.html",
+      "first_contribution": "Reproduce a small serving/configuration problem or improve a benchmark example with explicit hardware and workload details.",
+      "note": "GPU access can be expensive; do not assume every contribution requires kernel work or that local performance generalizes to production.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-sglang",
+      "name": "SGLang",
+      "url": "https://github.com/sgl-project/sglang",
+      "kind": "project",
+      "topics": [
+        "serving",
+        "structured output",
+        "multimodal",
+        "performance"
+      ],
+      "why": "An alternative serving architecture for comparing scheduling and generation behavior.",
+      "how_to_use": "Read the current contributor guide, run one bounded workload, and discuss larger changes in an issue or project Slack.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://docs.sglang.io/docs/developer_guide/contribution_guide",
+      "first_contribution": "Contribute a small configuration or output-handling regression test grounded in a reproduced failure.",
+      "note": "Use current documentation paths; guessed top-level CONTRIBUTING.md returned 404. GPU workloads can incur costs.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-llamacpp",
+      "name": "llama.cpp",
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "kind": "project",
+      "topics": [
+        "local inference",
+        "quantization",
+        "C++",
+        "performance"
+      ],
+      "why": "A direct route into local model execution, quantization, and hardware tradeoffs.",
+      "how_to_use": "Run a small compatible model, inspect the server/example behavior, and read CONTRIBUTING before proposing a change.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/ggml-org/llama.cpp/blob/master/CONTRIBUTING.md",
+      "first_contribution": "Reproduce a platform-specific build or server-input error and improve its test or diagnostic with exact platform details.",
+      "note": "Model files have separate licenses and memory requirements; the repo currently uses master for its contribution-guide URL.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-ollama",
+      "name": "Ollama",
+      "url": "https://github.com/ollama/ollama",
+      "kind": "project",
+      "topics": [
+        "local inference",
+        "models",
+        "deployment",
+        "API"
+      ],
+      "why": "A practical local-serving environment for building model-provider-independent experiments.",
+      "how_to_use": "Use a small local model through the API, compare documented behavior, then read the development and contribution guide.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/ollama/ollama/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Produce a small reproduction of a model-loading or API edge case and offer a focused diagnostic or test improvement.",
+      "note": "Local model licenses and available hardware still matter; optional hosted offerings are separate from the local codebase.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-instructor",
+      "name": "Instructor",
+      "url": "https://github.com/567-labs/instructor",
+      "kind": "project",
+      "topics": [
+        "structured output",
+        "validation",
+        "Python",
+        "retries"
+      ],
+      "why": "A narrow, understandable surface for learning typed model output and validation failures.",
+      "how_to_use": "Build a schema with one tricky validation constraint and inspect how extraction and retries behave.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/567-labs/instructor/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Add a regression case for a real nested-schema or validation/retry bug, keeping the reproduction small.",
+      "note": "Live provider integration tests can require credentials and spending; use the project’s documented test workflow.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-pydantic-ai",
+      "name": "Pydantic AI",
+      "url": "https://github.com/pydantic/pydantic-ai",
+      "kind": "project",
+      "topics": [
+        "agents",
+        "typed interfaces",
+        "validation",
+        "testing"
+      ],
+      "why": "Useful for studying how model providers, tools, and typed outputs fit together in Python.",
+      "how_to_use": "Read the current contribution guide and follow one minimal agent through its tests and provider boundary.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://pydantic.dev/docs/ai/project/contributing/",
+      "first_contribution": "Add a small reproducible test for an observed provider-response or tool-validation edge case.",
+      "note": "Old ai.pydantic.dev contribution URL redirects to the current pydantic.dev documentation; top-level CONTRIBUTING.md is a pointer.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-dspy",
+      "name": "DSPy",
+      "url": "https://github.com/stanfordnlp/dspy",
+      "kind": "project",
+      "topics": [
+        "optimization",
+        "evaluation",
+        "LM programs",
+        "retrieval"
+      ],
+      "why": "Shows how to optimize structured LM programs against measured objectives rather than editing prompts by intuition.",
+      "how_to_use": "Build one small task with an explicit metric and train/dev split, then compare an unoptimized and optimized program.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/stanfordnlp/dspy/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Improve a failing small example or add a regression test for a concrete signature/adapter problem.",
+      "note": "Optimization can multiply model calls; keep budgets explicit and evaluate on held-out examples.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-langgraph",
+      "name": "LangGraph",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "kind": "project",
+      "topics": [
+        "agents",
+        "state",
+        "persistence",
+        "human approval"
+      ],
+      "why": "Useful for learning persistent agent workflows and control over state transitions.",
+      "how_to_use": "Build a tiny resumable workflow, interrupt it, restart it, and inspect its state before choosing a contribution.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://docs.langchain.com/oss/python/contributing/overview",
+      "first_contribution": "Add a minimal reproduction and regression test for a real checkpoint or resume edge case.",
+      "note": "Open-source library and hosted platform offerings have different access and pricing; this entry concerns the OSS project.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-haystack",
+      "name": "Haystack",
+      "url": "https://github.com/deepset-ai/haystack",
+      "kind": "project",
+      "topics": [
+        "retrieval",
+        "RAG",
+        "pipelines",
+        "agents"
+      ],
+      "why": "Explicit components and pipelines make retrieval and generation behavior easier to reason about.",
+      "how_to_use": "Build a small retrieval pipeline with known-answer questions and inspect the intermediate results.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/deepset-ai/haystack/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Add a tiny fixture and regression test for an observed document-filter or pipeline-component bug.",
+      "note": "Use current Haystack documentation and component versions; tutorials from older major versions may differ.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-phoenix",
+      "name": "Arize Phoenix",
+      "url": "https://github.com/Arize-ai/phoenix",
+      "kind": "project",
+      "topics": [
+        "observability",
+        "traces",
+        "evaluation",
+        "datasets"
+      ],
+      "why": "A concrete way to learn what an AI application does through traces and evaluation records.",
+      "how_to_use": "Instrument a small app, inspect one bad trace, and connect the failure to a repeatable evaluation example.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/Arize-ai/phoenix/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Reproduce an import or trace-display issue using a tiny sanitized trace fixture and propose a targeted test/fix.",
+      "note": "Code and hosted services have distinct licensing/access terms; inspect the actual license and deployment option for intended use.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-promptfoo",
+      "name": "promptfoo",
+      "url": "https://github.com/promptfoo/promptfoo",
+      "kind": "project",
+      "topics": [
+        "evaluation",
+        "regression testing",
+        "red teaming",
+        "CI"
+      ],
+      "why": "A practical way to turn AI behavior into repeatable test cases and compare configurations.",
+      "how_to_use": "Create a small evaluation config with realistic expected behaviors and run it after each app change.",
+      "priority": "start",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://www.promptfoo.dev/docs/contributing/",
+      "first_contribution": "Fix a genuinely broken example or add a small assertion/provider regression case backed by a local reproduction.",
+      "note": "Paid model calls and commercial services are separate from the local evaluation tool; do not run broad evaluation matrices without estimating cost.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-ragas",
+      "name": "Ragas",
+      "url": "https://github.com/vibrantlabsai/ragas",
+      "kind": "project",
+      "topics": [
+        "evaluation",
+        "RAG",
+        "synthetic data",
+        "metrics"
+      ],
+      "why": "Offers a way to study retrieval quality, answer quality, and the limits of automated metrics.",
+      "how_to_use": "Evaluate a tiny hand-reviewed dataset and inspect individual disagreements before trusting aggregate scores.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/vibrantlabsai/ragas/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Add a deterministic regression case for a real dataset-column or metric-input issue.",
+      "note": "Old explodinggradients/ragas URL redirects to vibrantlabsai/ragas. Model-based metrics can cost money and are not ground truth.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-inspect",
+      "name": "Inspect AI",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "kind": "project",
+      "topics": [
+        "evaluation",
+        "scorers",
+        "agents",
+        "reproducibility"
+      ],
+      "why": "A structured evaluation framework with explicit tasks, datasets, solvers, and scoring.",
+      "how_to_use": "Implement a small task or extension, then follow the contribution gate before proposing core changes.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/CONTRIBUTING.md",
+      "first_contribution": "Publish a small reusable scorer extension, or submit a reproduction issue and wait for accepted status before a core-code PR.",
+      "note": "Most outsiders must start from a maintainer-accepted issue. Explicit exceptions include trivial docs fixes under 25 changed lines and extension-list additions. AI-assisted changes require understanding and tool disclosure.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-lmeval",
+      "name": "EleutherAI lm-evaluation-harness",
+      "url": "https://github.com/EleutherAI/lm-evaluation-harness",
+      "kind": "project",
+      "topics": [
+        "model evaluation",
+        "benchmarks",
+        "datasets",
+        "reproducibility"
+      ],
+      "why": "Provides a bridge from application-level tests to comparable model benchmarks and task definitions.",
+      "how_to_use": "Run one established small task, inspect its prompt/scoring configuration, then read the task guide before extending it.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/task_guide.md",
+      "first_contribution": "Correct a real task-template or dataset-mapping defect with a tiny example showing the before/after score behavior.",
+      "note": "Report exact model, revision, task, prompt settings, and runtime; benchmark numbers without configuration are hard to interpret. Guessed top-level CONTRIBUTING.md returned 404.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "project-litellm",
+      "name": "LiteLLM",
+      "url": "https://github.com/BerriAI/litellm",
+      "kind": "project",
+      "topics": [
+        "model gateways",
+        "providers",
+        "routing",
+        "cost tracking"
+      ],
+      "why": "A practical codebase for understanding provider differences, routing, and API compatibility.",
+      "how_to_use": "Compare one request across two providers or a local endpoint, then inspect the provider adapter and its tests.",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "entry_url": "https://github.com/BerriAI/litellm/blob/main/.github/CONTRIBUTING.md",
+      "first_contribution": "Add a targeted regression test for an observed provider-normalization problem, or fix a reproducibly broken docs example in the separate docs repo.",
+      "note": "Current README directs documentation PRs to https://github.com/BerriAI/litellm-docs. Provider calls and enterprise/hosted features may have separate costs.",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "get-involved"
+      ],
+      "source_type": "project"
+    },
+    {
+      "id": "mcp-intro",
+      "name": "Model Context Protocol introduction",
+      "url": "https://modelcontextprotocol.io/docs/getting-started/intro",
+      "topics": [
+        "MCP",
+        "tools",
+        "integration"
+      ],
+      "why": "The protocol’s own explanation of hosts, clients, servers and external capabilities.",
+      "how_to_use": "Trace one connection from an AI application to a read-only service.",
+      "kind": "standard",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "mcp-spec",
+      "name": "MCP specification — latest",
+      "url": "https://modelcontextprotocol.io/specification/latest",
+      "topics": [
+        "MCP",
+        "protocol",
+        "security"
+      ],
+      "why": "Authoritative requirements rather than a tutorial’s assumptions about the protocol.",
+      "how_to_use": "Record the version you implement and inspect its lifecycle, transport and authorization requirements.",
+      "kind": "standard",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "owasp-llm",
+      "name": "OWASP Top 10 for LLM Applications",
+      "url": "https://genai.owasp.org/llm-top-10/",
+      "topics": [
+        "security",
+        "prompt injection",
+        "risk"
+      ],
+      "why": "A threat taxonomy for thinking about application failures beyond answer quality.",
+      "how_to_use": "Turn applicable threats into concrete adversarial tests for your system.",
+      "kind": "standard",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "official"
+    },
+    {
+      "id": "otel-genai",
+      "name": "OpenTelemetry — Gen AI attributes",
+      "url": "https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/",
+      "topics": [
+        "observability",
+        "tracing",
+        "production"
+      ],
+      "why": "Shared telemetry vocabulary for model calls, retrieval and other AI operations.",
+      "how_to_use": "Compare your trace fields with the current conventions; check their stability before adopting.",
+      "kind": "standard",
+      "priority": "deepen",
+      "access": "free",
+      "verification": "opened",
+      "aliases": [],
+      "modes": [
+        "learn",
+        "keep-up"
+      ],
+      "source_type": "official"
+    }
+  ],
+  "verification_notes": [
+    "Verified public official pages or their Markdown twins with web open. Opened does not imply code execution or account eligibility. Source URLs use readable canonical forms.",
+    "Reading and source code are public/free. access=mixed flags potentially billed API execution, account-dependent product access or infrastructure; not paid documentation.",
+    "Use Responses for new direct-model integrations. Chat Completions remains supported but features differ by endpoint/model. Assistants was sunset August 26, 2026.",
+    "Evals remains an essential engineering practice. Hosted Evals dashboard/API/graders are read-only and shut November 30, 2026. Official migration recommends Promptfoo and application-owned eval workflows.",
+    "Reusable prompt objects (/v1/prompts) and Agent Builder shut November 30, 2026. Keep prompts in application code; avoid starting tutorials depending on these surfaces.",
+    "Self-serve fine-tuning is closed to new users. Eligible existing customers can create jobs until December 15, 2026 unless their model shuts sooner. Fine-tuned inference follows base-model shutdown. Distillation recipe is archived.",
+    "Apps SDK docs redirect to Plugins; legacy window.openai references are not a recommended new architecture.",
+    "Codex SDK differs from API clients and Agents SDK. Current docs include TypeScript and stable Python. codex mcp-server integrations are removed; use app server for custom clients.",
+    "Check live model compatibility, API permissions, account eligibility, regional availability, pricing and lifecycle before copied examples. No account-specific availability was tested.",
+    "No training by default does not mean zero retention. Inspect endpoint state, abuse logs, tools, traces and third-party flows separately.",
+    "Checked on 2026-11-25. Access describes the linked learning material or publication, not compute, API usage, university credit, or certificates. No unverified prices or cohort dates are promised.",
+    "Discovery sources (Hacker News, newsletters, creator commentary, popularity rankings) surface leads and opinions. For implementation and factual claims, follow through to current official docs, model cards, source repositories, papers, and reproducible experiments.",
+    "Papers with Code is not listed as a live independent research index: opening https://paperswithcode.com/ redirected to https://huggingface.co/papers/trending. Do not rely on old Papers with Code leaderboard links as if that service still operates unchanged.",
+    "Some YouTube pages expose only the channel title to the browser fetcher. URLs were opened, but this is not verification of every video or current upload schedule.",
+    "Archive dates matter: FSDL LLM Bootcamp (2023), Berkeley LLM Agents (2024), and Stanford CS329S (2022-era) are useful foundations, with framework/API details requiring current docs.",
+    "DeepLearning.AI direct pages returned 403. Its own search-indexed course catalog, community newsletter announcement, and membership support page were used instead; old claims that all short-course labs are free should not be assumed.",
+    "Stanford CS224N's current 2026 videos require enrollment; the official page links older public YouTube playlists. Stanford CS336's 2025 archive points to the root course site for the latest offering.",
+    "All URLs were opened as first-party pages or through their first-party links. Discord invitations resolve but channel contents, admission, and current activity were not inspected.",
+    "First-contribution ideas are proposed exercises, not claims that a particular issue is currently open or available. Always search existing issues and PRs and reread current contribution policies before starting.",
+    "Free denotes access to the community or local source code, not free model API usage, GPU compute, conference tickets, or hosted commercial services.",
+    "MLOps Community homepage redirected to AAIF during checking; the current AAIF user-community page is included with this limitation instead of assuming the old Slack route still applies.",
+    "OpenAI Python and Agents SDKs currently restrict PRs to collaborators. Transformers, PEFT, TRL, and Inspect AI have material contribution policies captured in individual notes."
+  ]
+}

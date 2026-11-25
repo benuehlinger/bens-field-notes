@@ -1,0 +1,418 @@
+[
+  {
+    "name": "Software and data foundations",
+    "tag": "foundations",
+    "point": "Understand enough of the surrounding software to debug the system when the model is not the problem.",
+    "topics": [
+      "**Python or TypeScript:** environments, dependencies, types, async I/O, exceptions and tests. Pick one working language first.",
+      "**HTTP and APIs:** JSON, authentication, status codes, pagination, streaming, timeouts and retry semantics.",
+      "**Data work:** parsing documents, SQL, joins, schemas, provenance, deduplication and versioned datasets.",
+      "**Application structure:** a small service, persistent storage, background work, configuration and secrets.",
+      "**Git and reproducibility:** reviewable diffs, lockfiles, a repeatable run command and small test fixtures.",
+      "**Debugging:** isolate data, application, model and network failures rather than changing all four at once."
+    ],
+    "checkpoint": "Take a small public document collection, parse it into a consistent schema, and make a repeatable script with one command and a test fixture.",
+    "connection": "These skills support every later area. An API timeout, broken parser or incorrect join can look like a model failure.",
+    "related": [
+      "OpenAI interfaces and SDKs",
+      "Production and inference",
+      "Evaluation and error analysis"
+    ],
+    "sources": [
+      "made-with-ml",
+      "llm-zoomcamp",
+      "openai-python"
+    ],
+    "slug": "software-and-data",
+    "source_terms": [
+      "python",
+      "typescript",
+      "data engineering",
+      "data pipelines",
+      "software",
+      "datasets"
+    ]
+  },
+  {
+    "name": "Model behavior and context",
+    "tag": "context",
+    "point": "Learn what the model sees, what you ask it to do, and how to tell whether a prompt change helped.",
+    "topics": [
+      "**LLM basics:** tokens, embeddings, attention, training versus inference, context limits and probabilistic generation.",
+      "**Instructions:** task boundaries, examples, output criteria and conflicting instructions.",
+      "**Context engineering:** select evidence, order it, manage conversation state and avoid carrying irrelevant history.",
+      "**Structured outputs:** schemas, validation, refusals and incomplete responses. Valid JSON does not establish factual correctness.",
+      "**Model selection:** compare capability, quality, latency and cost on the same representative inputs.",
+      "**Memory:** separate the current context from durable user preferences, retrieved records and workflow state."
+    ],
+    "checkpoint": "Compare a plain prompt, an example-based prompt and a structured-output version on the same small set of real tasks. Save failures and token usage.",
+    "connection": "Prompting changes the instructions and context at inference time. Retrieval supplies evidence; fine-tuning changes model weights. They address different causes.",
+    "related": [
+      "Retrieval and grounding",
+      "Evaluation and error analysis",
+      "Training adaptation and distillation"
+    ],
+    "sources": [
+      "openai-prompting",
+      "openai-structured",
+      "karpathy-course",
+      "3b1b-lessons",
+      "hf-context-course"
+    ],
+    "slug": "models-and-context",
+    "source_terms": [
+      "context",
+      "prompt",
+      "tokenization",
+      "transformers",
+      "language models"
+    ]
+  },
+  {
+    "name": "OpenAI interfaces and SDKs",
+    "tag": "openai",
+    "point": "Choose the interface according to where the application runs and who should own the agent loop.",
+    "topics": [
+      "**API clients:** Python and JavaScript/TypeScript libraries for making model and platform requests.",
+      "**Responses API:** direct model integration, output events, tools, streaming and application-controlled behavior.",
+      "**Agents SDK:** an agent loop inside your application, with tools, handoffs, sessions and tracing.",
+      "**Managed Agents API:** a separate managed Codex-harness runtime; inspect current availability and execution requirements.",
+      "**Codex SDK:** programmatic use of the coding-agent runtime; this differs from a generic model client.",
+      "**ChatGPT integrations:** current plugin documentation, formerly reached through Apps SDK URLs; MCP integration and embedded UI are a separate product surface.",
+      "**Operations:** projects, service credentials, usage, budgets, rate limits, data controls and deprecation monitoring."
+    ],
+    "checkpoint": "Build one structured response with an official client. Then add one tool. Explain what extra problem an agent runtime would solve before adopting one.",
+    "connection": "An SDK is a code library; an API is the service contract. MCP connects capabilities; it does not choose an agent runtime for you.",
+    "related": [
+      "Which OpenAI interface do I use",
+      "Tools and MCP",
+      "Agents and workflows"
+    ],
+    "sources": [
+      "openai-quickstart",
+      "openai-responses",
+      "openai-agents-sdk-python",
+      "openai-deprecations"
+    ],
+    "slug": "openai-interfaces",
+    "source_terms": [
+      "openai",
+      "responses",
+      "api clients",
+      "codex",
+      "chatgpt"
+    ]
+  },
+  {
+    "name": "Retrieval and grounding",
+    "tag": "retrieval",
+    "point": "Help a model answer from the right evidence, and make that evidence inspectable.",
+    "topics": [
+      "**Ingestion:** extraction, OCR where necessary, document structure, deduplication, refreshes and source permissions.",
+      "**Indexing:** chunk boundaries, metadata, embedding choices, vector indexes and keyword search.",
+      "**Retrieval:** query rewriting, metadata filters, hybrid search, reranking and context assembly.",
+      "**Grounded answers:** quotations, citations, source locations, uncertainty and abstention when evidence is missing.",
+      "**Evaluation:** retrieval relevance and coverage separately from answer correctness and citation support.",
+      "**Maintenance:** changed documents, stale indexes, deletions, access-controlled search and adversarial source text."
+    ],
+    "checkpoint": "Ask ten questions whose answers live in your documents and a few whose answers do not. Inspect retrieved passages before judging generated answers.",
+    "connection": "RAG means retrieval-augmented generation: retrieve evidence and supply it to the model. It can improve access to information without retraining the model.",
+    "related": [
+      "Model behavior and context",
+      "Security and trust boundaries",
+      "Evaluation and error analysis"
+    ],
+    "sources": [
+      "openai-retrieval",
+      "llm-zoomcamp",
+      "haystack",
+      "eugene-yan"
+    ],
+    "slug": "retrieval-and-grounding",
+    "source_terms": [
+      "retrieval",
+      "rag",
+      "search"
+    ]
+  },
+  {
+    "name": "Tools and MCP",
+    "tag": "mcp",
+    "point": "Give a model useful capabilities while keeping real permissions and execution under application control.",
+    "topics": [
+      "**Function tools:** clear schemas, argument validation, useful descriptions, results and error messages.",
+      "**Execution:** the model requests an action; trusted application code decides whether and how to execute it.",
+      "**MCP:** Model Context Protocol connects AI applications to external tools, resources and prompts through a shared contract.",
+      "**Roles and transport:** host, client and server; local and remote connections; current protocol version and lifecycle.",
+      "**Identity and authorization:** user-specific access, scoped credentials and enforcement at the service boundary.",
+      "**Reliability:** read versus write actions, idempotency, confirmation, retries, cancellation and audit trails.",
+      "**Debugging:** inspect requests and responses with MCP Inspector before involving a complex agent."
+    ],
+    "checkpoint": "Expose one read-only tool over a small dataset. Test it directly, then through MCP, then through the model. Try invalid inputs and denied access.",
+    "connection": "MCP standardizes the connection. Your code still supplies the domain logic, permission checks and safe execution behavior.",
+    "related": [
+      "Agents and workflows",
+      "Security and trust boundaries",
+      "OpenAI interfaces and SDKs"
+    ],
+    "sources": [
+      "mcp-intro",
+      "mcp-spec",
+      "mcp-inspector",
+      "hf-mcp-course"
+    ],
+    "slug": "tools-and-mcp",
+    "source_terms": [
+      "mcp",
+      "tools",
+      "function calling",
+      "integration"
+    ]
+  },
+  {
+    "name": "Agents and workflows",
+    "tag": "agents",
+    "point": "Decide which steps should be fixed in code and which decisions should be delegated to a model.",
+    "topics": [
+      "**Workflow versus agent:** a prescribed sequence versus a loop where the model selects subsequent actions.",
+      "**Single-agent execution:** tools, state, stop conditions, budgets and recovery from tool failures.",
+      "**Orchestration:** routing, parallel tasks, handoffs and multi-agent coordination when there is an observable benefit.",
+      "**Durable work:** checkpoints, resumability, background execution, cancellation and human review.",
+      "**Context and memory:** what each step can see, what persists and how irrelevant history is removed.",
+      "**Evaluation:** task completion, tool correctness, side effects, trajectory quality and cost—not just final answer fluency."
+    ],
+    "checkpoint": "Solve a task with a fixed two-step workflow first. Compare it with a bounded tool-using agent on the same tasks. Keep the simpler approach unless the agent earns its complexity.",
+    "connection": "Agents combine model behavior, tools and state. More agents introduce additional coordination, latency and failure modes; they are an architectural choice.",
+    "related": [
+      "Tools and MCP",
+      "Evaluation and error analysis",
+      "Production and inference"
+    ],
+    "sources": [
+      "openai-agents-sdk-python",
+      "openai-agents-guide",
+      "hf-agents-course",
+      "anthropic-engineering"
+    ],
+    "slug": "agents-and-workflows",
+    "source_terms": [
+      "agents",
+      "agentic",
+      "orchestration",
+      "workflows"
+    ]
+  },
+  {
+    "name": "Evaluation and error analysis",
+    "tag": "evals",
+    "point": "Turn “it seems good” into a repeatable account of what works, what fails and what changed.",
+    "topics": [
+      "**Task definition:** desired behavior, unacceptable failures and whose judgment matters.",
+      "**Dataset design:** representative inputs, edge cases, held-out examples, provenance and leakage control.",
+      "**Error analysis:** inspect real failures, group causes and choose a change that targets one cause.",
+      "**Scoring:** deterministic assertions, expert rubrics and calibrated model judges with human checks.",
+      "**Agent and RAG evaluation:** inspect retrieved evidence, tool calls, permissions and trajectories.",
+      "**Experiment design:** compare versions on the same cases; examine subgroup failures, uncertainty, cost and latency.",
+      "**Feedback:** production incidents and user corrections become new regression cases."
+    ],
+    "checkpoint": "Create a small versioned task set and a rubric. Run two implementations against it, manually inspect disagreements, and write why you would keep one.",
+    "connection": "Evaluation sits around the entire build loop. A failure in retrieval needs a different fix from a permission bug, unclear task or weak model.",
+    "related": [
+      "Training adaptation and distillation",
+      "Production and inference",
+      "Product and field engineering"
+    ],
+    "sources": [
+      "openai-eval-best-practices",
+      "hamel-husain",
+      "promptfoo",
+      "inspect-ai"
+    ],
+    "slug": "evaluation",
+    "source_terms": [
+      "evaluation",
+      "evals",
+      "error analysis",
+      "regression",
+      "testing"
+    ]
+  },
+  {
+    "name": "Training adaptation and distillation",
+    "tag": "adaptation",
+    "point": "Understand when changing a model is justified, and how to measure whether the change transfers to unseen tasks.",
+    "topics": [
+      "**Training data:** collection rights, cleaning, annotation, coverage, splits, contamination and versioning.",
+      "**Supervised fine-tuning:** train on task demonstrations; learn full tuning versus parameter-efficient methods such as LoRA/PEFT.",
+      "**Distillation:** use a stronger teacher’s outputs or judgments to teach a smaller student. Validate data quality and applicable usage terms.",
+      "**Preference optimization:** preference pairs, DPO, reward modeling and reinforcement learning; these are deeper electives.",
+      "**Training mechanics:** loss curves, overfitting, checkpoints, compute, quantization and reproducible experiments.",
+      "**Deployment comparison:** compare the adapted model with the original on held-out quality, latency, cost and important subgroups."
+    ],
+    "checkpoint": "Begin with a paper experiment design: identify a repeated failure, a dataset you may use, a baseline and a held-out test. Train only when the evidence and access justify it.",
+    "connection": "Retrieval supplies knowledge at run time; fine-tuning changes weights. Distillation is a training strategy, not a promise that a small model will retain all teacher capabilities.",
+    "related": [
+      "Model behavior and context",
+      "Evaluation and error analysis",
+      "Production and inference"
+    ],
+    "sources": [
+      "hf-llm-course",
+      "hf-smol-course",
+      "peft",
+      "trl",
+      "rlhfbook",
+      "openai-deprecations"
+    ],
+    "slug": "adaptation-and-distillation",
+    "source_terms": [
+      "training",
+      "fine-tuning",
+      "distillation",
+      "post-training",
+      "peft",
+      "rlhf"
+    ]
+  },
+  {
+    "name": "Multimodal and realtime systems",
+    "tag": "multimodal",
+    "point": "Choose the interface and timing that fit the task: documents, images, speech, video or interactive audio.",
+    "topics": [
+      "**Vision and documents:** image understanding, document extraction, spatial details and grounded source locations.",
+      "**Audio:** transcription, speech generation, language handling and noisy recordings.",
+      "**Realtime interaction:** streaming audio, turn detection, interruption, tool latency and recovery.",
+      "**Image and video generation:** controllability, review, provenance and task-specific quality checks.",
+      "**Modality-specific evaluation:** transcription errors, visual extraction accuracy and whether generated media meets the actual brief.",
+      "**User experience:** consent, recording indicators, visible system state and graceful text fallback."
+    ],
+    "checkpoint": "Use the same small task in text and one additional modality. Measure the new error modes and waiting time instead of treating a compelling demo as sufficient evidence.",
+    "connection": "Modality cuts across the map. A voice agent still needs tools, evaluation, security and operations; it is not a replacement for those layers.",
+    "related": [
+      "OpenAI interfaces and SDKs",
+      "Product and field engineering",
+      "Evaluation and error analysis"
+    ],
+    "sources": [
+      "openai-realtime",
+      "openai-vision",
+      "hf-youtube",
+      "hf-audio-course",
+      "hf-diffusion-course"
+    ],
+    "slug": "multimodal",
+    "source_terms": [
+      "multimodal",
+      "vision",
+      "speech",
+      "audio",
+      "video",
+      "image"
+    ]
+  },
+  {
+    "name": "Production and inference",
+    "tag": "production",
+    "point": "Make the system reliable, observable and economical under real use.",
+    "topics": [
+      "**Service design:** async work, queues, timeouts, cancellation, backpressure and bounded retries.",
+      "**Performance:** time to first token, total task latency, p50/p95, caching, batching and parallel work.",
+      "**Economics:** per-task cost, token use, tool costs and quality-aware model routing.",
+      "**Observability:** traces, structured logs, model/prompt/tool versions and redacted records for debugging.",
+      "**Deployment:** reproducible builds, CI checks, rollout, rollback and deprecation monitoring.",
+      "**Open-model serving:** GPU memory, quantization, batching, vLLM/SGLang/llama.cpp and operational ownership.",
+      "**Monitoring:** failure rates, quality drift, incidents and user feedback—not only uptime."
+    ],
+    "checkpoint": "Instrument one end-to-end task. Record quality, cost, first-output latency and completion time; test a tool outage and demonstrate recovery.",
+    "connection": "A model benchmark is only one component of system performance. Retrieval, tools, retries and UI rendering all affect the user’s wait.",
+    "related": [
+      "Security and trust boundaries",
+      "Evaluation and error analysis",
+      "Software and data foundations"
+    ],
+    "sources": [
+      "openai-production",
+      "openai-latency",
+      "otel-genai",
+      "vllm",
+      "mlsysbook"
+    ],
+    "slug": "production-and-inference",
+    "source_terms": [
+      "production",
+      "deployment",
+      "inference",
+      "serving",
+      "latency",
+      "observability",
+      "systems",
+      "mlops",
+      "cost"
+    ]
+  },
+  {
+    "name": "Security and trust boundaries",
+    "tag": "security",
+    "point": "Keep untrusted model inputs and outputs from becoming unauthorized actions or data access.",
+    "topics": [
+      "**Prompt injection:** retrieved pages, documents and tool output can contain hostile instructions.",
+      "**Authorization:** enforce who can read or change what outside the model; separate users and tenants.",
+      "**Tool isolation:** narrow permissions, sandboxing, secret handling, scoped credentials and approval for consequential actions.",
+      "**Output handling:** validate before executing commands, SQL, HTML or other generated instructions.",
+      "**Data governance:** collection rights, retention, deletion, sensitive data, logging and provider data controls.",
+      "**Abuse and robustness:** adversarial testing, unbounded tool loops, resource budgets and incident response."
+    ],
+    "checkpoint": "Put a hostile instruction in a retrieved document. Show that the application preserves its permissions and that the incident appears in the trace.",
+    "connection": "A prompt can express a policy; trusted services must enforce access. Guardrails help, but they do not replace authorization and isolation.",
+    "related": [
+      "Tools and MCP",
+      "Retrieval and grounding",
+      "Production and inference"
+    ],
+    "sources": [
+      "owasp-llm",
+      "mcp-spec",
+      "openai-safety"
+    ],
+    "slug": "security",
+    "source_terms": [
+      "security",
+      "safety",
+      "privacy",
+      "prompt injection"
+    ]
+  },
+  {
+    "name": "Product and field engineering",
+    "tag": "product",
+    "point": "Translate a real workflow into a useful system people can understand, evaluate and adopt.",
+    "topics": [
+      "**Discovery:** understand the user’s work, existing tools, constraints and the cost of mistakes.",
+      "**Scoping:** choose one measurable task, establish a baseline and agree what success means.",
+      "**Integration:** customer data, identity, existing APIs and the gap between a demo and a deployed workflow.",
+      "**Interaction design:** citations, editable outputs, progress, uncertainty, confirmation and recovery.",
+      "**Adoption:** handoffs, documentation, feedback, change management and operational ownership.",
+      "**Decision records:** what changed, why, evidence, tradeoffs and when to reconsider."
+    ],
+    "checkpoint": "Write a one-page task brief, show a working example to a user, and record whether it improves their work. Separate user evidence from your own design assumptions.",
+    "connection": "FDE means forward-deployed engineering: working close to users to deliver an integrated system. It draws on the whole map, not only model expertise.",
+    "related": [
+      "Evaluation and error analysis",
+      "Production and inference",
+      "The learning project"
+    ],
+    "sources": [
+      "fsdl-llm",
+      "chip-huyen",
+      "openai-production"
+    ],
+    "slug": "product-and-field-engineering",
+    "source_terms": [
+      "product",
+      "ux",
+      "field engineering",
+      "user experience",
+      "integration"
+    ]
+  }
+]

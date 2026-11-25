@@ -1,0 +1,41 @@
+---
+title: "Tools and MCP"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Tools and MCP
+
+Give a model useful capabilities while keeping real permissions and execution under application control.
+
+## What to understand
+
+- **Function tools:** clear schemas, argument validation, useful descriptions, results and error messages.
+- **Execution:** the model requests an action; trusted application code decides whether and how to execute it.
+- **MCP:** Model Context Protocol connects AI applications to external tools, resources and prompts through a shared contract.
+- **Roles and transport:** host, client and server; local and remote connections; current protocol version and lifecycle.
+- **Identity and authorization:** user-specific access, scoped credentials and enforcement at the service boundary.
+- **Reliability:** read versus write actions, idempotency, confirmation, retries, cancellation and audit trails.
+- **Debugging:** inspect requests and responses with MCP Inspector before involving a complex agent.
+
+## How the pieces connect
+
+MCP standardizes the connection. Your code still supplies the domain logic, permission checks and safe execution behavior.
+
+## A question to test
+
+Expose one read-only tool over a small dataset. Test it directly, then through MCP, then through the model. Try invalid inputs and denied access.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://modelcontextprotocol.io/docs/getting-started/intro" class="" target="_blank" rel="noopener noreferrer">Model Context Protocol introduction</a><small>standard</small></div><p>The protocol’s own explanation of hosts, clients, servers and external capabilities.</p></li><li><div><a href="https://modelcontextprotocol.io/specification/latest" class="" target="_blank" rel="noopener noreferrer">MCP specification — latest</a><small>standard</small></div><p>Authoritative requirements rather than a tutorial’s assumptions about the protocol.</p></li><li><div><a href="https://github.com/modelcontextprotocol/inspector" class="" target="_blank" rel="noopener noreferrer">MCP Inspector</a><small>project</small></div><p>Makes protocol and server behavior easier to inspect and test.</p></li><li><div><a href="https://huggingface.co/learn/mcp-course/unit0/introduction" class="" target="_blank" rel="noopener noreferrer">Hugging Face MCP Course</a><small>course</small></div><p>A practical course on the Model Context Protocol, developed with Anthropic.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Agents and workflows](agents-and-workflows.qmd) · [Security and trust boundaries](security.qmd) · [OpenAI interfaces and SDKs](openai-interfaces.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)

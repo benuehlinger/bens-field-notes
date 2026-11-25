@@ -4,8 +4,7 @@
 # Cloudflare Pages: set Build command to:
 #   bash scripts/cloudflare-pages-build.sh
 #
-# Environment variables (optional but recommended on Pages):
-#   R2_BASE_URL — passed to Quarto as param `r2-base-url` for live DuckDB charts.
+# The current knowledge pages use local content records and do not need R2.
 
 set -euo pipefail
 
@@ -49,20 +48,8 @@ export PATH="$(dirname "$QUARTO_BIN"):${PATH}"
 echo "[build] Using Quarto binary: ${QUARTO_BIN}"
 quarto --version
 
-if command -v python3 >/dev/null 2>&1; then
-  echo "[build] Installing notebook Python dependencies..."
-  python3 -m pip install --quiet -r requirements-notebooks.txt
-fi
-
-RENDER_ARGS=()
-if [[ -n "${R2_BASE_URL:-}" ]]; then
-  echo "[build] R2_BASE_URL is set — passing to Quarto as r2-base-url"
-  RENDER_ARGS+=( -P "r2-base-url:${R2_BASE_URL}" )
-else
-  echo "[build] WARNING: R2_BASE_URL not set — charts will show 'not configured' in the built site"
-fi
-
-echo "[build] quarto render ${RENDER_ARGS[*]:-}"
-quarto render "${RENDER_ARGS[@]}"
+echo "[build] Rendering the AI engineering knowledge site"
+rm -rf _site
+quarto render
 
 echo "[build] Done. Output: ${ROOT}/_site"

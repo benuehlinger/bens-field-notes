@@ -1,0 +1,40 @@
+---
+title: "Security and trust boundaries"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Security and trust boundaries
+
+Keep untrusted model inputs and outputs from becoming unauthorized actions or data access.
+
+## What to understand
+
+- **Prompt injection:** retrieved pages, documents and tool output can contain hostile instructions.
+- **Authorization:** enforce who can read or change what outside the model; separate users and tenants.
+- **Tool isolation:** narrow permissions, sandboxing, secret handling, scoped credentials and approval for consequential actions.
+- **Output handling:** validate before executing commands, SQL, HTML or other generated instructions.
+- **Data governance:** collection rights, retention, deletion, sensitive data, logging and provider data controls.
+- **Abuse and robustness:** adversarial testing, unbounded tool loops, resource budgets and incident response.
+
+## How the pieces connect
+
+A prompt can express a policy; trusted services must enforce access. Guardrails help, but they do not replace authorization and isolation.
+
+## A question to test
+
+Put a hostile instruction in a retrieved document. Show that the application preserves its permissions and that the incident appears in the trace.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://genai.owasp.org/llm-top-10/" class="" target="_blank" rel="noopener noreferrer">OWASP Top 10 for LLM Applications</a><small>standard</small></div><p>A threat taxonomy for thinking about application failures beyond answer quality.</p></li><li><div><a href="https://modelcontextprotocol.io/specification/latest" class="" target="_blank" rel="noopener noreferrer">MCP specification — latest</a><small>standard</small></div><p>Authoritative requirements rather than a tutorial’s assumptions about the protocol.</p></li><li><div><a href="https://developers.openai.com/api/docs/guides/safety-best-practices" class="" target="_blank" rel="noopener noreferrer">Safety best practices</a><small>official guide</small></div><p>Introduces adversarial testing and safeguards.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Tools and MCP](tools-and-mcp.qmd) · [Retrieval and grounding](retrieval-and-grounding.qmd) · [Production and inference](production-and-inference.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)

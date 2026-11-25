@@ -1,0 +1,40 @@
+---
+title: "Retrieval and grounding"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Retrieval and grounding
+
+Help a model answer from the right evidence, and make that evidence inspectable.
+
+## What to understand
+
+- **Ingestion:** extraction, OCR where necessary, document structure, deduplication, refreshes and source permissions.
+- **Indexing:** chunk boundaries, metadata, embedding choices, vector indexes and keyword search.
+- **Retrieval:** query rewriting, metadata filters, hybrid search, reranking and context assembly.
+- **Grounded answers:** quotations, citations, source locations, uncertainty and abstention when evidence is missing.
+- **Evaluation:** retrieval relevance and coverage separately from answer correctness and citation support.
+- **Maintenance:** changed documents, stale indexes, deletions, access-controlled search and adversarial source text.
+
+## How the pieces connect
+
+RAG means retrieval-augmented generation: retrieve evidence and supply it to the model. It can improve access to information without retraining the model.
+
+## A question to test
+
+Ask ten questions whose answers live in your documents and a few whose answers do not. Inspect retrieved passages before judging generated answers.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://developers.openai.com/api/docs/guides/retrieval" class="" target="_blank" rel="noopener noreferrer">Retrieval</a><small>official guide</small></div><p>Separates vector-store search from answer generation.</p></li><li><div><a href="https://github.com/DataTalksClub/llm-zoomcamp" class="" target="_blank" rel="noopener noreferrer">DataTalks.Club — LLM Zoomcamp</a><small>course</small></div><p>A project-based course for building question-answering systems over a knowledge base.</p></li><li><div><a href="https://github.com/deepset-ai/haystack" class="" target="_blank" rel="noopener noreferrer">Haystack</a><small>project</small></div><p>Explicit components and pipelines make retrieval and generation behavior easier to reason about.</p></li><li><div><a href="https://eugeneyan.com/" class="" target="_blank" rel="noopener noreferrer">Eugene Yan</a><small>blog</small></div><p>Practical essays and prototypes about reliable AI products, search, and evaluation.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Model behavior and context](models-and-context.qmd) · [Security and trust boundaries](security.qmd) · [Evaluation and error analysis](evaluation.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)

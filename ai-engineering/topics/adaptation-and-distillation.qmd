@@ -1,0 +1,42 @@
+---
+title: "Training adaptation and distillation"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Training adaptation and distillation
+
+Understand when changing a model is justified, and how to measure whether the change transfers to unseen tasks.
+
+## What to understand
+
+- **Training data:** collection rights, cleaning, annotation, coverage, splits, contamination and versioning.
+- **Supervised fine-tuning:** train on task demonstrations; learn full tuning versus parameter-efficient methods such as LoRA/PEFT.
+- **Distillation:** use a stronger teacher’s outputs or judgments to teach a smaller student. Validate data quality and applicable usage terms.
+- **Preference optimization:** preference pairs, DPO, reward modeling and reinforcement learning; these are deeper electives.
+- **Training mechanics:** loss curves, overfitting, checkpoints, compute, quantization and reproducible experiments.
+- **Deployment comparison:** compare the adapted model with the original on held-out quality, latency, cost and important subgroups.
+
+## How the pieces connect
+
+Retrieval supplies knowledge at run time; fine-tuning changes weights. Distillation is a training strategy, not a promise that a small model will retain all teacher capabilities.
+
+## A question to test
+
+Begin with a paper experiment design: identify a repeated failure, a dataset you may use, a baseline and a held-out test. Train only when the evidence and access justify it.
+
+**Platform note, 25 November 2026:** OpenAI’s self-serve fine-tuning has restricted access and a retirement timeline. Learn the concepts with current tooling, and check [the official availability notice](https://developers.openai.com/api/docs/deprecations) before planning a training run.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://huggingface.co/learn/llm-course/chapter1/1" class="" target="_blank" rel="noopener noreferrer">Hugging Face LLM Course</a><small>course</small></div><p>A practical introduction to the Hugging Face libraries and language-model workflow.</p></li><li><div><a href="https://huggingface.co/learn/smol-course/unit0/1" class="" target="_blank" rel="noopener noreferrer">Hugging Face smol-course — post-training</a><small>course</small></div><p>A compact open-model route into instruction tuning, preference alignment and evaluation.</p></li><li><div><a href="https://github.com/huggingface/peft" class="" target="_blank" rel="noopener noreferrer">Hugging Face PEFT</a><small>project</small></div><p>Teaches adapter-based fine-tuning and the practical tradeoffs around model adaptation.</p></li><li><div><a href="https://github.com/huggingface/trl" class="" target="_blank" rel="noopener noreferrer">Hugging Face TRL</a><small>project</small></div><p>Provides a path into supervised fine-tuning and preference/reward-based training.</p></li><li><div><a href="https://rlhfbook.com/" class="" target="_blank" rel="noopener noreferrer">Nathan Lambert — RLHF Book and Course</a><small>course</small></div><p>An author-maintained introduction to post-training with code, a course, and references.</p></li><li><div><a href="https://developers.openai.com/api/docs/deprecations" class="" target="_blank" rel="noopener noreferrer">API deprecations</a><small>official lifecycle reference</small></div><p>Authoritative shutdown timelines prevent adopting retired interfaces.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Model behavior and context](models-and-context.qmd) · [Evaluation and error analysis](evaluation.qmd) · [Production and inference](production-and-inference.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)

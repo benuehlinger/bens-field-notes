@@ -1,53 +1,33 @@
 # Ben's Field Notes
 
-Public **Quarto** data journal companion to [**bens-data-lake**](https://github.com/benuehlinger/bens-data-lake).
+A personal knowledge space for **learning AI engineering, keeping up with the field, and getting involved**. Built with Quarto and portable files. The visual direction is minimal and technical, inspired by Vercel, with the questions and experiments of a personal journal.
 
-- **Site:** `.qmd` notebooks + Observable JS + DuckDB-WASM charts reading Parquet from Cloudflare R2 (via a small [Worker](worker/) proxy — bucket stays private).
-- **Data:** lives in the lake (R2); this repo stays small — see `docs/DATA_CONTRACT.md`.
+## Work on the site
 
-## Local preview
-
-```bash
-brew install --cask quarto   # once
-cd bens-field-notes
-cp .env.example .env.local   # set R2_BASE_URL to your Worker URL
-quarto preview -P "r2-base-url:${R2_BASE_URL}"   # or put the URL inline
+```sh
+quarto preview --no-browser
 ```
 
-Open [http://localhost:4321](http://localhost:4321).
+`quarto render` produces `_site/`. A pre-render script generates the topic map, twelve subject pages, watchlist, participation routes and source library from `content/`. No notebook or model API is executed by that generator.
 
-## Cloudflare Pages (production)
+## Where to edit
 
-In the Pages project **Build settings**:
+- `index.qmd`: the journal's front page.
+- `ai-engineering/investigations/`: authored inquiries and, later, notebook stories.
+- `content/areas.json`: subjects, relationships, source links and topic-matching terms.
+- `content/questions.json`: starting questions and connections to investigations.
+- `content/sources.json`: the canonical annotated sources, participation routes and verification dates.
+- `scripts/build-knowledge.py`: renders those records into Quarto pages. Edit records rather than generated pages.
+- `styles/`: the visual system; `assets/knowledge.js`: progressive source filtering.
 
-| Setting | Value |
-|---------|-------|
-| **Framework preset** | None |
-| **Build command** | `bash scripts/cloudflare-pages-build.sh` |
-| **Build output directory** | `_site` (no leading slash) |
-| **Root directory** | `/` (repo root) |
-| **Environment variable** | `R2_BASE_URL` = `https://bens-field-notes-r2.<your-subdomain>.workers.dev` |
+The catalog was initially imported from Deep Dives. This repository is now the working source for the website; it does not depend on Obsidian or synchronize edits back into it.
 
-The script downloads Quarto for Linux (Cloudflare’s build image has no Quarto pre-installed).
+## Notebook stories
 
-## Worker (R2 proxy)
+Read [the notebook workflow](docs/NOTEBOOK-WORKFLOW.md) before starting an experiment. Ben wants to choose the problem, then work through **one block at a time in VS Code**. The first inquiry is smolagents versus LangGraph, including overlap with T3 Code. No notebook has been generated yet.
 
-See [`worker/README.md`](worker/README.md). Deploy from your laptop:
+## Publishing and history
 
-```bash
-cd worker
-npx wrangler deploy
-```
+The GitHub Actions workflow builds Quarto and deploys `_site/` to Cloudflare Pages. A clean output directory prevents retired pages from carrying into a new deployment. The repository and published site are public.
 
-After Pages gives you a `*.pages.dev` URL, set `ALLOWED_ORIGIN` in `worker/wrangler.toml` to that URL and redeploy — otherwise the browser blocks cross-origin Parquet fetches (CORS).
-
-## Spec-driven development
-
-[GitHub Spec Kit](https://github.com/github/spec-kit) — constitution → spec → plan → tasks. See `docs/SPEC_KIT.md` and `specs/001-site-v1/`.
-
-## Repo split
-
-| Repo | Role |
-|------|------|
-| **bens-data-lake** | Ingest, R2, schedules, `pipelines/` |
-| **bens-field-notes** (here) | Static site + Worker |
+The pre-pivot site is recoverable at branch `archive/before-ai-engineering-20261125` (commit `7400d27`). The finance articles are removed from the active site. `analysis/`, `worker/` and historical specs remain retired infrastructure; none is required by the AI engineering pages. An existing uncommitted finance notebook and untracked local skills were preserved.

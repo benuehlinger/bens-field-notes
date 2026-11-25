@@ -1,0 +1,40 @@
+---
+title: "Product and field engineering"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Product and field engineering
+
+Translate a real workflow into a useful system people can understand, evaluate and adopt.
+
+## What to understand
+
+- **Discovery:** understand the user’s work, existing tools, constraints and the cost of mistakes.
+- **Scoping:** choose one measurable task, establish a baseline and agree what success means.
+- **Integration:** customer data, identity, existing APIs and the gap between a demo and a deployed workflow.
+- **Interaction design:** citations, editable outputs, progress, uncertainty, confirmation and recovery.
+- **Adoption:** handoffs, documentation, feedback, change management and operational ownership.
+- **Decision records:** what changed, why, evidence, tradeoffs and when to reconsider.
+
+## How the pieces connect
+
+FDE means forward-deployed engineering: working close to users to deliver an integrated system. It draws on the whole map, not only model expertise.
+
+## A question to test
+
+Write a one-page task brief, show a working example to a user, and record whether it improves their work. Separate user evidence from your own design assumptions.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://fullstackdeeplearning.com/llm-bootcamp/" class="" target="_blank" rel="noopener noreferrer">Full Stack Deep Learning — LLM Bootcamp</a><small>course</small></div><p>Connects foundations, augmented language models, application UX, and operations.</p></li><li><div><a href="https://huyenchip.com/blog/" class="" target="_blank" rel="noopener noreferrer">Chip Huyen&#x27;s Blog</a><small>blog</small></div><p>Useful frameworks for system design, production applications, and model tradeoffs.</p></li><li><div><a href="https://developers.openai.com/api/docs/guides/production-best-practices" class="" target="_blank" rel="noopener noreferrer">Production best practices</a><small>official guide</small></div><p>Moves a prototype toward an operated API service.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Evaluation and error analysis](evaluation.qmd) · [Production and inference](production-and-inference.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)

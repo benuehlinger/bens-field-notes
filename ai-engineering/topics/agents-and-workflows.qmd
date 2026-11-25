@@ -1,0 +1,40 @@
+---
+title: "Agents and workflows"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Agents and workflows
+
+Decide which steps should be fixed in code and which decisions should be delegated to a model.
+
+## What to understand
+
+- **Workflow versus agent:** a prescribed sequence versus a loop where the model selects subsequent actions.
+- **Single-agent execution:** tools, state, stop conditions, budgets and recovery from tool failures.
+- **Orchestration:** routing, parallel tasks, handoffs and multi-agent coordination when there is an observable benefit.
+- **Durable work:** checkpoints, resumability, background execution, cancellation and human review.
+- **Context and memory:** what each step can see, what persists and how irrelevant history is removed.
+- **Evaluation:** task completion, tool correctness, side effects, trajectory quality and cost—not just final answer fluency.
+
+## How the pieces connect
+
+Agents combine model behavior, tools and state. More agents introduce additional coordination, latency and failure modes; they are an architectural choice.
+
+## A question to test
+
+Solve a task with a fixed two-step workflow first. Compare it with a bounded tool-using agent on the same tasks. Keep the simpler approach unless the agent earns its complexity.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://github.com/openai/openai-agents-python" class="" target="_blank" rel="noopener noreferrer">Agents SDK for Python</a><small>official repository</small></div><p>Application-run agent loop and workflow primitives.</p></li><li><div><a href="https://developers.openai.com/api/docs/guides/agents" class="" target="_blank" rel="noopener noreferrer">Choose an agent runtime</a><small>official guide</small></div><p>Compares Responses, Agents SDK and managed Agents API.</p></li><li><div><a href="https://huggingface.co/learn/agents-course/unit0/introduction" class="" target="_blank" rel="noopener noreferrer">Hugging Face Agents Course</a><small>course</small></div><p>Builds agent concepts into framework exercises and a final tested agent project.</p></li><li><div><a href="https://www.anthropic.com/engineering" class="" target="_blank" rel="noopener noreferrer">Anthropic Engineering</a><small>blog</small></div><p>Detailed accounts of building, evaluating, and deploying agent systems.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Tools and MCP](tools-and-mcp.qmd) · [Evaluation and error analysis](evaluation.qmd) · [Production and inference](production-and-inference.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)

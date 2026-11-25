@@ -1,0 +1,35 @@
+[
+  {
+    "id": "agent-control",
+    "title": "How much control should an agent have?",
+    "description": "Understand the tradeoff between a model choosing its next action and a workflow whose transitions are explicit.",
+    "areas": ["agents", "mcp", "openai", "evals"],
+    "experiment": "Give two implementations the same small task, tools and stop condition. Inspect what they do when a tool fails.",
+    "sources": ["oai-agents", "anthropic-engineering", "project-smolagents", "project-langgraph"],
+    "investigation": "investigations/smolagents-and-langgraph.qmd"
+  },
+  {
+    "id": "evaluation",
+    "title": "How do I know the system improved?",
+    "description": "Separate a convincing answer from a useful result. Look at failures, supporting evidence and the behavior of the whole system.",
+    "areas": ["evals", "retrieval", "production"],
+    "experiment": "Keep a few representative inputs and expected behaviors. Compare one change against the same cases and inspect the disagreements.",
+    "sources": ["hamel-husain", "oai-eval-practice", "project-promptfoo", "project-phoenix"]
+  },
+  {
+    "id": "context",
+    "title": "What belongs in the model's context?",
+    "description": "Connect instructions, memory, retrieval and tool results to the information the model actually needs.",
+    "areas": ["context", "retrieval", "mcp", "security"],
+    "experiment": "Try one task with different evidence selections. Record what the model could see and which answer that evidence supported.",
+    "sources": ["hf-context-course", "oai-retrieval", "simon-willison", "mcp-intro"]
+  },
+  {
+    "id": "deployment",
+    "title": "What makes an experiment useful to someone else?",
+    "description": "Follow the path from a working example to a reliable, understandable part of a person's work.",
+    "areas": ["product", "production", "security", "multimodal"],
+    "experiment": "Ask someone to try a narrow workflow. Watch where they wait, lose trust or need to correct the result.",
+    "sources": ["chip-huyen", "fsdl-llm", "oai-production", "community-aiengineer"]
+  }
+]

@@ -1,0 +1,41 @@
+---
+title: "Production and inference"
+subtitle: ""
+toc: true
+---
+
+[AI engineering](../index.qmd) / Production and inference
+
+Make the system reliable, observable and economical under real use.
+
+## What to understand
+
+- **Service design:** async work, queues, timeouts, cancellation, backpressure and bounded retries.
+- **Performance:** time to first token, total task latency, p50/p95, caching, batching and parallel work.
+- **Economics:** per-task cost, token use, tool costs and quality-aware model routing.
+- **Observability:** traces, structured logs, model/prompt/tool versions and redacted records for debugging.
+- **Deployment:** reproducible builds, CI checks, rollout, rollback and deprecation monitoring.
+- **Open-model serving:** GPU memory, quantization, batching, vLLM/SGLang/llama.cpp and operational ownership.
+- **Monitoring:** failure rates, quality drift, incidents and user feedback—not only uptime.
+
+## How the pieces connect
+
+A model benchmark is only one component of system performance. Retrieval, tools, retries and UI rendering all affect the user’s wait.
+
+## A question to test
+
+Instrument one end-to-end task. Record quality, cost, first-output latency and completion time; test a tool outage and demonstrate recovery.
+
+## Sources to work with
+
+
+```{=html}
+<ul class="annotated-sources"><li><div><a href="https://developers.openai.com/api/docs/guides/production-best-practices" class="" target="_blank" rel="noopener noreferrer">Production best practices</a><small>official guide</small></div><p>Moves a prototype toward an operated API service.</p></li><li><div><a href="https://developers.openai.com/api/docs/guides/latency-optimization" class="" target="_blank" rel="noopener noreferrer">Latency optimization</a><small>official guide</small></div><p>Separates first-token timing from full user wait.</p></li><li><div><a href="https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/" class="" target="_blank" rel="noopener noreferrer">OpenTelemetry — Gen AI attributes</a><small>standard</small></div><p>Shared telemetry vocabulary for model calls, retrieval and other AI operations.</p></li><li><div><a href="https://github.com/vllm-project/vllm" class="" target="_blank" rel="noopener noreferrer">vLLM</a><small>project</small></div><p>A production-serving codebase for learning throughput, memory use, and model-serving tradeoffs.</p></li><li><div><a href="https://mlsysbook.ai/" class="" target="_blank" rel="noopener noreferrer">Machine Learning Systems</a><small>course</small></div><p>An open textbook and learning ecosystem connecting models to real system constraints.</p></li></ul>
+```
+
+
+## Follow the connection
+
+[Security and trust boundaries](security.qmd) · [Evaluation and error analysis](evaluation.qmd) · [Software and data foundations](software-and-data.qmd)
+
+[Return to the map](../index.qmd) · [Search the source library](../library.qmd)
