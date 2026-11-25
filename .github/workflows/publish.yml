@@ -23,6 +23,7 @@ jobs:
 
       - name: Render site
         run: |
+          python3 -m unittest discover -s tests
           rm -rf _site
           quarto render
 

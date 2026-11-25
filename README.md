@@ -30,4 +30,6 @@ Read [the notebook workflow](docs/NOTEBOOK-WORKFLOW.md) before starting an exper
 
 The GitHub Actions workflow builds Quarto and deploys `_site/` to Cloudflare Pages. A clean output directory prevents retired pages from carrying into a new deployment. The repository and published site are public.
 
+After rendering, `scripts/version-assets.py` gives the site's CSS and JavaScript filenames a hash of their contents and updates the page links. A changed asset gets a new URL, so returning visitors receive styles and scripts that match the page. Run `python3 -m unittest discover -s tests` to check this build step.
+
 The pre-pivot site is recoverable at branch `archive/before-ai-engineering-20261125` (commit `7400d27`). The finance articles are removed from the active site. `analysis/`, `worker/` and historical specs remain retired infrastructure; none is required by the AI engineering pages. An existing uncommitted finance notebook and untracked local skills were preserved.
