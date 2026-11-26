@@ -50,3 +50,12 @@ The build renders notebook files with Quarto after Astro, sharing the website’
 GitHub Actions tests and builds the site, then deploys `dist/` to the existing Cloudflare Pages project. Astro gives compiled CSS, JavaScript and fonts content-specific filenames so returning visitors receive matching assets.
 
 The repository and published site are public. Git history preserves the prior Quarto implementation and earlier finance journal. The pre-AI site is also recoverable at `archive/before-ai-engineering-20261125` (`7400d27`). `analysis/`, `worker/` and historical finance specs are retired infrastructure, outside the website build.
+
+
+Link previews use static Open Graph metadata and four branded 1200 × 630 PNGs.
+Astro gives the images content-hashed URLs. Titles, descriptions, and image selection
+live in `src/lib/sharing.mjs`; artwork is reproducible from `scripts/build-previews.mjs`.
+Run `node scripts/build-previews.mjs` after changing the visual design or chart collection,
+using installed Playwright Chromium or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`.
+Commit the generated images and icons; normal site builds do not need a browser to render them.
+Apple-specific guidance: https://developer.apple.com/documentation/technotes/tn3156-create-rich-previews-for-messages

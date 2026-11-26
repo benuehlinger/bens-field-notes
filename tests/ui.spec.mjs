@@ -180,3 +180,60 @@ test('both desks remain readable on a phone in either theme', async ({ page }) =
     }
   }
 });
+
+test('shared links expose distinct preview art and Apple icons without JavaScript', async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    const images = new Set();
+    for (const path of [
+      '/',
+      '/ai-engineering/',
+      '/ai-engineering/keep-up.html',
+      '/ai-engineering/get-involved.html',
+      '/ai-engineering/investigations/smolagents-and-langgraph.html',
+    ]) {
+      await page.goto(`${baseURL}${path}`);
+      await expect(page.locator('meta[property="og:title"]')).toHaveCount(1);
+      const title = await page.locator('meta[property="og:title"]').getAttribute('content');
+      expect(title).not.toContain('· Ben’s Field Notes');
+      await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
+        'content',
+        'Ben’s Field Notes',
+      );
+      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+        'content',
+        `https://bensnotes.fyi${path}`,
+      );
+      await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+        'content',
+        'summary_large_image',
+      );
+      const image = await page.locator('meta[property="og:image"]').getAttribute('content');
+      expect(image).toMatch(/^https:\/\/bensnotes\.fyi\/_astro\/.+\.png$/);
+      images.add(image);
+      const response = await page.request.get(new URL(image).pathname);
+      expect(response.status()).toBe(200);
+      expect(response.headers()['content-type']).toContain('image/png');
+      const bytes = await response.body();
+      expect(bytes.readUInt32BE(16)).toBe(1200);
+      expect(bytes.readUInt32BE(20)).toBe(630);
+      expect(bytes.length).toBeLessThan(1_000_000);
+      expect(
+        await page.locator('meta[property="og:image:alt"]').getAttribute('content'),
+      ).toBeTruthy();
+    }
+    expect(images.size).toBe(4);
+    const iconPath = await page.locator('link[rel="apple-touch-icon"]').getAttribute('href');
+    const iconResponse = await page.request.get(iconPath);
+    expect(iconResponse.status()).toBe(200);
+    const icon = await iconResponse.body();
+    expect(icon.readUInt32BE(16)).toBe(180);
+    expect(icon.readUInt32BE(20)).toBe(180);
+  } finally {
+    await context.close();
+  }
+});

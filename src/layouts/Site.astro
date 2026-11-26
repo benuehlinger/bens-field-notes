@@ -2,17 +2,16 @@
 import '../styles/site.css';
 import '../styles/knowledge.css';
 import Icon from '../components/Icon.astro';
+import SocialMeta from '../components/SocialMeta.astro';
+import { shareInfo } from '../lib/sharing.mjs';
 import { areas, sources, domain, json, storyUrl } from '../lib/knowledge.mjs';
 interface Props {
   title: string;
   description?: string;
   active?: string;
 }
-const {
-  title,
-  description = 'A personal field guide to AI engineering. Questions, sources and experiments.',
-  active = '',
-} = Astro.props;
+const { title, description, active = '' } = Astro.props;
+const sharing = shareInfo(Astro.url.pathname, title, description);
 const links = [
   { title: 'AI engineering', href: '/ai-engineering/', id: 'knowledge' },
   { title: 'Currently learning', href: storyUrl, id: 'learning' },
@@ -39,12 +38,11 @@ const searchIndex = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} · Ben’s Field Notes</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={sharing.description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={new URL(Astro.url.pathname, 'https://bensnotes.fyi')} />
-    <meta property="og:title" content={`${title} · Ben’s Field Notes`} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <SocialMeta info={sharing} />
     <meta name="color-scheme" content="dark light" />
     <script is:inline>
       try {
