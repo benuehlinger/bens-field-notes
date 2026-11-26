@@ -29,29 +29,19 @@ const work = [
 <Site title="Ben Uehlinger" active="about">
   <div class="portfolio">
     <section class="portfolio-hero" aria-labelledby="portfolio-name">
-      <div class="portfolio-intro">
-        <h1 id="portfolio-name">
-          Ben <br />
-          Uehlinger
-        </h1>
-        <p>Senior Forward Deployed Engineer at Eliza</p>
-      </div>
-      <div class="portfolio-feature" data-portfolio-motion>
-        <div class="portfolio-art" aria-hidden="true">
-          <div class="portfolio-orbit"></div>
-          <div class="portfolio-still">
-            {work.map(({ area }) => (
-              <span>{area}</span>
-            ))}
-          </div>
-          <div class="portfolio-reel">
-            {work.map(({ area }) => (
-              <span>{area}</span>
-            ))}
-          </div>
-        </div>
-        <button type="button" class="portfolio-motion" data-portfolio-pause hidden>
-          Pause animation
+      <h1 id="portfolio-name">Ben Uehlinger</h1>
+      <p class="portfolio-role">Senior Forward Deployed Engineer at Eliza</p>
+      <div class="portfolio-disciplines">
+        <span class="portfolio-still">Applied AI</span>
+        <button class="portfolio-typed" type="button" aria-label="Pause rotating text">
+          {work.map(({ area }, index) => (
+            <span
+              aria-hidden="true"
+              style={{ '--letters': area.length, '--delay': `${index * 3000}ms` }}
+            >
+              {area}
+            </span>
+          ))}
         </button>
       </div>
     </section>
@@ -92,19 +82,9 @@ const work = [
 </Site>
 
 <script>
-  const feature = document.querySelector<HTMLElement>('[data-portfolio-motion]');
-  const button = feature?.querySelector<HTMLButtonElement>('[data-portfolio-pause]');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (feature && button) {
-    const syncMotion = () => {
-      feature.toggleAttribute('data-animated', !reducedMotion.matches);
-      button.hidden = reducedMotion.matches;
-    };
-    syncMotion();
-    reducedMotion.addEventListener('change', syncMotion);
-    button.addEventListener('click', () => {
-      const paused = feature.toggleAttribute('data-paused');
-      button.textContent = paused ? 'Resume animation' : 'Pause animation';
-    });
-  }
+  const rotation = document.querySelector<HTMLButtonElement>('.portfolio-typed');
+  rotation?.addEventListener('click', () => {
+    const paused = rotation.toggleAttribute('data-paused');
+    rotation.setAttribute('aria-label', paused ? 'Resume rotating text' : 'Pause rotating text');
+  });
 </script>
