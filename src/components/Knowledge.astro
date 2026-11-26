@@ -3,10 +3,8 @@ import Site from '../layouts/Site.astro';
 import Modes from './Modes.astro';
 import Atlas from './Atlas.astro';
 import Sources from './Sources.astro';
-import Icon from './Icon.astro';
 import KnowledgeIntro from './KnowledgeIntro.astro';
 import CurrentThread from './CurrentThread.astro';
-import { areas, questions, storyUrl, shortName } from '../lib/knowledge.mjs';
 const { home = false } = Astro.props;
 ---
 
@@ -17,40 +15,5 @@ const { home = false } = Astro.props;
     <Atlas />
     <Sources inline />
     <CurrentThread active="learn" />
-    <div class="below-atlas">
-      <div class="section-heading">
-        <h2>Questions worth following</h2>
-        <a class="quiet-link" href="/ai-engineering/questions.html">
-          All questions <Icon name="arrow" size={13} />
-        </a>
-      </div>
-      <div class="question-list">
-        {questions.map((question) => (
-          <a
-            class="question-item"
-            href={
-              question.investigation
-                ? question.investigation
-                : `/ai-engineering/questions.html#${question.id}`
-            }
-          >
-            <h3>{question.title}</h3>
-            <p>{question.description}</p>
-          </a>
-        ))}
-      </div>
-      <details class="guide-index">
-        <summary>
-          Browse the field guides<span>Twelve connected areas</span>
-        </summary>
-        <div class="guide-grid">
-          {areas.map((area) => (
-            <a href={`/ai-engineering/topics/${area.slug}.html`}>
-              {shortName(area)} <span aria-hidden="true">↗</span>
-            </a>
-          ))}
-        </div>
-      </details>
-    </div>
   </div>
 </Site>
