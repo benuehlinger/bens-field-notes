@@ -345,44 +345,6 @@ kbd {
   color: var(--faint);
   margin-left: 8px;
 }
-.mode-nav {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px solid var(--line);
-  margin: 12px 0 32px;
-}
-.mode-nav a {
-  position: relative;
-  padding: 17px 0 20px;
-  color: var(--muted);
-  text-decoration: none;
-}
-.mode-nav strong {
-  font-size: 15px;
-  font-weight: 500;
-  display: block;
-}
-.mode-nav span {
-  font-size: 12px;
-  display: block;
-  margin-top: 5px;
-  color: var(--faint);
-}
-.mode-nav a[aria-current='page'] {
-  color: var(--ink);
-}
-.mode-nav a[aria-current='page']::after {
-  content: '';
-  height: 2px;
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 20px;
-  background: var(--ink);
-}
-.mode-nav a:hover {
-  color: var(--ink);
-}
 .quiet-link {
   display: inline-flex;
   align-items: center;
@@ -664,58 +626,10 @@ kbd {
 .below-atlas {
   margin-top: 36px;
 }
-.current-story {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 64px;
-  padding: 32px 0;
-  border-bottom: 1px solid var(--line);
-}
 .section-note {
   font-size: 12px;
   color: var(--muted);
   margin: 0 0 13px;
-}
-.current-story h2 {
-  font-size: 29px;
-  margin: 0 0 14px;
-  letter-spacing: -0.05em;
-}
-.current-story h2 a {
-  color: var(--ink);
-  text-decoration: none;
-}
-.current-story p {
-  font-size: 14px;
-  color: var(--muted);
-  max-width: 52ch;
-  margin-bottom: 20px;
-}
-.story-diagram {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0;
-}
-.story-diagram div {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 12px;
-}
-.story-diagram b {
-  font-weight: 500;
-  color: var(--ink);
-}
-.story-diagram span {
-  color: var(--muted);
-}
-.story-status {
-  font-size: 11px;
-  color: var(--faint);
-  margin-top: 14px;
 }
 .section-heading {
   display: flex;
@@ -1392,57 +1306,6 @@ kbd {
 .mode-section h2 {
   font-size: 23px;
 }
-.curated-columns {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 38px;
-  margin: 36px 0 46px;
-}
-.curated-columns section {
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
-}
-.curated-columns h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-.curated-columns > section > p {
-  font-size: 12px;
-  color: var(--faint);
-  margin-bottom: 22px;
-}
-.curated-columns .annotated-sources a {
-  font-size: 13px;
-}
-.curated-columns .annotated-sources p {
-  font-size: 12px;
-}
-.curated-columns .annotated-sources small {
-  display: block;
-  margin: 4px 0 0;
-}
-.participation-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0 36px;
-  margin: 36px 0;
-}
-.participation-grid article {
-  padding: 22px 0;
-  border-top: 1px solid var(--line);
-}
-.participation-grid h2 {
-  font-size: 17px;
-}
-.participation-grid p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 9px;
-}
-.participation-grid small {
-  font-size: 11px;
-  color: var(--faint);
-}
 .quiet-note {
   font-size: 12px;
   color: var(--faint);
@@ -1544,12 +1407,6 @@ kbd {
   .source-table th.type-column {
     width: 17%;
   }
-  .current-story {
-    gap: 38px;
-  }
-  .curated-columns {
-    gap: 24px;
-  }
   .guide-content,
   .area-lead {
     gap: 36px;
@@ -1589,19 +1446,6 @@ kbd {
   }
   .page-intro p {
     font-size: 14px;
-  }
-  .mode-nav {
-    margin-bottom: 24px;
-  }
-  .mode-nav a {
-    padding: 14px 0 16px;
-  }
-  .mode-nav strong {
-    font-size: 13px;
-  }
-  .mode-nav span {
-    font-size: 10px;
-    max-width: 120px;
   }
   .atlas-head {
     padding: 23px 22px 16px;
@@ -1660,19 +1504,6 @@ kbd {
   }
   .chart-foot p + p {
     margin-top: 6px;
-  }
-  .current-story {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .current-story h2 {
-    font-size: 27px;
-  }
-  .current-story p {
-    font-size: 13px;
-  }
-  .story-diagram {
-    max-width: none;
   }
   .question-list {
     gap: 0 24px;
@@ -1836,17 +1667,6 @@ kbd {
   .inquiry-question {
     font-size: 20px;
   }
-  .curated-columns {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .participation-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0 24px;
-  }
-  .participation-grid h2 {
-    font-size: 15px;
-  }
   .site-footer {
     margin: 64px 20px 0;
     padding-top: 22px;
@@ -1884,12 +1704,6 @@ kbd {
   }
   .page-intro h1 {
     font-size: 39px;
-  }
-  .mode-nav span {
-    display: none;
-  }
-  .mode-nav a[aria-current='page']::after {
-    right: 12px;
   }
   .atlas-head {
     display: block;
@@ -1954,9 +1768,6 @@ kbd {
     display: none;
   }
   .guide-grid {
-    grid-template-columns: 1fr;
-  }
-  .participation-grid {
     grid-template-columns: 1fr;
   }
   .browser-heading h2 {

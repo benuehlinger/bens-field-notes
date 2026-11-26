@@ -1,0 +1,67 @@
+---
+import Icon from './Icon.astro';
+import SourceTile from './SourceTile.astro';
+const { groups, initial, mode } = Astro.props;
+---
+
+<div class="explore-desk" data-explore-desk data-initial-view={initial}>
+  <nav
+    class="desk-selector"
+    aria-label={mode === 'keep-up' ? 'Choose what to follow' : 'Choose how to participate'}
+  >
+    {groups.map((group) => (
+      <a href={`?view=${group.id}#desk`} data-desk-choice={group.id}>
+        <Icon name={group.icon} size={19} />
+        <span>
+          <strong>{group.label}</strong>
+          <small>{group.hint}</small>
+        </span>
+        <Icon name="chevron" size={13} />
+      </a>
+    ))}
+    <p class="desk-selector-note">
+      {mode === 'keep-up'
+        ? 'A curated collection. Open a source for its latest work.'
+        : 'Entry routes to explore. Check each project or event for current availability.'}
+    </p>
+  </nav>
+  <div class="desk-content">
+    {groups.map((group) => (
+      <section
+        class="desk-panel"
+        id={`view-${group.id}`}
+        data-desk-panel={group.id}
+        aria-labelledby={`title-${group.id}`}
+      >
+        <div class="desk-panel-head">
+          <div>
+            <h3 id={`title-${group.id}`}>{group.title}</h3>
+            <p>{group.description}</p>
+          </div>
+          <span class="desk-count">
+            {group.sources.length} {mode === 'keep-up' ? 'sources' : 'places'}
+          </span>
+        </div>
+        {group.steps && (
+          <ol class="participation-path" aria-label="Suggested approach">
+            {group.steps.map((step) => (
+              <li>{step}</li>
+            ))}
+          </ol>
+        )}
+        <div class="desk-roster">
+          {group.sources.map((source) => (
+            <SourceTile {...source} contribution={mode === 'get-involved'} />
+          ))}
+        </div>
+        <div class="desk-takeaway">
+          <Icon name={group.icon} size={17} />
+          <p>{group.takeaway}</p>
+        </div>
+      </section>
+    ))}
+  </div>
+</div>
+<script>
+  import '../scripts/desk.js';
+</script>

@@ -1,0 +1,48 @@
+---
+import Icon from './Icon.astro';
+import { getSource, kindFor, domain } from '../lib/knowledge.mjs';
+const { id, name, mark, focus, action, contribution = false } = Astro.props;
+const source = getSource(id);
+const kind = kindFor(source.source_type);
+const href = contribution ? source.entry_url || source.url : source.url;
+---
+
+<article class="desk-source" style={`--source-color:var(--${kind.color})`}>
+  <div class="source-emblem" aria-hidden="true">
+    {mark}
+  </div>
+  <div class="desk-source-main">
+    <div class="desk-source-title">
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {name || source.name}
+        <Icon name="arrow" size={13} />
+      </a>
+      <span class="desk-source-format">{source.kind.replace('official ', '')}</span>
+    </div>
+    <p>{focus || source.why}</p>
+    <details class="desk-source-notes">
+      <summary>
+        {contribution ? 'A first contribution' : 'Reading notes'}
+        <Icon name="down" size={12} />
+      </summary>
+      <div>
+        <p>{action || (contribution ? source.first_contribution : source.how_to_use)}</p>
+        {source.note && <p class="desk-caveat">{source.note}</p>}
+        <a href={`/ai-engineering/library.html#${source.id}`}>
+          Source details & access
+          <Icon name="arrow" size={12} />
+        </a>
+      </div>
+    </details>
+  </div>
+  <a
+    class="desk-source-open"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={`${contribution ? 'Contribution route for' : 'Visit'} ${source.name}`}
+  >
+    <span>{contribution ? 'Start here' : domain(source.url)}</span>
+    <Icon name="arrow" size={15} />
+  </a>
+</article>

@@ -1,0 +1,19 @@
+---
+import Icon from './Icon.astro';
+import { storyUrl } from '../lib/knowledge.mjs';
+---
+
+<div class="page-intro knowledge-intro">
+  <div>
+    <h1>AI engineering.</h1>
+    <p>A personal field guide. Learn something, try it, bring it to the conversation.</p>
+  </div>
+  <a class="learning-mini" href={storyUrl}>
+    <span />
+    <span>
+      <small>Currently learning</small>
+      <strong>smolagents vs LangGraph</strong>
+    </span>
+    <Icon name="arrow" size={15} />
+  </a>
+</div>

@@ -1,0 +1,49 @@
+---
+import Icon from './Icon.astro';
+import { storyUrl } from '../lib/knowledge.mjs';
+const { active = 'learn' } = Astro.props;
+const connections = [
+  {
+    id: 'learn',
+    label: 'Understand the agent loop',
+    note: 'The opening questions',
+    href: storyUrl,
+  },
+  {
+    id: 'keep-up',
+    label: 'Read how others build',
+    note: 'Practitioner experiments',
+    href: '/ai-engineering/keep-up.html?view=read',
+  },
+  {
+    id: 'get-involved',
+    label: 'Bring a reproducible example',
+    note: 'smolagents & LangGraph',
+    href: '/ai-engineering/get-involved.html?view=contribute',
+  },
+];
+---
+
+<aside class="current-thread" aria-labelledby="thread-title">
+  <div class="thread-heading">
+    <span class="thread-indicator" aria-hidden="true" />
+    <div>
+      <span class="section-note">My current interest</span>
+      <h2 id="thread-title">
+        <a href={storyUrl}>smolagents vs LangGraph</a>
+      </h2>
+      <p class="thread-question">How do agents execute a task, and where should control live?</p>
+    </div>
+  </div>
+  <div class="thread-connections">
+    {connections.map((item) => (
+      <a href={item.href} class:list={{ 'thread-here': active === item.id }}>
+        <strong>
+          {item.label}
+          <Icon name="arrow" size={13} />
+        </strong>
+        <span>{item.note}</span>
+      </a>
+    ))}
+  </div>
+</aside>

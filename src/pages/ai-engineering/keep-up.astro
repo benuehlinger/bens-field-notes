@@ -1,49 +1,124 @@
 ---
 import Site from '../../layouts/Site.astro';
+import KnowledgeIntro from '../../components/KnowledgeIntro.astro';
 import Modes from '../../components/Modes.astro';
-import SourceList from '../../components/SourceList.astro';
-import Sources from '../../components/Sources.astro';
+import ExploreDesk from '../../components/ExploreDesk.astro';
+import CurrentThread from '../../components/CurrentThread.astro';
+import Icon from '../../components/Icon.astro';
 const groups = [
   {
+    id: 'read',
+    label: 'Read',
+    hint: 'People & practice',
+    icon: 'book',
     title: 'People who show their work',
-    note: 'Experiments, explanations and technical judgment.',
-    ids: ['simon-willison', 'hamel-husain', 'latent-space', 'eugene-yan', 'chip-huyen'],
+    description: 'Experiments, engineering decisions, and the failures behind them.',
+    sources: [
+      {
+        id: 'simon-willison',
+        name: 'Simon Willison',
+        mark: 'SW',
+        focus: 'Model experiments, coding agents, and practical tools.',
+      },
+      {
+        id: 'hamel-husain',
+        name: 'Hamel Husain',
+        mark: 'HH',
+        focus: 'Error analysis and evals grounded in real failures.',
+      },
+      { id: 'latent-space', mark: 'LS', focus: 'Builder interviews and how teams put AI to work.' },
+      { id: 'eugene-yan', mark: 'EY', focus: 'Search, evaluation, and reliable AI products.' },
+      {
+        id: 'chip-huyen',
+        name: 'Chip Huyen',
+        mark: 'CH',
+        focus: 'System design and model tradeoffs. An essay archive.',
+      },
+    ],
+    takeaway:
+      'Pick one essay or interview. Follow its evidence, then try one idea in a small experiment.',
   },
   {
-    title: 'When the ground changes',
-    note: 'Official releases, availability and breaking changes.',
-    ids: ['oai-changelog', 'oai-deprecations', 'hf-blog', 'anthropic-engineering'],
+    id: 'check',
+    label: 'Check',
+    hint: 'Releases & changes',
+    icon: 'layers',
+    title: 'Changes that affect what I build',
+    description: 'Check the primary source before changing a model, tool, or dependency.',
+    sources: [
+      {
+        id: 'oai-changelog',
+        name: 'OpenAI API changelog',
+        mark: 'OA',
+        focus: 'API releases and changes to supported capabilities.',
+      },
+      {
+        id: 'oai-deprecations',
+        name: 'OpenAI deprecations',
+        mark: 'OA',
+        focus: 'Retirement dates to check before choosing an interface.',
+      },
+      { id: 'hf-blog', mark: 'HF', focus: 'Open-model releases, tutorials, and linked code.' },
+      {
+        id: 'anthropic-engineering',
+        mark: 'A',
+        focus: 'Engineering accounts of building and evaluating agents.',
+      },
+    ],
+    takeaway:
+      'Check before an upgrade. Record what changed and which test would catch a regression.',
   },
   {
-    title: 'Ideas before the tutorial',
-    note: 'Papers, builder conversations and early demonstrations.',
-    ids: ['hf-papers', 'openreview', 'hn', 'show-hn', 'ai-engineer-youtube', 'interconnects'],
+    id: 'discover',
+    label: 'Discover',
+    hint: 'Papers & prototypes',
+    icon: 'search',
+    title: 'Find an idea worth testing',
+    description: 'Use the discussion to find the paper, code, or demo behind a claim.',
+    sources: [
+      {
+        id: 'hf-papers',
+        name: 'Hugging Face Papers',
+        mark: 'HF',
+        focus: 'Research papers with linked implementations.',
+      },
+      { id: 'openreview', mark: 'OR', focus: 'Papers, reviews, and author responses.' },
+      { id: 'show-hn', mark: 'HN', focus: 'Try a prototype and inspect what its builder made.' },
+      { id: 'hn', mark: 'HN', focus: 'Tools, failure stories, and engineering discussion.' },
+      {
+        id: 'ai-engineer-youtube',
+        name: 'AI Engineer talks',
+        mark: 'AE',
+        focus: 'Technical case studies and implementation workshops.',
+      },
+      {
+        id: 'interconnects',
+        name: 'Interconnects',
+        mark: 'IC',
+        focus: 'Model development, post-training, and open-model research.',
+      },
+    ],
+    takeaway:
+      'Choose a claim related to a question you already have. Look for a way to reproduce it.',
   },
 ];
 ---
 
 <Site title="Keep up" active="knowledge">
-  <div class="shell">
-    <div class="page-intro">
-      <div>
-        <h1>Follow the work.</h1>
-        <p>A small watchlist for developments that might change what I try next.</p>
-      </div>
-    </div>
+  <div class="shell knowledge-page">
+    <KnowledgeIntro />
     <Modes active="keep-up" />
-    <div class="curated-columns">
-      {groups.map((group) => (
-        <section>
-          <h2>{group.title}</h2>
-          <p>{group.note}</p>
-          <SourceList ids={group.ids} />
-        </section>
-      ))}
+    <div class="desk-heading" id="desk">
+      <div>
+        <h2>Keep up</h2>
+        <p>A few useful sources, with a reason to open each one.</p>
+      </div>
+      <a class="quiet-link" href="/ai-engineering/library.html?mode=keep-up">
+        Browse the watchlist
+        <Icon name="arrow" size={14} />
+      </a>
     </div>
-    <Sources mode="keep-up" />
-    <p class="quiet-note">
-      For an update worth keeping: record what changed, its evidence, which question it affects, and
-      what to try. This is a curated collection; releases and dates need a fresh check.
-    </p>
+    <ExploreDesk groups={groups} initial="read" mode="keep-up" />
+    <CurrentThread active="keep-up" />
   </div>
 </Site>

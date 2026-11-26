@@ -99,3 +99,84 @@ test('phone layout, navigation, table and source sheet are usable', async ({ pag
   await expect(page.locator('#mobile-nav')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('the reading desk separates reading, release checks and discovery with shareable views', async ({
+  page,
+}) => {
+  await page.goto('/ai-engineering/keep-up.html');
+  await expect(page.locator('[data-desk-panel]:visible')).toHaveCount(1);
+  await expect(page.locator('[data-desk-panel="read"]')).toContainText('Simon Willison');
+  await page.locator('[data-desk-choice="check"]').click();
+  await expect(page).toHaveURL(/view=check/);
+  await expect(page.locator('[data-desk-choice="check"]')).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('[data-desk-panel="check"]')).toBeVisible();
+  await expect(page.locator('[data-desk-panel="read"]')).toBeHidden();
+  await page.locator('[data-desk-panel="check"] details').first().locator('summary').click();
+  await expect(page.locator('[data-desk-panel="check"] details').first()).toContainText(
+    'regression cases',
+  );
+  await page.reload();
+  await expect(page.locator('[data-desk-panel="check"]')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('[data-desk-panel="read"]')).toBeVisible();
+  await page.locator('[data-desk-choice="discover"]').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('[data-desk-panel="discover"]')).toContainText('OpenReview');
+  await page.getByRole('link', { name: 'Browse the watchlist' }).click();
+  await expect(page.locator('#source-mode')).toHaveValue('keep-up');
+});
+
+test('participation connects concrete actions with real contribution and community routes', async ({
+  page,
+}) => {
+  await page.goto('/ai-engineering/get-involved.html');
+  const contribution = page.locator('[data-desk-panel="contribute"]');
+  await expect(contribution).toBeVisible();
+  await expect(contribution.locator('.participation-path')).toContainText('Reproduce a failure');
+  await expect(
+    contribution.getByRole('link', {
+      name: 'Contribution route for Hugging Face smolagents',
+      exact: true,
+    }),
+  ).toHaveAttribute('href', 'https://github.com/huggingface/smolagents/blob/main/CONTRIBUTING.md');
+  await contribution.locator('summary').first().click();
+  await expect(contribution.locator('details').first()).toContainText('minimal reproduction');
+  for (const view of ['discuss', 'collaborate', 'share']) {
+    await page.locator(`[data-desk-choice="${view}"]`).click();
+    await expect(page.locator('[data-desk-panel]:visible')).toHaveCount(1);
+    await expect(page.locator(`[data-desk-panel="${view}"]`)).toBeVisible();
+  }
+  await expect(page.locator('[data-desk-panel="share"]')).toContainText('Hugging Face Spaces');
+  await page.goto('/ai-engineering/get-involved.html?view=missing');
+  await expect(contribution).toBeVisible();
+  await expect(page.locator('.current-thread')).toContainText('smolagents vs LangGraph');
+  await page.locator('.current-thread a[href*="keep-up"]').click();
+  await expect(page.locator('[data-desk-panel="read"]')).toBeVisible();
+});
+
+test('both desks remain readable on a phone in either theme', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const path of ['keep-up', 'get-involved']) {
+    await page.goto(`/ai-engineering/${path}.html`);
+    const modeLinks = await page.locator('.mode-nav > a').all();
+    const modePositions = await Promise.all(
+      modeLinks.map(async (link) => (await link.boundingBox()).y),
+    );
+    expect(new Set(modePositions).size).toBe(1);
+    for (const theme of ['dark', 'light']) {
+      await page.evaluate((value) => (document.documentElement.dataset.theme = value), theme);
+      for (const choice of await page.locator('[data-desk-choice]').all()) {
+        await choice.click();
+        await expect(page.locator('[data-desk-panel]:visible')).toHaveCount(1);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+          true,
+        );
+        for (const row of await page.locator('[data-desk-panel]:visible .desk-source').all()) {
+          const bounds = await row.boundingBox();
+          expect(bounds.x).toBeGreaterThanOrEqual(0);
+          expect(bounds.x + bounds.width).toBeLessThanOrEqual(391);
+        }
+      }
+    }
+  }
+});

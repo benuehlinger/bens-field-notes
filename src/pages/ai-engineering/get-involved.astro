@@ -1,83 +1,167 @@
 ---
 import Site from '../../layouts/Site.astro';
+import KnowledgeIntro from '../../components/KnowledgeIntro.astro';
 import Modes from '../../components/Modes.astro';
-import SourceList from '../../components/SourceList.astro';
-import Sources from '../../components/Sources.astro';
-const routes = [
-  [
-    'Ask and help',
-    'Bring a precise question, a reproduction or an explanation.',
-    'Forums, Discord, Slack and office hours.',
-  ],
-  [
-    'Reproduce and compare',
-    'Test a paper, demo or technical claim on a small example.',
-    'Paper clubs, GitHub discussions and research groups.',
-  ],
-  [
-    'Contribute',
-    'Improve a test, document an edge case or fix a bounded problem.',
-    'Open-source projects and contribution channels.',
-  ],
-  [
-    'Build together',
-    'Take responsibility for a specific part of a shared problem.',
-    'Project groups, hackathons and meetups.',
-  ],
-  [
-    'Explain and demonstrate',
-    'Share what you tried, what broke and what you learned.',
-    'A repo, Substack, LinkedIn, YouTube or a live demo.',
-  ],
-  [
-    'Maintain and convene',
-    'Keep a useful tool or technical conversation going.',
-    'A repository, study group or recurring community session.',
-  ],
+import ExploreDesk from '../../components/ExploreDesk.astro';
+import CurrentThread from '../../components/CurrentThread.astro';
+import Icon from '../../components/Icon.astro';
+const groups = [
+  {
+    id: 'discuss',
+    label: 'Discuss',
+    hint: 'Bring a question',
+    icon: 'message',
+    title: 'Get another engineer’s perspective',
+    description: 'A small example gives someone something specific to help with.',
+    steps: ['Search existing threads', 'Show what you tried', 'Ask a precise question'],
+    sources: [
+      {
+        id: 'community-huggingface',
+        name: 'Hugging Face',
+        mark: 'HF',
+        focus: 'Find the relevant library category. Bring a runnable example and its output.',
+      },
+      {
+        id: 'community-openai',
+        name: 'OpenAI Developer Community',
+        mark: 'OA',
+        focus: 'Compare API behavior. Include the SDK version and the response you observed.',
+      },
+      {
+        id: 'community-latentspace',
+        name: 'Latent Space',
+        mark: 'LS',
+        focus: 'Discuss an implementation or take a reproduction question to a paper club.',
+      },
+    ],
+    takeaway:
+      'For the agent comparison: “Here is the same tool call in both libraries. Why does this trace differ?”',
+  },
+  {
+    id: 'contribute',
+    label: 'Contribute',
+    hint: 'Make a small fix',
+    icon: 'code',
+    title: 'Work on a tool I’m learning',
+    description: 'Start with behavior you can reproduce, then find the contribution route.',
+    steps: ['Reproduce a failure', 'Add a focused test', 'Propose a change'],
+    sources: [
+      {
+        id: 'project-smolagents',
+        name: 'smolagents',
+        mark: 'sm',
+        focus: 'Agent loop & tool handling. Reproduce a tool-schema or output-handling failure.',
+      },
+      {
+        id: 'project-langgraph',
+        mark: 'LG',
+        focus:
+          'State & persistence. Inspect what happens when a tiny workflow is interrupted and resumed.',
+      },
+      {
+        id: 'project-mcp-inspector',
+        mark: 'MC',
+        focus: 'Tool debugging. Trigger a malformed server response and inspect the error.',
+      },
+      {
+        id: 'project-promptfoo',
+        mark: 'pf',
+        focus: 'Evaluation. Reproduce a broken example or an assertion that behaves incorrectly.',
+      },
+    ],
+    takeaway:
+      'A useful first contribution can be a reproduction, a regression test, or a corrected example. Read the project’s guide before proposing it.',
+  },
+  {
+    id: 'collaborate',
+    label: 'Collaborate',
+    hint: 'Work with people',
+    icon: 'people',
+    title: 'Find people working on a similar question',
+    description: 'Join around an experiment, course project, or technical session.',
+    steps: [
+      'Choose a relevant group',
+      'Bring a small experiment',
+      'Offer a specific piece of work',
+    ],
+    sources: [
+      {
+        id: 'community-mlcollective',
+        mark: 'ML',
+        focus: 'Research jams & reading groups. Bring a small replication for feedback.',
+      },
+      {
+        id: 'community-datatalks',
+        mark: 'DT',
+        focus: 'Course projects & Slack. Share a failure you fixed and help someone reproduce it.',
+      },
+      {
+        id: 'community-latentspace',
+        name: 'Latent Space',
+        mark: 'LS',
+        focus: 'Paper clubs & builder events. Check the calendar for a relevant session.',
+      },
+      {
+        id: 'community-aaif',
+        mark: 'AA',
+        focus:
+          'Agent interoperability. Check the event listing and bring a concrete integration question.',
+      },
+    ],
+    takeaway:
+      'Check current dates and participation requirements on the official page. These are places to explore, not confirmed project openings.',
+  },
+  {
+    id: 'share',
+    label: 'Share',
+    hint: 'Show the work',
+    icon: 'share',
+    title: 'Make an experiment easy to engage with',
+    description: 'Show the question, the code, what happened, and what you still don’t understand.',
+    steps: ['Package a runnable example', 'Explain what happened', 'Invite specific feedback'],
+    sources: [
+      {
+        id: 'community-hf-spaces',
+        name: 'Hugging Face Spaces',
+        mark: 'HF',
+        focus: 'Publish a small interactive demo with examples and clear limitations.',
+      },
+      {
+        id: 'show-hn',
+        mark: 'HN',
+        focus: 'Share something people can actually try. Read the submission guidelines first.',
+        action:
+          'Package a working demo and a clear explanation of what it does. Read the Show HN guidelines before submitting.',
+      },
+      {
+        id: 'community-aiengineer',
+        name: 'AI Engineer',
+        mark: 'AE',
+        focus:
+          'Turn an implementation into a short technical demo. Check for a suitable event or call.',
+      },
+    ],
+    takeaway:
+      'The smolagents vs LangGraph story can become a notebook, a small repo, and a demo. Start with an observed difference worth explaining.',
+  },
 ];
 ---
 
 <Site title="Get involved" active="knowledge">
-  <div class="shell">
-    <div class="page-intro">
-      <div>
-        <h1>Bring work to people.</h1>
-        <p>
-          A question, a small experiment, an honest failure. Something another person can engage
-          with.
-        </p>
-      </div>
-    </div>
+  <div class="shell knowledge-page">
+    <KnowledgeIntro />
     <Modes active="get-involved" />
-    <div class="participation-grid">
-      {routes.map(([title, description, where]) => (
-        <article>
-          <h2>{title}</h2>
-          <p>{description}</p>
-          <small>{where}</small>
-        </article>
-      ))}
+    <div class="desk-heading" id="desk">
+      <div>
+        <h2>Get involved</h2>
+        <p>Choose what to bring. Find a place where it’s useful.</p>
+      </div>
+      <a class="quiet-link" href="/ai-engineering/library.html?mode=get-involved">
+        Explore all routes
+        <Icon name="arrow" size={14} />
+      </a>
     </div>
-    <section class="mode-section">
-      <h2>A few places to start contributing</h2>
-      <p>
-        Start with a problem you can reproduce. These are entry routes; individual issues need a
-        fresh check.
-      </p>
-      <SourceList
-        ids={[
-          'project-mcp-inspector',
-          'project-datasets',
-          'project-promptfoo',
-          'project-haystack',
-          'project-phoenix',
-        ]}
-      />
-    </section>
-    <Sources mode="get-involved" />
-    <p class="quiet-note">
-      An involvement scout could connect current questions to projects and collaboration calls,
-      explaining the fit and the smallest first action. That scouting process is not automated here.
-    </p>
+    <ExploreDesk groups={groups} initial="contribute" mode="get-involved" />
+    <CurrentThread active="get-involved" />
   </div>
 </Site>
