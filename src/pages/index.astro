@@ -32,14 +32,12 @@ const work = [
       <h1 id="portfolio-name">Ben Uehlinger</h1>
       <p class="portfolio-role">Senior Forward Deployed Engineer at Eliza</p>
       <div class="portfolio-disciplines">
-        <span class="portfolio-still">Applied AI</span>
-        <button class="portfolio-typed" type="button" aria-label="Pause rotating text">
+        <button class="portfolio-typed" type="button" aria-label="Pause rotating text" disabled>
           {work.map(({ area }, index) => (
-            <span
-              aria-hidden="true"
-              style={{ '--letters': area.length, '--delay': `${index * 3000}ms` }}
-            >
-              {area}
+            <span class="portfolio-phrase" aria-hidden="true" hidden={index !== 0}>
+              <span class="portfolio-lettering" style={{ '--letters': area.length }}>
+                {area}
+              </span>
             </span>
           ))}
         </button>
@@ -83,8 +81,25 @@ const work = [
 
 <script>
   const rotation = document.querySelector<HTMLButtonElement>('.portfolio-typed');
-  rotation?.addEventListener('click', () => {
-    const paused = rotation.toggleAttribute('data-paused');
-    rotation.setAttribute('aria-label', paused ? 'Resume rotating text' : 'Pause rotating text');
-  });
+  if (rotation) {
+    const phrases = Array.from(rotation.querySelectorAll<HTMLElement>('.portfolio-phrase'));
+    let current = 0;
+    const advance = () => {
+      phrases[current].hidden = true;
+      current = (current + 1) % phrases.length;
+      phrases[current].hidden = false;
+    };
+
+    let timer = window.setInterval(advance, 3000);
+    rotation.disabled = false;
+    rotation.addEventListener('click', () => {
+      const paused = rotation.toggleAttribute('data-paused');
+      rotation.setAttribute('aria-label', paused ? 'Resume rotating text' : 'Pause rotating text');
+      if (paused) {
+        window.clearInterval(timer);
+      } else {
+        timer = window.setInterval(advance, 3000);
+      }
+    });
+  }
 </script>

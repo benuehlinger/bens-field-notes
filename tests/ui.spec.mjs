@@ -29,37 +29,43 @@ test('the portfolio introduces Ben and links to all three areas', async ({ page 
   await expect(page.getByRole('heading', { level: 1, name: 'Lending Data Lake' })).toBeVisible();
 });
 
-test('the homepage types one discipline at a time and loops on a phone', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto('/');
-  const rotation = page.getByRole('button', { name: 'Pause rotating text' });
-  await expect(rotation).toBeVisible();
-  const sequence = await rotation.locator('span').evaluateAll((phrases) => {
-    const animations = phrases.map((phrase) => phrase.getAnimations()[0]);
-    return [1200, 4200, 7200, 10200].map((time) => {
-      for (const animation of animations) animation.currentTime = time;
-      return phrases
-        .filter((phrase) => getComputedStyle(phrase).visibility === 'visible')
-        .map((phrase) => phrase.textContent.trim());
-    });
+for (const [device, viewport, reducedMotion] of [
+  ['desktop', { width: 1440, height: 900 }, 'no-preference'],
+  ['phone', { width: 390, height: 844 }, 'no-preference'],
+  ['phone', { width: 390, height: 844 }, 'reduce'],
+]) {
+  test(`the hero loops on ${device} with reduced motion set to ${reducedMotion}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion });
+    await page.clock.install();
+    await page.goto('/');
+    const rotation = page.locator('.portfolio-typed');
+    const visible = rotation.locator('.portfolio-phrase:visible');
+    await expect(rotation).toBeEnabled();
+
+    for (const label of ['Applied AI', 'Data Engineering', 'Data Science', 'Applied AI']) {
+      await expect(visible).toHaveCount(1);
+      await expect(visible).toHaveText(label);
+      await expect(visible.locator('.portfolio-lettering')).toHaveCSS(
+        'animation-name',
+        reducedMotion === 'reduce' ? 'none' : 'portfolio-type',
+      );
+      await page.clock.runFor(3000);
+    }
+
+    await rotation.click();
+    await expect(rotation).toHaveAccessibleName('Resume rotating text');
+    const pausedLabel = await visible.textContent();
+    await page.clock.runFor(6000);
+    await expect(visible).toHaveText(pausedLabel.trim());
+    await rotation.click();
+    await expect(rotation).toHaveAccessibleName('Pause rotating text');
+    await page.clock.runFor(3000);
+    await expect(visible).not.toHaveText(pausedLabel.trim());
   });
-  expect(sequence).toEqual([
-    ['Applied AI'],
-    ['Data Engineering'],
-    ['Data Science'],
-    ['Applied AI'],
-  ]);
-  await rotation.click();
-  await expect(page.getByRole('button', { name: 'Resume rotating text' })).toBeVisible();
-  await expect(page.locator('.portfolio-typed span').first()).toHaveCSS(
-    'animation-play-state',
-    'paused',
-  );
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect(page.locator('.portfolio-typed')).toBeHidden();
-  await expect(page.locator('.portfolio-still')).toHaveText('Applied AI');
-});
+}
 
 test('the atlas opens matching sources in place and browser Back restores the overview', async ({
   page,

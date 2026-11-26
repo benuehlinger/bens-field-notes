@@ -5,16 +5,19 @@
 }
 
 .portfolio-hero {
-  padding-block: 10px 58px;
+  padding-block: 14px 58px;
 }
 
 .portfolio-hero h1,
 .portfolio-section h1 {
   margin: 0;
-  font-size: clamp(2.85rem, 8.3vw, 7.6rem);
   line-height: 0.98;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.075em;
   font-weight: 620;
+}
+
+.portfolio-hero h1 {
+  font-size: clamp(2.65rem, 5.4vw, 5rem);
 }
 
 .portfolio-role,
@@ -26,70 +29,70 @@
 }
 
 .portfolio-disciplines {
-  display: grid;
-  margin-top: 24px;
+  margin-top: clamp(32px, 5vw, 76px);
   color: var(--accent);
-  font-family: 'Geist Mono Variable', monospace;
-  font-size: clamp(0.82rem, 2.5vw, 1.25rem);
-  line-height: 1.6;
-  letter-spacing: -0.035em;
 }
 
 .portfolio-typed {
-  display: none;
-  width: fit-content;
+  display: block;
+  min-height: 1.25em;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   color: inherit;
-  font: inherit;
-  letter-spacing: inherit;
+  font-family: 'Geist Mono Variable', monospace;
+  font-size: clamp(1.6rem, 7.8vw, 5.4rem);
+  font-weight: 480;
+  line-height: 1.25;
+  letter-spacing: -0.075em;
   text-align: left;
 }
 
+.portfolio-phrase {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.portfolio-lettering {
+  display: block;
+}
+
+.portfolio-phrase::after {
+  content: '';
+  width: 0.055em;
+  min-width: 2px;
+  height: 0.78em;
+  margin-inline-start: 0.13em;
+  align-self: center;
+  background: currentColor;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .portfolio-still {
-    display: none;
+  .portfolio-typed:not([data-paused]) .portfolio-lettering {
+    animation: portfolio-type 640ms steps(var(--letters), end) both;
   }
 
-  .portfolio-typed {
-    display: grid;
-    justify-items: start;
-    align-items: start;
-  }
-
-  .portfolio-typed span {
-    grid-area: 1 / 1;
-    white-space: nowrap;
-    visibility: hidden;
-    animation: portfolio-type 9s var(--delay) infinite;
-  }
-
-  .portfolio-typed[data-paused] span {
-    animation-play-state: paused;
+  .portfolio-typed:not([data-paused]) .portfolio-phrase::after {
+    animation: portfolio-caret 640ms steps(1, end) both;
   }
 
   @keyframes portfolio-type {
-    0% {
-      visibility: visible;
-      opacity: 1;
+    from {
       clip-path: inset(0 100% 0 0);
-      animation-timing-function: steps(var(--letters), end);
     }
-
-    9%,
-    31% {
-      visibility: visible;
-      opacity: 1;
+    to {
       clip-path: inset(0);
     }
+  }
 
-    33.333%,
-    100% {
-      visibility: hidden;
+  @keyframes portfolio-caret {
+    from {
       opacity: 0;
-      clip-path: inset(0);
+    }
+    to {
+      opacity: 1;
     }
   }
 }
@@ -201,10 +204,6 @@
 
   .portfolio-role {
     margin-top: 12px;
-  }
-
-  .portfolio-disciplines {
-    margin-top: 17px;
   }
 
   .portfolio-about {
