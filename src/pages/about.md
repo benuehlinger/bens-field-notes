@@ -1,0 +1,37 @@
+---
+title: 'A working understanding'
+subtitle: 'About Ben’s Field Notes'
+layout: ../layouts/Article.astro
+---
+
+This is a personal knowledge space for the things I want to understand well enough to use,
+question and explain. Right now, that means AI engineering: the models, the systems around
+them, and what it takes to build something useful with agents.
+
+The site has three ways in:
+
+- **[Learn](/ai-engineering/index.html):** follow a question into explanations, source material and small experiments.
+- **[Keep up](/ai-engineering/keep-up.html):** notice changes in the field and connect them to something worth trying.
+- **[Get involved](/ai-engineering/get-involved.html):** find people and projects where a question or contribution can lead to a useful exchange.
+
+## Follow the work
+
+Experiments will begin in VS Code notebooks, one question and one block at a time.
+The story should follow what the work reveals. Code, intermediate outputs, diagrams and
+interpretation belong together when they help someone understand the result.
+
+I’m currently learning how [smolagents, LangGraph and T3 Code relate](/ai-engineering/investigations/smolagents-and-langgraph.html).
+It is an opening inquiry; no comparison has been run yet.
+
+## Sources and evidence
+
+Sources are annotated with what they help explain and how someone might use them.
+A publication can be useful for discovery without being authoritative about another tool.
+A saved result establishes what happened in that run, rather than how every future run will behave.
+
+The initial [source collection](/ai-engineering/library.html) was checked on 25 November 2026.
+Contribution rules, product availability and event schedules need to be checked again when acting on them.
+
+The website is built with [Astro](https://astro.build). Notebook stories use [Quarto](https://quarto.org). The pages and structured source collection
+live in [the public repository](https://github.com/benuehlinger/bens-field-notes).
+The earlier finance journal is preserved in Git history.

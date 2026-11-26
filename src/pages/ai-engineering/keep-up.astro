@@ -1,0 +1,49 @@
+---
+import Site from '../../layouts/Site.astro';
+import Modes from '../../components/Modes.astro';
+import SourceList from '../../components/SourceList.astro';
+import Sources from '../../components/Sources.astro';
+const groups = [
+  {
+    title: 'People who show their work',
+    note: 'Experiments, explanations and technical judgment.',
+    ids: ['simon-willison', 'hamel-husain', 'latent-space', 'eugene-yan', 'chip-huyen'],
+  },
+  {
+    title: 'When the ground changes',
+    note: 'Official releases, availability and breaking changes.',
+    ids: ['oai-changelog', 'oai-deprecations', 'hf-blog', 'anthropic-engineering'],
+  },
+  {
+    title: 'Ideas before the tutorial',
+    note: 'Papers, builder conversations and early demonstrations.',
+    ids: ['hf-papers', 'openreview', 'hn', 'show-hn', 'ai-engineer-youtube', 'interconnects'],
+  },
+];
+---
+
+<Site title="Keep up" active="knowledge">
+  <div class="shell">
+    <div class="page-intro">
+      <div>
+        <h1>Follow the work.</h1>
+        <p>A small watchlist for developments that might change what I try next.</p>
+      </div>
+    </div>
+    <Modes active="keep-up" />
+    <div class="curated-columns">
+      {groups.map((group) => (
+        <section>
+          <h2>{group.title}</h2>
+          <p>{group.note}</p>
+          <SourceList ids={group.ids} />
+        </section>
+      ))}
+    </div>
+    <Sources mode="keep-up" />
+    <p class="quiet-note">
+      For an update worth keeping: record what changed, its evidence, which question it affects, and
+      what to try. This is a curated collection; releases and dates need a fresh check.
+    </p>
+  </div>
+</Site>

@@ -1,35 +1,52 @@
-# Ben's Field Notes
+# Ben’s Field Notes
 
-A personal knowledge space for **learning AI engineering, keeping up with the field, and getting involved**. Built with Quarto and portable files. The visual direction is minimal and technical, inspired by Vercel, with the questions and experiments of a personal journal.
+A personal knowledge space for learning AI engineering, keeping up with the field and getting involved. Astro builds the website. Quarto renders notebook stories when they exist.
 
 ## Work on the site
 
+Use Node 24 and install dependencies with `npm ci`.
+
 ```sh
-quarto preview --no-browser
+npm run dev
 ```
 
-`quarto render` produces `_site/`. A pre-render script generates the topic map, twelve subject pages, watchlist, participation routes and source library from `content/`. No notebook or model API is executed by that generator.
+`npm run build` creates `dist/`: the Astro pages, the portable content records, and any saved notebook stories. `npm run preview` serves the built site. Existing `.html` links are preserved with Astro’s `preserve` build format.
 
 ## Where to edit
 
-- `index.qmd`: the journal's front page.
-- `ai-engineering/investigations/`: authored inquiries and, later, notebook stories.
-- `content/areas.json`: subjects, relationships, source links and topic-matching terms.
-- `content/questions.json`: starting questions and connections to investigations.
-- `content/sources.json`: the canonical annotated sources, participation routes and verification dates.
-- `scripts/build-knowledge.py`: renders those records into Quarto pages. Edit records rather than generated pages.
-- `styles/`: the visual system; `assets/knowledge.js`: progressive source filtering.
+- `src/pages/`: home, learning views, subject guides, source library and current inquiries. Regular writing can use Markdown with `src/layouts/Article.astro`.
+- `src/components/Atlas.astro`: the quantitative source map.
+- `src/components/Sources.astro`: the shared table and source-detail panel.
+- `src/scripts/`: chart, source browser, theme and global search interactions.
+- `src/styles/site.css`: shared typography, color, spacing and responsive layouts. Fonts are self-hosted.
+- `content/sources.json`: the canonical 127-source collection, access notes and verification dates.
+- `content/areas.json` and `content/questions.json`: subject relationships and starting questions.
+- `src/lib/knowledge.mjs`: source lookup and topic membership used by both chart and filters.
+- `notebooks/`: future `.ipynb` and `.qmd` notebook stories; no notebook has been created yet.
 
-The catalog was initially imported from Deep Dives. This repository is now the working source for the website; it does not depend on Obsidian or synchronize edits back into it.
+The source collection is kept in portable JSON. This repository is the website’s working source; it does not synchronize edits back into Obsidian.
+
+## Design and verification
+
+Read [the design direction](docs/DESIGN.md) for the intended chart-to-table experience.
+
+```sh
+npm test
+npm run build
+npx playwright install chromium webkit
+npm run test:ui
+```
+
+The browser checks cover chart selections, filtering, sorting, source details, deep links, theme persistence, search and phone navigation. For an existing local Chrome, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable when running the browser tests.
 
 ## Notebook stories
 
-Read [the notebook workflow](docs/NOTEBOOK-WORKFLOW.md) before starting an experiment. Ben wants to choose the problem, then work through **one block at a time in VS Code**. The first inquiry is smolagents versus LangGraph, including overlap with T3 Code. No notebook has been generated yet.
+Read [the notebook workflow](docs/NOTEBOOK-WORKFLOW.md) before creating an experiment. Ben chooses the problem and works through one block at a time in VS Code. The first inquiry is smolagents versus LangGraph, including overlap with T3 Code.
 
-## Publishing and history
+The build renders notebook files with Quarto after Astro, sharing the website’s navigation and stylesheet. Execution is disabled; publishing saved outputs and running a notebook are separate actions.
 
-The GitHub Actions workflow builds Quarto and deploys `_site/` to Cloudflare Pages. A clean output directory prevents retired pages from carrying into a new deployment. The repository and published site are public.
+## Publishing and recovery
 
-After rendering, `scripts/version-assets.py` gives the site's CSS and JavaScript filenames a hash of their contents and updates the page links. A changed asset gets a new URL, so returning visitors receive styles and scripts that match the page. Run `python3 -m unittest discover -s tests` to check this build step.
+GitHub Actions tests and builds the site, then deploys `dist/` to the existing Cloudflare Pages project. Astro gives compiled CSS, JavaScript and fonts content-specific filenames so returning visitors receive matching assets.
 
-The pre-pivot site is recoverable at branch `archive/before-ai-engineering-20261125` (commit `7400d27`). The finance articles are removed from the active site. `analysis/`, `worker/` and historical specs remain retired infrastructure; none is required by the AI engineering pages. An existing uncommitted finance notebook and untracked local skills were preserved.
+The repository and published site are public. Git history preserves the prior Quarto implementation and earlier finance journal. The pre-AI site is also recoverable at `archive/before-ai-engineering-20261125` (`7400d27`). `analysis/`, `worker/` and historical finance specs are retired infrastructure, outside the website build.

@@ -52,3 +52,10 @@ drafts/*
 # Personal throwaway notebooks (keep the shared explorers)
 analysis/notebooks/*-scratch.ipynb
 !analysis/outputs/jcurve_sample.parquet
+
+# Astro and browser verification
+dist/
+.astro/
+playwright-report/
+test-results/
+notebooks/.generated/

@@ -1,0 +1,157 @@
+---
+import '../styles/site.css';
+import Icon from '../components/Icon.astro';
+import { areas, sources, domain, json, storyUrl } from '../lib/knowledge.mjs';
+interface Props {
+  title: string;
+  description?: string;
+  active?: string;
+}
+const {
+  title,
+  description = 'A personal field guide to AI engineering. Questions, sources and experiments.',
+  active = '',
+} = Astro.props;
+const links = [
+  { title: 'AI engineering', href: '/ai-engineering/', id: 'knowledge' },
+  { title: 'Currently learning', href: storyUrl, id: 'learning' },
+  { title: 'Sources', href: '/ai-engineering/library.html', id: 'sources' },
+];
+const searchIndex = [
+  ...links.map((link) => ({ title: link.title, href: link.href, note: 'Page' })),
+  ...areas.map((area) => ({
+    title: area.name,
+    href: `/ai-engineering/topics/${area.slug}.html`,
+    note: 'Field guide',
+  })),
+  ...sources.map((source) => ({
+    title: source.name,
+    href: `/ai-engineering/library.html#${source.id}`,
+    note: domain(source.url),
+  })),
+];
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · Ben’s Field Notes</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, 'https://bensnotes.fyi')} />
+    <meta property="og:title" content={`${title} · Ben’s Field Notes`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="color-scheme" content="dark light" />
+    <script is:inline>
+      try {
+        const saved =
+          localStorage.getItem('field-notes-theme') || localStorage.getItem('quarto-color-scheme');
+        document.documentElement.dataset.theme = saved === 'light' ? 'light' : 'dark';
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <header class="site-header" id="site-header">
+      <div class="header-inner">
+        <a class="brand" href="/" aria-label="Ben’s Field Notes home">
+          <span class="brand-mark" aria-hidden="true">
+            b.
+          </span>
+          <span>Ben’s Field Notes</span>
+        </a>
+        <nav class="primary-nav" aria-label="Main navigation">
+          {links.map((link) => (
+            <a href={link.href} aria-current={active === link.id ? 'page' : undefined}>
+              {link.title}
+            </a>
+          ))}
+        </nav>
+        <div class="header-actions">
+          <button
+            class="icon-button search-toggle"
+            aria-label="Search the knowledge base"
+            title="Search (/)"
+            data-search-open
+          >
+            <Icon name="search" />
+            <kbd>/</kbd>
+          </button>
+          <button class="icon-button" data-theme-toggle aria-label="Switch to light theme">
+            <span class="theme-sun">
+              <Icon name="sun" />
+            </span>
+            <span class="theme-moon">
+              <Icon name="moon" />
+            </span>
+          </button>
+          <button
+            class="icon-button mobile-menu"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            data-menu-toggle
+            aria-label="Open navigation"
+          >
+            <Icon name="menu" />
+          </button>
+        </div>
+      </div>
+      <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation" hidden>
+        {links.map((link) => (
+          <a href={link.href} aria-current={active === link.id ? 'page' : undefined}>
+            {link.title}
+          </a>
+        ))}
+        <a href="/about.html">About</a>
+      </nav>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer" id="site-footer">
+      <a href="/" class="footer-brand">
+        Ben’s Field Notes<span>A working understanding.</span>
+      </a>
+      <div>
+        <a href="/about.html">About this space</a>
+        <a
+          href="https://github.com/benuehlinger/bens-field-notes"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Source & history <Icon name="arrow" size={13} />
+        </a>
+      </div>
+    </footer>
+    <dialog class="search-dialog" data-search-dialog aria-labelledby="search-title">
+      <div class="search-top">
+        <Icon name="search" />
+        <label class="sr-only" id="search-title" for="site-search">
+          Search the knowledge base
+        </label>
+        <input
+          id="site-search"
+          type="search"
+          placeholder="A topic, source or question…"
+          autocomplete="off"
+        />
+        <button class="icon-button" data-search-close aria-label="Close search">
+          <Icon name="close" />
+        </button>
+      </div>
+      <ul data-search-results class="search-results"></ul>
+      <p class="search-hint">
+        Search field guides and sources. <kbd>esc</kbd> to close.
+      </p>
+    </dialog>
+    <script id="search-index" type="application/json" set:html={json(searchIndex)} />
+    <script>
+      import '../scripts/site.js';
+    </script>
+  </body>
+</html>

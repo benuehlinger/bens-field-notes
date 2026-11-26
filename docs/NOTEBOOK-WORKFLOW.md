@@ -20,7 +20,7 @@ A failed approach can become the most useful part of the story. Preserve what ch
 
 ## Keep the code and story close
 
-Quarto can render a saved Jupyter `.ipynb`, including Markdown and outputs. Once the first notebook exists, choose authoring and render settings around the actual experiment. Prefer one canonical notebook to manually copying cells into a second article. A short `.qmd` introduction can link to it when useful.
+Quarto can render a saved Jupyter `.ipynb`, including Markdown and outputs. Once the first notebook exists, choose authoring and render settings around the actual experiment. Prefer one canonical notebook to manually copying cells into a second article. A regular Markdown page on the Astro site can introduce and link to it when useful.
 
 Saved output establishes a previous run. Publishing a saved notebook and re-executing it are separate operations; keep versions and run conditions with the result. Build-time execution should be explicit when it uses paid APIs or external state.
 

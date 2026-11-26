@@ -1,0 +1,35 @@
+---
+import Site from '../../layouts/Site.astro';
+import SourceList from '../../components/SourceList.astro';
+import { questions, areas } from '../../lib/knowledge.mjs';
+---
+
+<Site title="Questions worth following" active="learning">
+  <article class="article-shell questions-page">
+    <header class="article-header">
+      <h1>Questions worth following.</h1>
+      <p>Starting points for an explanation, a small experiment and the next question.</p>
+    </header>
+    {questions.map((question) => (
+      <section id={question.id}>
+        <h2>{question.title}</h2>
+        <p>{question.description}</p>
+        <p>
+          <strong>A small experiment.</strong> {question.experiment}
+        </p>
+        <div class="topic-chips">
+          {question.areas.map((tag) => {
+            const area = areas.find((area) => area.tag === tag);
+            return area && <a href={`/ai-engineering/topics/${area.slug}.html`}>{area.name}</a>;
+          })}
+        </div>
+        <SourceList ids={question.sources} />
+        {question.investigation && (
+          <a href={question.investigation} class="text-link">
+            What I’m currently learning ↗
+          </a>
+        )}
+      </section>
+    ))}
+  </article>
+</Site>

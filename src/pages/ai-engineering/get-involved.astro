@@ -1,0 +1,83 @@
+---
+import Site from '../../layouts/Site.astro';
+import Modes from '../../components/Modes.astro';
+import SourceList from '../../components/SourceList.astro';
+import Sources from '../../components/Sources.astro';
+const routes = [
+  [
+    'Ask and help',
+    'Bring a precise question, a reproduction or an explanation.',
+    'Forums, Discord, Slack and office hours.',
+  ],
+  [
+    'Reproduce and compare',
+    'Test a paper, demo or technical claim on a small example.',
+    'Paper clubs, GitHub discussions and research groups.',
+  ],
+  [
+    'Contribute',
+    'Improve a test, document an edge case or fix a bounded problem.',
+    'Open-source projects and contribution channels.',
+  ],
+  [
+    'Build together',
+    'Take responsibility for a specific part of a shared problem.',
+    'Project groups, hackathons and meetups.',
+  ],
+  [
+    'Explain and demonstrate',
+    'Share what you tried, what broke and what you learned.',
+    'A repo, Substack, LinkedIn, YouTube or a live demo.',
+  ],
+  [
+    'Maintain and convene',
+    'Keep a useful tool or technical conversation going.',
+    'A repository, study group or recurring community session.',
+  ],
+];
+---
+
+<Site title="Get involved" active="knowledge">
+  <div class="shell">
+    <div class="page-intro">
+      <div>
+        <h1>Bring work to people.</h1>
+        <p>
+          A question, a small experiment, an honest failure. Something another person can engage
+          with.
+        </p>
+      </div>
+    </div>
+    <Modes active="get-involved" />
+    <div class="participation-grid">
+      {routes.map(([title, description, where]) => (
+        <article>
+          <h2>{title}</h2>
+          <p>{description}</p>
+          <small>{where}</small>
+        </article>
+      ))}
+    </div>
+    <section class="mode-section">
+      <h2>A few places to start contributing</h2>
+      <p>
+        Start with a problem you can reproduce. These are entry routes; individual issues need a
+        fresh check.
+      </p>
+      <SourceList
+        ids={[
+          'project-mcp-inspector',
+          'project-datasets',
+          'project-promptfoo',
+          'project-haystack',
+          'project-phoenix',
+        ]}
+      />
+    </section>
+    <Sources mode="get-involved" />
+    <p class="quiet-note">
+      An involvement scout could connect current questions to projects and collaboration calls,
+      explaining the fit and the smallest first action. That scouting process is not automated here.
+    </p>
+  </div>
+</Site>

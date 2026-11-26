@@ -1,0 +1,18 @@
+project:
+  type: default
+  output-dir: ../dist/notebooks
+  render:
+    - '**/*.qmd'
+    - '**/*.ipynb'
+format:
+  html:
+    theme: none
+    toc: false
+    body-classes: notebook-page
+    include-in-header: .generated/head.html
+    include-before-body: .generated/header.html
+    include-after-body: .generated/footer.html
+    code-fold: true
+    highlight-style: github
+execute:
+  enabled: false

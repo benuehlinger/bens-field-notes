@@ -1,0 +1,212 @@
+---
+import Icon from './Icon.astro';
+import { areas, sources, kinds, kindFor, domain, memberships, json } from '../lib/knowledge.mjs';
+const { inline = false, mode = 'all', standalone = false } = Astro.props;
+---
+
+<section
+  class:list={['source-browser', { 'source-browser-inline': inline }]}
+  id="sources"
+  data-source-browser
+  data-collapsed={inline ? 'true' : 'false'}
+  data-initial-mode={mode}
+  aria-labelledby={standalone ? 'library-title' : 'sources-title'}
+>
+  {!standalone && (
+    <div class="browser-heading">
+      <div>
+        <span class="browser-context" data-browser-context>
+          {inline ? 'Explore the collection' : 'The collection'}
+        </span>
+        <h2 id="sources-title">{inline ? 'Explore the sources' : 'Source library'}</h2>
+        <p data-browser-description>Find something worth reading, trying or contributing to.</p>
+      </div>
+      <a class="quiet-link" data-guide-link hidden>
+        Open field guide <Icon name="arrow" size={14} />
+      </a>
+      {inline && (
+        <button class="icon-button" data-browser-close aria-label="Close source browser">
+          <Icon name="close" />
+        </button>
+      )}
+    </div>
+  )}
+  <form class="source-toolbar" role="search" data-source-controls hidden onsubmit="return false">
+    <label class="search-field">
+      <Icon name="search" size={17} />
+      <span class="sr-only">Search sources</span>
+      <input type="search" id="source-search" placeholder="Search sources…" autocomplete="off" />
+    </label>
+    <label class="select-field">
+      <span class="sr-only">Purpose</span>
+      <select id="source-mode">
+        <option value="all">All purposes</option>
+        <option value="learn">Learn</option>
+        <option value="keep-up">Keep up</option>
+        <option value="get-involved">Get involved</option>
+      </select>
+      <Icon name="down" size={14} />
+    </label>
+    <label class="select-field">
+      <span class="sr-only">Source type</span>
+      <select id="source-type">
+        <option value="all">All types</option>
+        {kinds.map((kind) => (
+          <option value={kind.id}>{kind.label}</option>
+        ))}
+      </select>
+      <Icon name="down" size={14} />
+    </label>
+    <label class="select-field topic-filter">
+      <span class="sr-only">Topic</span>
+      <select id="source-topic">
+        <option value="all">All topics</option>
+        {areas.map((area) => (
+          <option value={area.tag}>{area.name}</option>
+        ))}
+      </select>
+      <Icon name="down" size={14} />
+    </label>
+    <button class="reset-button" type="button" id="source-reset" title="Reset filters">
+      Reset
+    </button>
+  </form>
+  <div class="results-meta">
+    <p id="source-count" role="status" aria-live="polite">
+      {sources.length} sources
+    </p>
+    <div class="results-actions">
+      {standalone && (
+        <a class="quiet-link" data-guide-link hidden>
+          Field guide <Icon name="arrow" size={12} />
+        </a>
+      )}
+      <label class="sort-field">
+        <span>Sort</span>
+        <select id="source-sort" aria-label="Sort sources">
+          <option value="recommended">Collection order</option>
+          <option value="name">Name A–Z</option>
+          <option value="type">Source type</option>
+        </select>
+        <Icon name="down" size={12} />
+      </label>
+    </div>
+  </div>
+  <div class="source-table-wrap">
+    <table class="source-table">
+      <thead>
+        <tr>
+          <th scope="col">Source</th>
+          <th scope="col" class="type-column">
+            Type
+          </th>
+          <th scope="col" class="summary-column">
+            Useful for
+          </th>
+          <th scope="col">
+            <span class="sr-only">Source details</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="source-results">
+        {sources.map((source) => {
+          const kind = kindFor(source.source_type);
+          return (
+            <tr
+              class="source-entry"
+              id={source.id}
+              data-source-row={source.id}
+              data-kind={source.source_type}
+              data-purpose={source.modes.join(' ')}
+              data-area={memberships.get(source.id).join(' ')}
+              data-search={[
+                source.name,
+                source.why,
+                ...source.topics,
+                source.first_contribution || '',
+              ]
+                .join(' ')
+                .toLowerCase()}
+            >
+              <td class="source-name-cell">
+                <a class="source-title" href={source.url} target="_blank" rel="noopener noreferrer">
+                  {source.name}
+                  <Icon name="arrow" size={13} />
+                </a>
+                <span class="source-domain">{domain(source.url)}</span>
+                <p class="mobile-summary">{source.why}</p>
+                <span class="mobile-kind">
+                  <i class={`kind-dot kind-${kind.color}`} />
+                  {kind.label}
+                </span>
+              </td>
+              <td class="type-column">
+                <span class="type-label">
+                  <i class={`kind-dot kind-${kind.color}`} />
+                  {kind.label}
+                </span>
+              </td>
+              <td class="summary-column">
+                <span class="source-summary">{source.why}</span>
+              </td>
+              <td class="source-details-cell">
+                <button
+                  class="details-button"
+                  type="button"
+                  data-source-details={source.id}
+                  aria-label={`Details about ${source.name}`}
+                  hidden
+                >
+                  Details
+                  <Icon name="chevron" size={13} />
+                </button>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+  <div class="source-empty" id="source-empty" hidden>
+    <Icon name="search" size={24} />
+    <h3>No sources found</h3>
+    <p>Try a broader search, or reset the filters.</p>
+  </div>
+  <div class="browser-footer">
+    <span data-shown-count>{sources.length} sources</span>
+    <button id="source-more" class="button button-secondary button-small" type="button" hidden>
+      Show more
+    </button>
+    <a class="quiet-link" href="/about.html#sources-and-evidence">
+      About the sources <Icon name="arrow" size={12} />
+    </a>
+  </div>
+  <dialog class="source-dialog" id="source-dialog" aria-labelledby="source-dialog-title">
+    <button
+      class="icon-button dialog-close"
+      data-source-close
+      aria-label="Close source details"
+      autofocus
+    >
+      <Icon name="close" />
+    </button>
+    <div id="source-dialog-content"></div>
+  </dialog>
+  <script
+    id="source-data"
+    type="application/json"
+    set:html={json({
+      sources,
+      areas: areas.map((area) => ({
+        id: area.tag,
+        name: area.name,
+        point: area.point,
+        guide: `/ai-engineering/topics/${area.slug}.html`,
+      })),
+      kinds,
+    })}
+  />
+</section>
+<script>
+  import '../scripts/sources.js';
+</script>

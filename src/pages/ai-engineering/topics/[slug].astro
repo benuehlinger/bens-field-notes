@@ -1,0 +1,75 @@
+---
+import Site from '../../../layouts/Site.astro';
+import SourceList from '../../../components/SourceList.astro';
+import { areas } from '../../../lib/knowledge.mjs';
+import { marked } from 'marked';
+export function getStaticPaths() {
+  return areas.map((area) => ({ params: { slug: area.slug }, props: { area } }));
+}
+const { area } = Astro.props;
+---
+
+<Site title={area.name} active="knowledge">
+  <article class="article-shell article-wide shell">
+    <div class="breadcrumbs">
+      <a href="/ai-engineering/">AI engineering</a>
+      <span>/</span>
+      <span>Field guide</span>
+    </div>
+    <header class="article-header">
+      <h1>{area.name}</h1>
+      <p>{area.point}</p>
+    </header>
+    <div class="guide-content">
+      <div class="prose">
+        <h2>What to understand</h2>
+        <ul>
+          {area.topics.map((item) => (
+            <li set:html={marked.parseInline(item)} />
+          ))}
+        </ul>
+        <h2>How the pieces connect</h2>
+        <p>{area.connection}</p>
+        <h2>Follow the connection</h2>
+        <ul>
+          {area.related.map((name) => {
+            const related = areas.find((item) => item.name === name);
+            return (
+              related && (
+                <li>
+                  <a href={`/ai-engineering/topics/${related.slug}.html`}>{name}</a>
+                </li>
+              )
+            );
+          })}
+        </ul>
+        {['evals', 'adaptation'].includes(area.tag) && (
+          <p class="quiet-note">
+            Platform availability changes. Check{' '}
+            <a
+              href="https://developers.openai.com/api/docs/deprecations"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenAI’s current deprecation notices
+            </a>{' '}
+            before choosing hosted eval or fine-tuning tooling.
+          </p>
+        )}
+      </div>
+      <div>
+        <aside class="area-aside">
+          <h2>A question to test</h2>
+          <p>{area.checkpoint}</p>
+        </aside>
+        <section class="mode-section">
+          <h2>Sources to work with</h2>
+          <SourceList ids={area.sources} />
+          <a class="text-link" href={`/ai-engineering/library.html?topic=${area.tag}`}>
+            Explore all sources in this area ↗
+          </a>
+        </section>
+      </div>
+    </div>
+  </article>
+</Site>

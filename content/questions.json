@@ -6,7 +6,7 @@
     "areas": ["agents", "mcp", "openai", "evals"],
     "experiment": "Give two implementations the same small task, tools and stop condition. Inspect what they do when a tool fails.",
     "sources": ["oai-agents", "anthropic-engineering", "project-smolagents", "project-langgraph"],
-    "investigation": "investigations/smolagents-and-langgraph.qmd"
+    "investigation": "/ai-engineering/investigations/smolagents-and-langgraph.html"
   },
   {
     "id": "evaluation",

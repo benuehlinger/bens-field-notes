@@ -1,9 +1,11 @@
-# Ben's Field Notes
+# Ben’s Field Notes
 
-This repository is the working home for Ben's AI engineering website. Read `README.md` for the content map. The current direction is Learn / Keep up / Get involved, with a minimal technical design inspired by Vercel. Earlier finance specs are historical.
+This is Ben’s public AI engineering knowledge site. Astro owns all website pages; Quarto is reserved for notebook stories. Read `README.md` for editing and build paths. The chart is the main way into the knowledge collection, with a reusable compact source browser.
 
-For a source or topic update, edit `content/`. For a new investigation or story, author a Quarto page under `ai-engineering/investigations/`. `scripts/build-knowledge.py` owns the other generated AI engineering pages. Preserve source IDs, links and verification dates. Distinguish a suggested participation route from an opportunity confirmed as open.
+Edit source facts, topic membership and questions in `content/`. `content/sources.json` is authoritative; preserve IDs, URLs, verification dates and access notes. Use canonical source IDs in topic and question references. Distinguish a possible contribution route from an opportunity confirmed as open.
 
-For notebook work, read `docs/NOTEBOOK-WORKFLOW.md` first. Ben directs the inquiry: agree on the problem, write one block, inspect the result and follow the next question. Create a notebook only when requested. Keep hypotheses, proposed experiments and observed results distinguishable. Never invent outputs or predetermine the story.
+For UI work, read `docs/DESIGN.md`. Inspect browser renders in both themes and at phone and desktop widths. Verify chart selections, filter counts, source links, detail panels, keyboard controls and an already-cached prior release. Astro owns content-hashed CSS/JS URLs.
 
-This repository is public. Keep private scratch outside published content. Render and inspect actual pages, check navigation and filters, and verify light/dark and mobile layouts. Preserve unrelated user changes.
+Before notebook work, read `docs/NOTEBOOK-WORKFLOW.md`. Ben chooses the problem and explores one block at a time in VS Code. Create a notebook only when requested. Preserve actual outputs and distinguish hypotheses from observations. Publishing uses saved outputs with execution disabled.
+
+The repository and site are public. Preserve unrelated user changes and keep private scratch outside published content.

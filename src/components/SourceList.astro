@@ -1,0 +1,23 @@
+---
+import { getSource } from '../lib/knowledge.mjs';
+import Icon from './Icon.astro';
+interface Props {
+  ids: string[];
+}
+const { ids } = Astro.props;
+---
+
+<ul class="annotated-sources">
+  {ids.map((id) => {
+    const source = getSource(id);
+    return (
+      <li>
+        <a href={source.url} target="_blank" rel="noopener noreferrer">
+          {source.name} <Icon name="arrow" size={12} />
+        </a>
+        <small>{source.kind}</small>
+        <p>{source.why}</p>
+      </li>
+    );
+  })}
+</ul>

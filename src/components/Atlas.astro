@@ -1,0 +1,105 @@
+---
+import { areas, areaSources, kinds, shortName, sources, json } from '../lib/knowledge.mjs';
+const rows = areas.map((area) => ({ ...area, records: areaSources(area) }));
+const maximum = Math.ceil(Math.max(...rows.map((row) => row.records.length)) / 10) * 10;
+---
+
+<section class="atlas" aria-labelledby="atlas-title" id="source-atlas">
+  <div class="atlas-head">
+    <div>
+      <h2 id="atlas-title">A map of the field</h2>
+      <p>Select a topic or a color to explore its sources.</p>
+    </div>
+    <a class="quiet-link" href="/ai-engineering/library.html">
+      Browse all {sources.length} sources <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+  <div class="atlas-tools" aria-label="Filter the chart by source type">
+    <button class="legend-button active" data-chart-kind="all" aria-pressed="true">
+      All sources
+    </button>
+    {kinds.map((kind) => (
+      <button class="legend-button" data-chart-kind={kind.id} aria-pressed="false">
+        <i class={`kind-dot kind-${kind.color}`}></i>
+        {kind.label}
+      </button>
+    ))}
+  </div>
+  <div class="chart-plot">
+    <div class="chart-axis" aria-hidden="true">
+      <span>Area of interest</span>
+      <div class="chart-ticks">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <span style={`left:${i * 25}%`}>{(maximum * i) / 4}</span>
+        ))}
+      </div>
+      <span>Sources</span>
+    </div>
+    {rows.map((area) => (
+      <div class="chart-row" data-chart-row={area.tag}>
+        <a
+          class="chart-label"
+          href={`/ai-engineering/library.html?topic=${area.tag}`}
+          data-chart-topic={area.tag}
+        >
+          <span>{shortName(area)}</span>
+          <span class="row-arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+        <div class="chart-track">
+          <div class="chart-grid" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <i style={`left:${i * 25}%`} />
+            ))}
+          </div>
+          <div class="chart-bar" style={`width:${(area.records.length / maximum) * 100}%`}>
+            {kinds.map((kind) => {
+              const count = area.records.filter((s) => s.source_type === kind.id).length;
+              return (
+                count > 0 && (
+                  <a
+                    class={`chart-segment kind-${kind.color}`}
+                    href={`/ai-engineering/library.html?topic=${area.tag}&type=${kind.id}`}
+                    style={`flex:${count}`}
+                    data-chart-segment={area.tag}
+                    data-kind={kind.id}
+                    data-count={count}
+                    aria-label={`${area.name}: ${count} ${kind.label.toLowerCase()}`}
+                    title={`${count} ${kind.label.toLowerCase()}`}
+                  />
+                )
+              );
+            })}
+          </div>
+        </div>
+        <span class="chart-total">{area.records.length}</span>
+      </div>
+    ))}
+  </div>
+  <div class="chart-foot">
+    <p class="chart-readout" data-chart-readout aria-live="polite">
+      {sources.length} sources across twelve connected areas.
+    </p>
+    <p>Sources can appear in more than one area. Counts show references, not learning progress.</p>
+  </div>
+  <script
+    id="chart-data"
+    type="application/json"
+    set:html={json(
+      rows.map((row) => ({
+        id: row.tag,
+        name: row.name,
+        counts: Object.fromEntries(
+          kinds.map((kind) => [
+            kind.id,
+            row.records.filter((s) => s.source_type === kind.id).length,
+          ]),
+        ),
+      })),
+    )}
+  />
+</section>
+<script>
+  import '../scripts/chart.js';
+</script>

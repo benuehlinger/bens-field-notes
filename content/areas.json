@@ -21,7 +21,7 @@
     "sources": [
       "made-with-ml",
       "llm-zoomcamp",
-      "openai-python"
+      "oai-python"
     ],
     "slug": "software-and-data",
     "source_terms": [
@@ -53,8 +53,8 @@
       "Training adaptation and distillation"
     ],
     "sources": [
-      "openai-prompting",
-      "openai-structured",
+      "oai-prompting",
+      "oai-structured",
       "karpathy-course",
       "3b1b-lessons",
       "hf-context-course"
@@ -89,10 +89,10 @@
       "Agents and workflows"
     ],
     "sources": [
-      "openai-quickstart",
-      "openai-responses",
-      "openai-agents-sdk-python",
-      "openai-deprecations"
+      "oai-quickstart",
+      "oai-responses",
+      "oai-agents-python",
+      "oai-deprecations"
     ],
     "slug": "openai-interfaces",
     "source_terms": [
@@ -123,9 +123,9 @@
       "Evaluation and error analysis"
     ],
     "sources": [
-      "openai-retrieval",
+      "oai-retrieval",
       "llm-zoomcamp",
-      "haystack",
+      "project-haystack",
       "eugene-yan"
     ],
     "slug": "retrieval-and-grounding",
@@ -158,7 +158,7 @@
     "sources": [
       "mcp-intro",
       "mcp-spec",
-      "mcp-inspector",
+      "project-mcp-inspector",
       "hf-mcp-course"
     ],
     "slug": "tools-and-mcp",
@@ -189,8 +189,8 @@
       "Production and inference"
     ],
     "sources": [
-      "openai-agents-sdk-python",
-      "openai-agents-guide",
+      "oai-agents-python",
+      "oai-agents",
       "hf-agents-course",
       "anthropic-engineering"
     ],
@@ -223,10 +223,10 @@
       "Product and field engineering"
     ],
     "sources": [
-      "openai-eval-best-practices",
+      "oai-eval-practice",
       "hamel-husain",
-      "promptfoo",
-      "inspect-ai"
+      "project-promptfoo",
+      "project-inspect"
     ],
     "slug": "evaluation",
     "source_terms": [
@@ -259,10 +259,10 @@
     "sources": [
       "hf-llm-course",
       "hf-smol-course",
-      "peft",
-      "trl",
+      "project-peft",
+      "project-trl",
       "rlhfbook",
-      "openai-deprecations"
+      "oai-deprecations"
     ],
     "slug": "adaptation-and-distillation",
     "source_terms": [
@@ -294,8 +294,8 @@
       "Evaluation and error analysis"
     ],
     "sources": [
-      "openai-realtime",
-      "openai-vision",
+      "oai-realtime",
+      "oai-vision",
       "hf-youtube",
       "hf-audio-course",
       "hf-diffusion-course"
@@ -331,10 +331,10 @@
       "Software and data foundations"
     ],
     "sources": [
-      "openai-production",
-      "openai-latency",
+      "oai-production",
+      "oai-latency",
       "otel-genai",
-      "vllm",
+      "project-vllm",
       "mlsysbook"
     ],
     "slug": "production-and-inference",
@@ -372,7 +372,7 @@
     "sources": [
       "owasp-llm",
       "mcp-spec",
-      "openai-safety"
+      "oai-safety"
     ],
     "slug": "security",
     "source_terms": [
@@ -404,7 +404,7 @@
     "sources": [
       "fsdl-llm",
       "chip-huyen",
-      "openai-production"
+      "oai-production"
     ],
     "slug": "product-and-field-engineering",
     "source_terms": [

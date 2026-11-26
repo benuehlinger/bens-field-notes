@@ -1,0 +1,13 @@
+---
+import { modes } from '../lib/knowledge.mjs';
+const { active = 'learn' } = Astro.props;
+---
+
+<nav class="mode-nav" aria-label="Ways to explore AI engineering">
+  {modes.map((mode) => (
+    <a href={mode.href} aria-current={mode.id === active ? 'page' : undefined}>
+      <strong>{mode.name}</strong>
+      <span>{mode.note}</span>
+    </a>
+  ))}
+</nav>
