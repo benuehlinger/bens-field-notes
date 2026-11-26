@@ -29,43 +29,34 @@ test('the portfolio introduces Ben and links to all three areas', async ({ page 
   await expect(page.getByRole('heading', { level: 1, name: 'Lending Data Lake' })).toBeVisible();
 });
 
-for (const [device, viewport, reducedMotion] of [
-  ['desktop', { width: 1440, height: 900 }, 'no-preference'],
-  ['phone', { width: 390, height: 844 }, 'no-preference'],
-  ['phone', { width: 390, height: 844 }, 'reduce'],
-]) {
-  test(`the hero loops on ${device} with reduced motion set to ${reducedMotion}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    await page.emulateMedia({ reducedMotion });
-    await page.clock.install();
-    await page.goto('/');
-    const rotation = page.locator('.portfolio-typed');
-    const visible = rotation.locator('.portfolio-phrase:visible');
-    await expect(rotation).toBeEnabled();
+test.describe('the portfolio hero with scripts disabled', () => {
+  test.use({ javaScriptEnabled: false });
 
-    for (const label of ['Applied AI', 'Data Engineering', 'Data Science', 'Applied AI']) {
-      await expect(visible).toHaveCount(1);
-      await expect(visible).toHaveText(label);
-      await expect(visible.locator('.portfolio-lettering')).toHaveCSS(
-        'animation-name',
-        reducedMotion === 'reduce' ? 'none' : 'portfolio-type',
-      );
-      await page.clock.runFor(3000);
-    }
+  for (const [device, viewport, reducedMotion] of [
+    ['desktop', { width: 1440, height: 900 }, 'no-preference'],
+    ['phone', { width: 390, height: 844 }, 'no-preference'],
+    ['phone', { width: 390, height: 844 }, 'reduce'],
+  ]) {
+    test(`cycles on ${device} with reduced motion set to ${reducedMotion}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.emulateMedia({ reducedMotion });
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      const visible = page.locator('.portfolio-phrase:visible');
+      for (const label of ['Applied AI', 'Data Engineering', 'Data Science', 'Applied AI']) {
+        await expect(visible).toHaveText(label);
+      }
 
-    await rotation.click();
-    await expect(rotation).toHaveAccessibleName('Resume rotating text');
-    const pausedLabel = await visible.textContent();
-    await page.clock.runFor(6000);
-    await expect(visible).toHaveText(pausedLabel.trim());
-    await rotation.click();
-    await expect(rotation).toHaveAccessibleName('Pause rotating text');
-    await page.clock.runFor(3000);
-    await expect(visible).not.toHaveText(pausedLabel.trim());
-  });
-}
+      const pause = page.getByRole('checkbox', { name: 'Pause rotating text' });
+      await pause.focus();
+      await page.keyboard.press('Space');
+      await expect(pause).toBeChecked();
+      await expect(visible).toHaveCSS('animation-play-state', 'paused');
+      await page.keyboard.press('Space');
+      await expect(pause).not.toBeChecked();
+      await expect(visible).toHaveCSS('animation-play-state', 'running');
+    });
+  }
+});
 
 test('the atlas opens matching sources in place and browser Back restores the overview', async ({
   page,

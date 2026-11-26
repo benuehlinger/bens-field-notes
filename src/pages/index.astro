@@ -27,20 +27,26 @@ const work = [
 ---
 
 <Site title="Ben Uehlinger" active="about">
-  <div class="portfolio">
+  <div class="portfolio portfolio-home">
     <section class="portfolio-hero" aria-labelledby="portfolio-name">
       <h1 id="portfolio-name">Ben Uehlinger</h1>
       <p class="portfolio-role">Senior Forward Deployed Engineer at Eliza</p>
       <div class="portfolio-disciplines">
-        <button class="portfolio-typed" type="button" aria-label="Pause rotating text" disabled>
+        <input
+          class="sr-only portfolio-pause"
+          id="portfolio-pause"
+          type="checkbox"
+          aria-label="Pause rotating text"
+        />
+        <label class="portfolio-typed" for="portfolio-pause" aria-hidden="true">
           {work.map(({ area }, index) => (
-            <span class="portfolio-phrase" aria-hidden="true" hidden={index !== 0}>
+            <span class="portfolio-phrase" style={{ '--delay': `${index * 3000}ms` }}>
               <span class="portfolio-lettering" style={{ '--letters': area.length }}>
                 {area}
               </span>
             </span>
           ))}
-        </button>
+        </label>
       </div>
     </section>
 
@@ -78,28 +84,3 @@ const work = [
     </section>
   </div>
 </Site>
-
-<script>
-  const rotation = document.querySelector<HTMLButtonElement>('.portfolio-typed');
-  if (rotation) {
-    const phrases = Array.from(rotation.querySelectorAll<HTMLElement>('.portfolio-phrase'));
-    let current = 0;
-    const advance = () => {
-      phrases[current].hidden = true;
-      current = (current + 1) % phrases.length;
-      phrases[current].hidden = false;
-    };
-
-    let timer = window.setInterval(advance, 3000);
-    rotation.disabled = false;
-    rotation.addEventListener('click', () => {
-      const paused = rotation.toggleAttribute('data-paused');
-      rotation.setAttribute('aria-label', paused ? 'Resume rotating text' : 'Pause rotating text');
-      if (paused) {
-        window.clearInterval(timer);
-      } else {
-        timer = window.setInterval(advance, 3000);
-      }
-    });
-  }
-</script>

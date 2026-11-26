@@ -4,8 +4,12 @@
   padding-block: 76px 100px;
 }
 
+.portfolio-home {
+  padding-block: clamp(36px, 5.2vw, 68px) clamp(40px, 5vw, 72px);
+}
+
 .portfolio-hero {
-  padding-block: 14px 58px;
+  padding-bottom: clamp(28px, 4vw, 48px);
 }
 
 .portfolio-hero h1,
@@ -29,34 +33,30 @@
 }
 
 .portfolio-disciplines {
-  margin-top: clamp(32px, 5vw, 76px);
+  position: relative;
+  margin-top: clamp(20px, 3vw, 42px);
   color: var(--accent);
 }
 
 .portfolio-typed {
-  display: block;
-  min-height: 1.25em;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
+  display: grid;
+  justify-items: start;
+  width: fit-content;
   font-family: 'Geist Mono Variable', monospace;
   font-size: clamp(1.6rem, 7.8vw, 5.4rem);
   font-weight: 480;
-  line-height: 1.25;
+  line-height: 1.18;
   letter-spacing: -0.075em;
-  text-align: left;
+  cursor: pointer;
 }
 
 .portfolio-phrase {
   display: inline-flex;
+  grid-area: 1 / 1;
   align-items: baseline;
   white-space: nowrap;
-}
-
-.portfolio-lettering {
-  display: block;
+  visibility: hidden;
+  animation: portfolio-cycle 9s steps(1, end) var(--delay) infinite;
 }
 
 .portfolio-phrase::after {
@@ -69,30 +69,43 @@
   background: currentColor;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .portfolio-typed:not([data-paused]) .portfolio-lettering {
-    animation: portfolio-type 640ms steps(var(--letters), end) both;
-  }
+.portfolio-pause:focus-visible + .portfolio-typed {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+}
 
-  .portfolio-typed:not([data-paused]) .portfolio-phrase::after {
-    animation: portfolio-caret 640ms steps(1, end) both;
+.portfolio-pause:checked + .portfolio-typed .portfolio-phrase,
+.portfolio-pause:checked + .portfolio-typed .portfolio-lettering {
+  animation-play-state: paused;
+}
+
+.portfolio-pause:checked + .portfolio-typed .portfolio-lettering {
+  clip-path: none !important;
+}
+
+@keyframes portfolio-cycle {
+  0% {
+    visibility: visible;
+  }
+  33.333%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .portfolio-lettering {
+    animation: portfolio-type 9s var(--delay) infinite;
   }
 
   @keyframes portfolio-type {
-    from {
+    0% {
       clip-path: inset(0 100% 0 0);
+      animation-timing-function: steps(var(--letters), end);
     }
-    to {
+    7%,
+    100% {
       clip-path: inset(0);
-    }
-  }
-
-  @keyframes portfolio-caret {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
     }
   }
 }
@@ -103,7 +116,7 @@
   gap: 20px 36px;
   align-items: start;
   border-top: 1px solid var(--line);
-  padding-block: 34px 44px;
+  padding-block: clamp(24px, 2.8vw, 34px) clamp(30px, 3.8vw, 44px);
 }
 
 .portfolio-about h2,
@@ -198,8 +211,8 @@
     padding-block: 43px 66px;
   }
 
-  .portfolio-hero {
-    padding-block: 0 32px;
+  .portfolio-home {
+    padding-block: 34px 42px;
   }
 
   .portfolio-role {
@@ -208,10 +221,7 @@
 
   .portfolio-about {
     grid-template-columns: 1fr;
-  }
-
-  .portfolio-about {
-    padding-block: 26px 34px;
+    row-gap: 12px;
   }
 
   .portfolio-rows a {
