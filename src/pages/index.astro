@@ -40,10 +40,20 @@ const work = [
         />
         <label class="portfolio-typed" for="portfolio-pause" aria-hidden="true">
           {work.map(({ area }, index) => (
-            <span class="portfolio-phrase" style={{ '--delay': `${index * 3000}ms` }}>
-              <span class="portfolio-lettering" style={{ '--letters': area.length }}>
-                {area}
-              </span>
+            <span
+              class="portfolio-phrase"
+              style={{ '--delay': `${index * 3000}ms`, '--letters': area.length }}
+            >
+              {[...area].map((character, position) => (
+                <span
+                  class="portfolio-character"
+                  style={{
+                    '--reveal': `${index * 3000 + Math.round((630 * (position + 1)) / area.length)}ms`,
+                  }}
+                >
+                  {character}
+                </span>
+              ))}
             </span>
           ))}
         </label>

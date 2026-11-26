@@ -54,6 +54,25 @@ test.describe('the portfolio hero with scripts disabled', () => {
       await page.keyboard.press('Space');
       await expect(pause).not.toBeChecked();
       await expect(visible).toHaveCSS('animation-play-state', 'running');
+
+      const frames = await page
+        .locator('.portfolio-phrase')
+        .nth(1)
+        .evaluate((phrase) => {
+          const animations = document.getAnimations();
+          const letters = Array.from(phrase.querySelectorAll('.portfolio-character'));
+          return [3300, 3800].map((time) => {
+            for (const animation of animations) {
+              animation.pause();
+              animation.currentTime = time;
+            }
+            return letters
+              .filter((letter) => getComputedStyle(letter).opacity === '1')
+              .map((letter) => letter.textContent)
+              .join('');
+          });
+        });
+      expect(frames).toEqual(['Data En', 'Data Engineering']);
     });
   }
 });

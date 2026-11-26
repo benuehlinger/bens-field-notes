@@ -67,6 +67,7 @@
   margin-inline-start: 0.13em;
   align-self: center;
   background: currentColor;
+  animation: portfolio-caret 9s var(--delay) infinite;
 }
 
 .portfolio-pause:focus-visible + .portfolio-typed {
@@ -74,39 +75,57 @@
   outline-offset: 6px;
 }
 
+.portfolio-character {
+  white-space: pre;
+  opacity: 0;
+  animation: portfolio-character 9s steps(1, end) var(--reveal) infinite;
+}
+
 .portfolio-pause:checked + .portfolio-typed .portfolio-phrase,
-.portfolio-pause:checked + .portfolio-typed .portfolio-lettering {
+.portfolio-pause:checked + .portfolio-typed .portfolio-phrase::after,
+.portfolio-pause:checked + .portfolio-typed .portfolio-character {
   animation-play-state: paused;
 }
 
-.portfolio-pause:checked + .portfolio-typed .portfolio-lettering {
-  clip-path: none !important;
+.portfolio-pause:checked + .portfolio-typed .portfolio-character {
+  opacity: 1 !important;
+}
+
+.portfolio-pause:checked + .portfolio-typed .portfolio-phrase::after {
+  transform: none !important;
 }
 
 @keyframes portfolio-cycle {
   0% {
     visibility: visible;
   }
+
   33.333%,
   100% {
     visibility: hidden;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .portfolio-lettering {
-    animation: portfolio-type 9s var(--delay) infinite;
+@keyframes portfolio-character {
+  0% {
+    opacity: 1;
   }
 
-  @keyframes portfolio-type {
-    0% {
-      clip-path: inset(0 100% 0 0);
-      animation-timing-function: steps(var(--letters), end);
-    }
-    7%,
-    100% {
-      clip-path: inset(0);
-    }
+  33.333%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes portfolio-caret {
+  0% {
+    transform: translateX(calc((0.075em - 1ch) * var(--letters)));
+    animation-timing-function: steps(var(--letters), end);
+  }
+
+  7%,
+  100% {
+    transform: none;
   }
 }
 
