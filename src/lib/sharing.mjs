@@ -4,9 +4,12 @@ export const siteName = 'Ben’s Field Notes';
 export const siteOrigin = 'https://bensnotes.fyi';
 const pages = {
   '/': {
-    title: 'AI engineering field notes',
+    title: 'Ben Uehlinger | Portfolio',
     description:
-      'Ben’s working notes on AI engineering. A place to learn, keep up, and get involved.',
+      'Selected projects and field notes in applied AI, data engineering, and data science.',
+    image: 'portfolio',
+  },
+  '/applied-ai/': {
     image: 'atlas',
   },
   '/ai-engineering/': {
@@ -35,6 +38,7 @@ const pages = {
   },
 };
 const imageDescriptions = {
+  portfolio: 'Ben Uehlinger’s portfolio, featuring Applied AI, Data Engineering, and Data Science.',
   atlas:
     'Ben’s Field Notes monogram beside the vivid stacked source chart from the AI engineering atlas.',
   reading: 'Ben’s Field Notes monogram beside three reading cards in pink, blue, and amber.',
@@ -45,14 +49,16 @@ const imageDescriptions = {
 export function shareInfo(pathname, title, description) {
   const page = pages[pathname] || {};
   const area = areas.find((item) => pathname === `/ai-engineering/topics/${item.slug}.html`);
-  const image = page.image || 'atlas';
+  const image = page.image || (pathname.startsWith('/ai-engineering/') ? 'atlas' : 'portfolio');
   return {
     title: page.title || title,
     description:
       description ||
       page.description ||
       area?.point ||
-      'A personal field guide to AI engineering. Questions, sources, and experiments.',
+      (pathname.startsWith('/ai-engineering/')
+        ? 'A personal field guide to AI engineering. Questions, sources, and experiments.'
+        : 'Selected projects and field notes by Ben Uehlinger.'),
     canonical: new URL(pathname, siteOrigin).href,
     type: page.type || (area ? 'article' : 'website'),
     image,

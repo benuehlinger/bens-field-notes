@@ -13,12 +13,17 @@ interface Props {
 const { title, description, active = '' } = Astro.props;
 const sharing = shareInfo(Astro.url.pathname, title, description);
 const links = [
-  { title: 'AI engineering', href: '/ai-engineering/', id: 'knowledge' },
-  { title: 'Currently learning', href: storyUrl, id: 'learning' },
-  { title: 'Sources', href: '/ai-engineering/library.html', id: 'sources' },
+  { title: 'About', href: '/', id: 'about' },
+  { title: 'Applied AI', href: '/applied-ai/', id: 'applied-ai' },
+  { title: 'Data Engineering', href: '/data-engineering/', id: 'data-engineering' },
+  { title: 'Data Science', href: '/data-science/', id: 'data-science' },
 ];
 const searchIndex = [
   ...links.map((link) => ({ title: link.title, href: link.href, note: 'Page' })),
+  { title: 'AI Engineering Field Notes', href: '/ai-engineering/', note: 'Page' },
+  { title: 'Lending Data Lake', href: '/data-engineering/lending-data-lake/', note: 'Project' },
+  { title: 'Currently learning', href: storyUrl, note: 'Page' },
+  { title: 'Sources', href: '/ai-engineering/library.html', note: 'Page' },
   ...areas.map((area) => ({
     title: area.name,
     href: `/ai-engineering/topics/${area.slug}.html`,
@@ -106,7 +111,6 @@ const searchIndex = [
             {link.title}
           </a>
         ))}
-        <a href="/about.html">About</a>
       </nav>
     </header>
     <main id="main">
@@ -117,7 +121,7 @@ const searchIndex = [
         Ben’s Field Notes<span>A working understanding.</span>
       </a>
       <div>
-        <a href="/about.html">About this space</a>
+        <a href="/#about">About me</a>
         <a
           href="https://github.com/benuehlinger/bens-field-notes"
           target="_blank"

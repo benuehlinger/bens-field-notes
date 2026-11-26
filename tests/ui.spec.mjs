@@ -1,5 +1,46 @@
 import { test, expect } from '@playwright/test';
 
+test('the portfolio introduces Ben and links to all three areas', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Ben Uehlinger' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'About me' })).toBeVisible();
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    'content',
+    'Ben Uehlinger | Portfolio',
+  );
+  const pause = page.getByRole('button', { name: 'Pause animation' });
+  await pause.click();
+  await expect(page.locator('.portfolio-reel span').first()).toHaveCSS(
+    'animation-play-state',
+    'paused',
+  );
+  await page.getByRole('button', { name: 'Resume animation' }).click();
+  await expect(pause).toBeVisible();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(pause).toBeHidden();
+  await expect(page.locator('.portfolio-still')).toBeVisible();
+
+  for (const [link, heading] of [
+    ['AI Engineering Field Notes', 'Applied AI'],
+    ['Lending Data Lake', 'Data Engineering'],
+    ['Credit Risk Research', 'Data Science'],
+  ]) {
+    await page
+      .locator('.portfolio-rows')
+      .getByRole('link', { name: new RegExp(link) })
+      .click();
+    await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+    await page.goBack();
+  }
+
+  await page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Data Engineering' })
+    .click();
+  await page.getByRole('link', { name: 'Explore the Lending Data Lake' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Lending Data Lake' })).toBeVisible();
+});
+
 test('the atlas opens matching sources in place and browser Back restores the overview', async ({
   page,
 }) => {
@@ -226,7 +267,7 @@ test('shared links expose distinct preview art and Apple icons without JavaScrip
         await page.locator('meta[property="og:image:alt"]').getAttribute('content'),
       ).toBeTruthy();
     }
-    expect(images.size).toBe(4);
+    expect(images.size).toBe(5);
     const iconPath = await page.locator('link[rel="apple-touch-icon"]').getAttribute('href');
     const iconResponse = await page.request.get(iconPath);
     expect(iconResponse.status()).toBe(200);

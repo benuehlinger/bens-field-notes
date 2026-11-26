@@ -45,6 +45,19 @@ function atlas() {
   });
   return frame(art);
 }
+
+function portfolio() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+${rect(0, 0, 1200, 630, '#080808')}
+<text x="72" y="145" fill="#a1a1aa" font-size="28">Ben’s Field Notes</text>
+<text x="66" y="304" fill="#f5f5f7" font-size="126" font-weight="620" letter-spacing="-9">Ben Uehlinger</text>
+${line(72, 372, 1128, 372, '#28282d', 1)}
+<text x="72" y="453" fill="#9cb8ff" font-size="38" font-weight="520" letter-spacing="-1">Applied AI</text>
+<text x="395" y="453" fill="#f5f5f7" font-size="38" font-weight="520" letter-spacing="-1">Data Engineering</text>
+<text x="826" y="453" fill="#f5f5f7" font-size="38" font-weight="520" letter-spacing="-1">Data Science</text>
+<text x="72" y="554" fill="#a1a1aa" font-size="23">bensnotes.fyi</text>
+</svg>`;
+}
 function reading() {
   let art = '';
   [palette[4], palette[0], palette[5]].forEach((color, row) => {
@@ -129,6 +142,7 @@ try {
     reading: reading(),
     involved: involved(),
     agents: agents(),
+    portfolio: portfolio(),
   })) {
     await writeFile(new URL(`${name}.svg`, root), svg);
     await render(svg, new URL(`${name}.png`, root).pathname, 1200, 630);

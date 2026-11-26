@@ -1,6 +1,6 @@
 # Ben’s Field Notes
 
-A personal knowledge space for learning AI engineering, keeping up with the field and getting involved. Astro builds the website. Quarto renders notebook stories when they exist.
+Ben Uehlinger’s portfolio and field notes on applied AI, data engineering, and data science. Astro builds the website. Quarto renders notebook stories when they exist.
 
 ## Work on the site
 
@@ -52,7 +52,7 @@ GitHub Actions tests and builds the site, then deploys `dist/` to the existing C
 The repository and published site are public. Git history preserves the prior Quarto implementation and earlier finance journal. The pre-AI site is also recoverable at `archive/before-ai-engineering-20261125` (`7400d27`). `analysis/`, `worker/` and historical finance specs are retired infrastructure, outside the website build.
 
 
-Link previews use static Open Graph metadata and four branded 1200 × 630 PNGs.
+Link previews use static Open Graph metadata and five branded 1200 × 630 PNGs.
 Astro gives the images content-hashed URLs. Titles, descriptions, and image selection
 live in `src/lib/sharing.mjs`; artwork is reproducible from `scripts/build-previews.mjs`.
 Run `node scripts/build-previews.mjs` after changing the visual design or chart collection,

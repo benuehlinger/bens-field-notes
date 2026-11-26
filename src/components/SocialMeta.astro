@@ -3,9 +3,10 @@ import atlas from '../assets/social/atlas.png';
 import reading from '../assets/social/reading.png';
 import involved from '../assets/social/involved.png';
 import agents from '../assets/social/agents.png';
+import portfolio from '../assets/social/portfolio.png';
 import { siteName, siteOrigin } from '../lib/sharing.mjs';
 const { info } = Astro.props;
-const images = { atlas, reading, involved, agents };
+const images = { atlas, reading, involved, agents, portfolio };
 const image = new URL(images[info.image].src, siteOrigin).href;
 ---
 

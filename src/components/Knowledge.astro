@@ -5,10 +5,9 @@ import Atlas from './Atlas.astro';
 import Sources from './Sources.astro';
 import KnowledgeIntro from './KnowledgeIntro.astro';
 import CurrentThread from './CurrentThread.astro';
-const { home = false } = Astro.props;
 ---
 
-<Site title={home ? 'A working understanding' : 'AI engineering'} active="knowledge">
+<Site title="AI engineering" active="knowledge">
   <div class="shell">
     <KnowledgeIntro />
     <Modes active="learn" />

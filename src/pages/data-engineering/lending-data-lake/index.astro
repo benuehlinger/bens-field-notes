@@ -1,0 +1,36 @@
+---
+import PortfolioSection from '../../../layouts/PortfolioSection.astro';
+---
+
+<PortfolioSection
+  title="Lending Data Lake"
+  description="Loan-level data from SEC filings, organized for credit-risk research."
+  active="data-engineering"
+>
+  <section class="portfolio-entry">
+    <h2>Why I built it</h2>
+    <p>
+      I wanted to study how loans perform over time across different pools. The SEC publishes the
+      underlying data as XML exhibits attached to asset-backed securities filings. The lake lets me
+      query those records together in DuckDB and trace them back to the filing they came from.
+    </p>
+  </section>
+  <section class="portfolio-entry">
+    <h2>From filings to Parquet</h2>
+    <p>
+      The pipeline finds filings in EDGAR, parses their loan-level exhibits, and writes partitioned
+      Parquet to Cloudflare R2. It organizes the data by asset class, filing month, and accession.
+      The lake includes auto loans, auto leases, and commercial mortgage-backed securities.
+    </p>
+    <a href="https://github.com/benuehlinger/bens-data-lake">Explore the pipeline repository</a>
+  </section>
+  <section class="portfolio-entry">
+    <h2>Checking coverage and duplicates</h2>
+    <p>
+      I’m checking where the lake’s coverage differs from the SEC filing index. A filing can appear
+      under more than one identifier, and an amendment can repeat the same loan records. Both affect
+      how I count observations before using the data for research.
+    </p>
+    <a href="/data-science/">See the planned credit-risk research</a>
+  </section>
+</PortfolioSection>

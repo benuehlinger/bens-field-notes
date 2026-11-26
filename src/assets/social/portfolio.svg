@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect x="0" y="0" width="1200" height="630" rx="0" fill="#080808" stroke="none"/>
+<text x="72" y="145" fill="#a1a1aa" font-size="28">Ben’s Field Notes</text>
+<text x="66" y="304" fill="#f5f5f7" font-size="126" font-weight="620" letter-spacing="-9">Ben Uehlinger</text>
+<path d="M72 372L1128 372" stroke="#28282d" stroke-width="1" fill="none"/>
+<text x="72" y="453" fill="#9cb8ff" font-size="38" font-weight="520" letter-spacing="-1">Applied AI</text>
+<text x="395" y="453" fill="#f5f5f7" font-size="38" font-weight="520" letter-spacing="-1">Data Engineering</text>
+<text x="826" y="453" fill="#f5f5f7" font-size="38" font-weight="520" letter-spacing="-1">Data Science</text>
+<text x="72" y="554" fill="#a1a1aa" font-size="23">bensnotes.fyi</text>
+</svg>

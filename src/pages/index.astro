@@ -1,5 +1,110 @@
 ---
-import Knowledge from '../components/Knowledge.astro';
+import Site from '../layouts/Site.astro';
+import Icon from '../components/Icon.astro';
+import '../styles/portfolio.css';
+
+const work = [
+  {
+    area: 'Applied AI',
+    title: 'AI Engineering Field Notes',
+    description: 'Questions, experiments, and a source atlas for building with AI.',
+    href: '/applied-ai/',
+  },
+  {
+    area: 'Data Engineering',
+    title: 'Lending Data Lake',
+    description:
+      'A pipeline that turns SEC asset-backed securities filings into queryable loan data.',
+    href: '/data-engineering/',
+  },
+  {
+    area: 'Data Science',
+    title: 'Credit Risk Research',
+    description: 'Research notes and planned predictive analysis of auto-loan performance.',
+    href: '/data-science/',
+  },
+];
 ---
 
-<Knowledge home />
+<Site title="Ben Uehlinger" active="about">
+  <div class="portfolio">
+    <section class="portfolio-hero" aria-labelledby="portfolio-name">
+      <div class="portfolio-intro">
+        <h1 id="portfolio-name">
+          Ben <br />
+          Uehlinger
+        </h1>
+        <p>Senior Forward Deployed Engineer at Eliza</p>
+      </div>
+      <div class="portfolio-feature" data-portfolio-motion>
+        <div class="portfolio-art" aria-hidden="true">
+          <div class="portfolio-orbit"></div>
+          <div class="portfolio-still">
+            {work.map(({ area }) => (
+              <span>{area}</span>
+            ))}
+          </div>
+          <div class="portfolio-reel">
+            {work.map(({ area }) => (
+              <span>{area}</span>
+            ))}
+          </div>
+        </div>
+        <button type="button" class="portfolio-motion" data-portfolio-pause hidden>
+          Pause animation
+        </button>
+      </div>
+    </section>
+
+    <section class="portfolio-about" id="about" aria-labelledby="about-title">
+      <h2 id="about-title">About me</h2>
+      <div>
+        <p>
+          At Eliza, I work directly with customers to figure out where AI can help and build it into
+          their day-to-day work.
+        </p>
+        <p>
+          Before Eliza, I worked as a data scientist in credit risk. I built a lending data lake
+          from SEC filings so I could work with loan-level data and study how auto loans perform.
+          This site is where I share the projects and questions I keep coming back to.
+        </p>
+      </div>
+    </section>
+
+    <section class="portfolio-work" aria-labelledby="work-title">
+      <h2 id="work-title">Selected work</h2>
+      <ul class="portfolio-rows">
+        {work.map(({ area, title, description, href }) => (
+          <li>
+            <a href={href}>
+              <span class="portfolio-category">{area}</span>
+              <div>
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </div>
+              <Icon name="arrow" size={21} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</Site>
+
+<script>
+  const feature = document.querySelector<HTMLElement>('[data-portfolio-motion]');
+  const button = feature?.querySelector<HTMLButtonElement>('[data-portfolio-pause]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (feature && button) {
+    const syncMotion = () => {
+      feature.toggleAttribute('data-animated', !reducedMotion.matches);
+      button.hidden = reducedMotion.matches;
+    };
+    syncMotion();
+    reducedMotion.addEventListener('change', syncMotion);
+    button.addEventListener('click', () => {
+      const paused = feature.toggleAttribute('data-paused');
+      button.textContent = paused ? 'Resume animation' : 'Pause animation';
+    });
+  }
+</script>

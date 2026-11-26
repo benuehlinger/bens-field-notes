@@ -1,0 +1,21 @@
+---
+import Site from './Site.astro';
+import '../styles/portfolio.css';
+
+interface Props {
+  title: string;
+  description: string;
+  active: string;
+}
+const { title, description, active } = Astro.props;
+---
+
+<Site title={title} description={description} active={active}>
+  <article class="portfolio portfolio-section">
+    <header>
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </header>
+    <slot />
+  </article>
+</Site>
